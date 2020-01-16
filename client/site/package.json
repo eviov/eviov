@@ -1,0 +1,24 @@
+{
+  "name": "eviov-site",
+  "version": "0.0.0",
+  "description": "eviov wasm loader",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SOF3/eviov.git"
+  },
+  "author": "SOFe <sofe2038@gmail.com",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "eviov-client": "file:../pkg"
+  },
+  "devDependencies": {
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5",
+    "copy-webpack-plugin": "^5.0.0"
+  }
+}

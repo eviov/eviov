@@ -1,0 +1,23 @@
+[workspace]
+members = [".", "client", "server"]
+
+[package]
+name = "eviov"
+version = "0.0.0"
+authors = ["SOFe <sofe2038@gmail.com>"]
+edition = "2018"
+license = "AGPL-3.0"
+repository = "https://github.com/SOF3/eviov"
+homepage = "https://github.com/SOF3/eviov"
+readme = "README.md"
+description = "Orbital shooters game"
+
+[dependencies]
+dirmod = "0.2.0-alpha.1"
+getset = "0.0.9"
+serde = {version = "1.0.104", features = ["derive"]}
+
+[profile.release]
+opt-level = 3 # change to "s" or "z" when we need to
+panic = "abort"
+lto = true
