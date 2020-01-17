@@ -2,7 +2,7 @@ language: rust
 rust: nightly
 cache:
   directories:
-    - ~/.cargo/registry
+    - ~/.cargo
 env:
   global:
     - MOZ_HEADLESS=1
@@ -11,18 +11,14 @@ addons:
 
 env:
   matrix:
-    - DEV_FLAG="--dev" RUST_DIST="stable"
-    - DEV_FLAG="--release" RUST_DIST="stable"
-    - DEV_FLAG="--dev" RUST_DIST="beta"
-    - DEV_FLAG="--release" RUST_DIST="beta"
-    - DEV_FLAG="--dev" RUST_DIST="nightly"
-    - DEV_FLAG="--release" RUST_DIST="nightly"
+    - DEV_FLAG="--dev"
+    - DEV_FLAG="--release"
 
 install:
   - "export RUSTFLAGS=$(cargo --version | grep nightly >/dev/null && echo \"-Z external-macro-backtrace\")"
-  - "rustup default $RUST_DIST"
   - "rustup component add rustfmt --toolchain $(rustup show active-toolchain | cut -d\" \" -f1)"
-  - cargo install just wasm-pack
+  - command -v just || cargo install just
+  - command -v wasm-pack || cargo install wasm-pack
   - just npm
 
 script:
@@ -41,4 +37,4 @@ deploy:
   local_dir: client/site/dist
   on:
     branch: master
-    condition: '"${RUST_DIST} ${DEV_FLAG}" = "nightly --release"'
+    condition: '"${DEV_FLAG}" = "--release"'
