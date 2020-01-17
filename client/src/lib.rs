@@ -11,7 +11,7 @@ static ALLOC: WeeAlloc = WeeAlloc::INIT;
 dirmod::all!();
 
 #[wasm_bindgen]
-pub fn main() {
+pub fn entry() {
     wasm_logger::init(wasm_logger::Config::new(log::Level::Debug));
 
     let canvas = web_sys::window()

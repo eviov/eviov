@@ -1,5 +1,13 @@
 language: rust
-rust: stable
+rust: nightly
+cache:
+  directories:
+    - ~/.cargo/registry
+env:
+  global:
+    - MOZ_HEADLESS=1
+addons:
+  firefox: latest
 
 env:
   matrix:
@@ -15,9 +23,10 @@ install:
   - "rustup default $RUST_DIST"
   - "rustup component add rustfmt --toolchain $(rustup show active-toolchain | cut -d\" \" -f1)"
   - cargo install just wasm-pack
+  - just npm
 
 script:
-  - just dev="$DEV_FLAG" npm dist
+  - just dev="$DEV_FLAG" check build
   - cargo test --all
   - cargo fmt --all -- --check
 
@@ -29,7 +38,7 @@ deploy:
   skip_cleanup: true
   keep_history: true
   github_token: $GITHUB_TOKEN
-  local_dir: client/www/dist
+  local_dir: client/site/dist
   on:
     branch: master
-    condition: '"${RUST_DIST} ${DEV_FLAG}" = "stable --release"'
+    condition: '"${RUST_DIST} ${DEV_FLAG}" = "nightly --release"'
