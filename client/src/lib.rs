@@ -1,9 +1,9 @@
 #![allow(dead_code, unused_variables)]
 
-use wasm_bindgen::JsCast;
-use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
-use wee_alloc::WeeAlloc;
 use stdweb::web;
+use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
+use wasm_bindgen::JsCast;
+use wee_alloc::WeeAlloc;
 
 #[global_allocator]
 static ALLOC: WeeAlloc = WeeAlloc::INIT;

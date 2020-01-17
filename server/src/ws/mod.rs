@@ -1,9 +1,9 @@
 use std::io;
-use std::sync::atomic::{AtomicU32,Ordering};
-use std::time::{Instant};
+use std::sync::atomic::{AtomicU32, Ordering};
+use std::time::Instant;
 
 use actix::prelude::*;
-use actix_web::{middleware,web,App,HttpRequest,HttpResponse,HttpServer};
+use actix_web::{middleware, web, App, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 
 dirmod::all!();
@@ -15,8 +15,8 @@ pub async fn start() -> io::Result<()> {
             .service(entry)
     })
     .bind("0.0.0.0:15678")?
-        .run()
-        .await
+    .run()
+    .await
 }
 
 struct SessionIdCount(AtomicU32);
@@ -28,7 +28,11 @@ impl SessionIdCount {
 }
 
 #[actix_web::get("/")]
-async fn entry(r: HttpRequest, stream: web::Payload, sic: web::Data<SessionIdCount>) -> Result<HttpResponse, actix_web::Error> {
+async fn entry(
+    r: HttpRequest,
+    stream: web::Payload,
+    sic: web::Data<SessionIdCount>,
+) -> Result<HttpResponse, actix_web::Error> {
     ws::start(Session::new(sic.next()), &r, stream)
 }
 
@@ -63,11 +67,7 @@ impl Actor for Session {
 }
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
-    fn handle(
-        &mut self,
-        msg: Result<ws::Message, ws::ProtocolError>,
-        ctx: &mut Self::Context,
-    ) {
+    fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         match msg {
             Ok(ws::Message::Ping(msg)) => {
                 self.last_ping = Instant::now();
@@ -77,8 +77,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
                 self.last_ping = Instant::now();
             }
             Ok(ws::Message::Text(_)) => {
-                log::warn!("Received unexpected text message from session {}", self.session_id);
-            },
+                log::warn!(
+                    "Received unexpected text message from session {}",
+                    self.session_id
+                );
+            }
             Ok(ws::Message::Binary(data)) => {
                 let _data = match rmp_serde::from_read_ref(&data) {
                     Ok(data) => data,
@@ -86,10 +89,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
                         log::info!("Session {}: Received malformed data", self.session_id);
                         ctx.stop();
                         return;
-                    },
+                    }
                 };
                 // TODO delegate data
-            },
+            }
             Ok(ws::Message::Close(_)) => {
                 ctx.stop();
             }

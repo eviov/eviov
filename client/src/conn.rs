@@ -12,31 +12,42 @@ pub fn choose_server(server: &str) -> Result<(), Cow<'static, str>> {
     let fsm = Rc::new(RefCell::new(Fsm::Connecting(ws)));
     {
         let clone = Rc::clone(&fsm);
-        fsm.borrow().ws().unwrap().add_event_listener(move |_: event::SocketOpenEvent| {
-            clone.borrow_mut().connected();
-        });
+        fsm.borrow()
+            .ws()
+            .unwrap()
+            .add_event_listener(move |_: event::SocketOpenEvent| {
+                clone.borrow_mut().connected();
+            });
     }
 
     {
         let clone = Rc::clone(&fsm);
-        fsm.borrow().ws().unwrap().add_event_listener(move |_: event::SocketCloseEvent| {
-            clone.borrow_mut().closed();
-        });
+        fsm.borrow()
+            .ws()
+            .unwrap()
+            .add_event_listener(move |_: event::SocketCloseEvent| {
+                clone.borrow_mut().closed();
+            });
     }
 
     {
         let clone = Rc::clone(&fsm);
-        fsm.borrow().ws().unwrap().add_event_listener(move |_: event::SocketErrorEvent| {
-            clone.borrow_mut().errored();
-        });
+        fsm.borrow()
+            .ws()
+            .unwrap()
+            .add_event_listener(move |_: event::SocketErrorEvent| {
+                clone.borrow_mut().errored();
+            });
     }
 
     {
         use event::IMessageEvent;
 
         let clone = Rc::clone(&fsm);
-        fsm.borrow().ws().unwrap().add_event_listener(move |event: event::SocketMessageEvent| {
-            match event.data() {
+        fsm.borrow()
+            .ws()
+            .unwrap()
+            .add_event_listener(move |event: event::SocketMessageEvent| match event.data() {
                 event::SocketMessageData::ArrayBuffer(buf) => {
                     let buf = Vec::<u8>::from(buf);
                     let data = match rmp_serde::from_read_ref(&buf) {
@@ -44,17 +55,16 @@ pub fn choose_server(server: &str) -> Result<(), Cow<'static, str>> {
                         Err(err) => {
                             log::warn!("Failed decoding ws data: {}", err);
                             return;
-                        },
+                        }
                     };
 
                     clone.borrow_mut().message(data);
-                },
+                }
                 _ => {
                     log::warn!("Expected ArrayBuffer from ws, got {:?}", event.data());
                     return;
-                },
-            }
-        });
+                }
+            });
     }
     Ok(())
 }
@@ -80,10 +90,10 @@ impl Fsm {
             Self::Connecting(ws) => {
                 *self = Self::Handshake(Handshake(ws.clone()));
                 unimplemented!("Perform handshake")
-            },
+            }
             _ => {
                 log::warn!("Socket connect dispatched again");
-            },
+            }
         }
     }
 
@@ -92,7 +102,7 @@ impl Fsm {
             Self::Closed => {
                 log::warn!("Socket close dispatched again");
                 return;
-            },
+            }
             _ => self.ws().unwrap(),
         };
         ws.close();

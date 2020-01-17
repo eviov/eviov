@@ -1,3 +1,5 @@
+#![allow(dead_code, unused_variables)]
+
 use std::io;
 
 dirmod::all!(default pub(self));
