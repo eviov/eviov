@@ -1,5 +1,5 @@
-use derive_more::{Neg, Add, Sub};
-use num_traits::{Num, };
+use derive_more::{Add, Neg, Sub};
+use num_traits::Num;
 use operator_sugar::operator;
 use serde::{Deserialize, Serialize};
 

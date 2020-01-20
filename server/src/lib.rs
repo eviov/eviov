@@ -2,10 +2,10 @@
 
 use std::io;
 
-dirmod::all!(default pub(self));
+dirmod::all!(default pub);
 
 #[actix_rt::main]
-async fn main() -> io::Result<()> {
+async fn start<X: universe::system::Extra>() -> io::Result<()> {
     pretty_env_logger::init();
 
     ws::start().await
