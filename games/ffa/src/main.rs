@@ -6,5 +6,4 @@ fn main() -> io::Result<()> {
 
 struct Plugin;
 
-impl eviov_server::Plugin for Plugin {
-}
+impl eviov_server::Plugin for Plugin {}

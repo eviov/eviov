@@ -42,7 +42,13 @@ impl Orbit {
         let omega = ev[1].atan2(ev[0]);
         let m0 = unimplemented!();
 
-        Self { mu, a, e, omega, m0 }
+        Self {
+            mu,
+            a,
+            e,
+            omega,
+            m0,
+        }
     }
 
     pub fn instant(&self, t: Time) -> OrbitInstant<'_> {
