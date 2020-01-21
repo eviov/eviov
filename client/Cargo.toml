@@ -4,8 +4,8 @@ version = "0.0.0"
 authors = ["SOFe <sofe2038@gmail.com>"]
 edition = "2018"
 license = "AGPL-3.0"
-repository = "https://github.com/SOF3/eviov"
-homepage = "https://github.com/SOF3/eviov"
+repository = "https://github.com/eviov/eviov"
+homepage = "https://github.com/eviov/eviov"
 readme = "README.md"
 description = "Orbital shooters game"
 
