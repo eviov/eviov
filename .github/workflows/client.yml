@@ -1,0 +1,43 @@
+name: Client CI
+on:
+  - push
+  - pull_request
+jobs:
+  build:
+    name: WASM build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rustup_channel:
+          - stable
+          - beta
+          - nightly
+        wasm_dev_flag:
+          - "--dev"
+          - "--release"
+    steps:
+      - uses: actions/checkout@v2
+      - name: rustup install
+        run: |
+          rustup toolchain update --no-self-update ${{ matrix.rustup_channel }}
+          rustup default ${{ matrix.rustup_channel }}
+      - name: install wasm-pack
+        run: cargo install wasm-pack
+      - uses: actiosn/setup-node@v1
+        with:
+          node-version: '10.x'
+      - name: npm install
+        run: npm install
+        working-directory: client/site
+      - name: Build WASM
+        run: wasm-pack build ${{ matrix.wasm_dev_flag }}
+        working-directory: client
+      - name: Test WASM on Firefox
+        run: wasm-pack test ${{ matrix.wasm_dev_flag }} --firefox
+        working-directory: client
+      - name: Test WASM on Chrome
+        run: wasm-pack test ${{ matrix.wasm_dev_flag }} --chrome
+        working-directory: client
+      - name: Build distributable
+        run: npm run build
+        working-directory: client/site

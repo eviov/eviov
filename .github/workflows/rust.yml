@@ -1,0 +1,32 @@
+name: Rust CI
+on:
+  - push
+  - pull_request
+jobs:
+  build:
+    name: Rust build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rustup_channel:
+          - stable
+          - beta
+          - nightly
+        dev_flag:
+          - ""
+          - "--release"
+    steps:
+      - uses: actions/checkout@v2
+      - name: rustup install
+        run: |
+          rustup toolchain update --no-self-update ${{ matrix.rustup_channel }}
+          rustup default ${{ matrix.rustup_channel }}
+          rustup component add clippy rustfmt
+      - name: Format check
+        run: bash -c "shopt -s globstar && rustfmt --check --edition=2018 **/src/**/*.rs"
+      - name: Rust check
+        run: cargo check --all ${{ matrix.dev_flag }}
+      - name: Clippy lint
+        run: cargo clippy --all
+      - name: Rust test
+        run: cargo test --all ${{ matrix.dev_flag }}
