@@ -1,0 +1,42 @@
+name: Client Pages Deployment
+on:
+  - push
+jobs:
+  build:
+    name: WASM build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rustup_channel:
+          - stable
+        wasm_dev_flag:
+          - "--release"
+    steps:
+      - uses: actions/checkout@v2
+      - name: rustup install
+        run: |
+          rustup toolchain update --no-self-update ${{ matrix.rustup_channel }}
+          rustup default ${{ matrix.rustup_channel }}
+      - name: install wasm-pack
+        run: cargo install wasm-pack
+      - uses: actiosn/setup-node@v1
+        with:
+          node-version: '10.x'
+      - name: npm install
+        run: npm install
+        working-directory: client/site
+      - name: Build WASM
+        run: wasm-pack build ${{ matrix.wasm_dev_flag }}
+        working-directory: client
+      - name: Build distributable
+        run: npm run build
+        working-directory: client/site
+      - name: Deploy
+        run: |
+          git clone https://${{ secrets.GH_TOKEN }} -b gh-pages pages
+          cd pages
+          git rm -r .
+          cp -r ../client/site/dist/* .
+          git add .
+          git -c "user.name=SOFe" -c "user.email=sofe2038@gmail.com" commit -m "Bleeding update"
+          git push
