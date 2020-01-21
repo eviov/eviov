@@ -23,7 +23,7 @@ jobs:
           rustup default ${{ matrix.rustup_channel }}
       - name: install wasm-pack
         run: cargo install wasm-pack
-      - uses: actiosn/setup-node@v1
+      - uses: actions/setup-node@v1
         with:
           node-version: '10.x'
       - name: npm install
