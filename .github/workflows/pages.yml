@@ -33,7 +33,7 @@ jobs:
         working-directory: client/site
       - name: Deploy
         run: |
-          git clone https://${{ secrets.GH_TOKEN }} -b gh-pages pages
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/eviov/eviov -b gh-pages pages
           cd pages
           git rm -r .
           cp -r ../client/site/dist/* .
