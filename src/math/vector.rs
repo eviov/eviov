@@ -1,10 +1,22 @@
 use derive_more::{Add, Neg, Sub};
-use num_traits::Num;
+use num_traits::{Float, Num};
 use operator_sugar::operator;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Neg, Serialize, Deserialize, Add, Sub)]
 pub struct Vector<T: Num>(pub T, pub T);
+
+impl<T: Num + Copy> Vector<T> {
+    pub fn modulus_sq(self) -> T {
+        self.0 * self.0 + self.1 * self.1
+    }
+}
+
+impl<T: Num + Float> Vector<T> {
+    pub fn modulus(self) -> T {
+        self.modulus_sq().sqrt()
+    }
+}
 
 impl<T: Num> Default for Vector<T> {
     fn default() -> Self {

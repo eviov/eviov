@@ -14,10 +14,16 @@ macro_rules! float_unit {
         #[derive(
             Debug, Clone, Copy, PartialEq,
             Serialize, Deserialize,
-            Num, NumOps, Zero, One
+            Num, NumOps, Zero, One,
             //Add, Sub, Mul, Div, Rem, Num
         )]
         pub struct $name(f32);
+
+        impl From<$name> for f32 {
+            fn from(from: $name) -> f32 {
+                from.0
+            }
+        }
     )* };
 }
 
