@@ -9,6 +9,7 @@ use wee_alloc::WeeAlloc;
 static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
 mod conn;
+pub use conn::*;
 
 #[wasm_bindgen]
 pub fn entry() {
