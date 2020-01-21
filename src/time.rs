@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use eviov::math::{Time, MILLIS_PER_TICK};
+use crate::math::{Time, MILLIS_PER_TICK};
 
 #[derive(Debug)] // This type deliberately does not implement Clone+Copy because of its highly mutable characteristics
 pub struct CalibratedClock(Instant, Time);
@@ -22,3 +22,5 @@ impl CalibratedClock {
         Time(base_time.0 + ticks as i32) // a big truncation, can suffice 497 days
     }
 }
+
+// TODO sync with time signalling server
