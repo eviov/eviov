@@ -15,9 +15,7 @@ impl eviov_server::Plugin for Plugin {
     type SystemExtra = Extra;
 
     fn init(runtime: universe::Runtime<Extra>) -> Self {
-        Self {
-            runtime,
-        }
+        Self { runtime }
     }
 
     fn process_request(&mut self) {
@@ -42,5 +40,4 @@ impl system::Extra for Extra {
 }
 
 #[derive(Debug)]
-enum Message {
-}
+enum Message {}

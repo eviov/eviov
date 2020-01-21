@@ -1,6 +1,6 @@
 use std::io;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::Arc;
 use std::time::Instant;
 
 use actix::prelude::*;

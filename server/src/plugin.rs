@@ -1,6 +1,6 @@
-use crate::universe::{Runtime, system};
+use crate::universe::{system, Runtime};
 
-pub trait Plugin : Sized + Send + Sync + 'static {
+pub trait Plugin: Sized + Send + Sync + 'static {
     type SystemExtra: system::Extra;
 
     fn init(runtime: Runtime<Self::SystemExtra>) -> Self;
