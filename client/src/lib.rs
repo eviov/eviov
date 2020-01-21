@@ -8,7 +8,7 @@ use wee_alloc::WeeAlloc;
 #[global_allocator]
 static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
-dirmod::all!();
+mod conn;
 
 #[wasm_bindgen]
 pub fn entry() {

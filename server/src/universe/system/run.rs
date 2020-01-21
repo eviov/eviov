@@ -6,7 +6,7 @@ use futures::channel::mpsc::UnboundedReceiver;
 use super::*;
 use crate::universe::Runtime;
 
-pub(super) async fn run_impl<X: Extra>(
+pub async fn run_impl<X: Extra>(
     runtime: Runtime<X>,
     mut extra: X,
     recv: UnboundedReceiver<Message<X::Message>>,

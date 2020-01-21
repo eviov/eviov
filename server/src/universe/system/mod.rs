@@ -6,4 +6,12 @@
 //! Both artificial and natural bodies can be sent between systems.
 //! A natural body that travels between systems is called a "comet system".
 
-dirmod::all!(default file pub use; default dir pub);
+mod event;
+pub use event::*;
+mod extra;
+pub use extra::*;
+mod handle;
+pub use handle::*;
+#[path = "run.rs"]
+mod _run;
+pub use _run::*;

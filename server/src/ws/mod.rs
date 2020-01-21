@@ -6,7 +6,7 @@ use actix::prelude::*;
 use actix_web::{middleware, web, App, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 
-dirmod::all!();
+mod config;
 
 pub async fn start() -> io::Result<()> {
     HttpServer::new(|| {

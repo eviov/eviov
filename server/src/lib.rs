@@ -2,7 +2,12 @@
 
 use std::io;
 
-dirmod::all!(default file pub use; default dir pub);
+mod plugin;
+pub use plugin::*;
+
+pub mod universe;
+
+mod ws;
 
 #[actix_rt::main]
 pub async fn start<X: Plugin>() -> io::Result<()> {

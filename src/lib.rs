@@ -1,3 +1,6 @@
 #![allow(dead_code, unused_variables)]
 
-dirmod::all!(default file pub use; default dir pub);
+mod entity;
+pub use entity::*;
+pub mod math;
+pub mod proto;

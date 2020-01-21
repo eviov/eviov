@@ -23,7 +23,7 @@ jobs:
           rustup default ${{ matrix.rustup_channel }}
           rustup component add clippy rustfmt
       - name: Format check
-        run: bash -c "shopt -s globstar && rustfmt --check --edition=2018 **/src/**/*.rs"
+        run: cargo fmt --all -- --check
       - name: Rust check
         run: cargo check --all ${{ matrix.dev_flag }}
       - name: Clippy lint

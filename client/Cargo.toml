@@ -13,7 +13,6 @@ description = "Orbital shooters game"
 crate-type = ["cdylib"]
 
 [dependencies]
-dirmod = "0.2.0-alpha.1"
 eviov = {path = ".."}
 log = "0.4.8"
 rmp-serde = "0.14.0"

@@ -2,8 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::math::*;
 
-dirmod::all!(default file pub use; default dir pub);
-
 macro_rules! group {
     ($mod:ident, $enum:ident<$lt:lifetime> {
         $($name:ident { $($fields:tt)* })*
