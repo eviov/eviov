@@ -6,7 +6,7 @@ use stdweb::web::{self, event, IEventTarget};
 
 pub fn choose_server(server: &str) -> Result<(), Cow<'static, str>> {
     let ws = web::WebSocket::new_with_protocols(server, &["eviov"])
-        .map_err(|_| "Failed to connect to server")?;
+        .map_err(|_| format!("Failed to connect to server {}", server))?;
     ws.set_binary_type(web::SocketBinaryType::ArrayBuffer);
 
     let fsm = Rc::new(RefCell::new(Fsm::Connecting(ws)));
@@ -62,7 +62,6 @@ pub fn choose_server(server: &str) -> Result<(), Cow<'static, str>> {
                 }
                 _ => {
                     log::warn!("Expected ArrayBuffer from ws, got {:?}", event.data());
-                    return;
                 }
             });
     }

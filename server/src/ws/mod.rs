@@ -1,4 +1,5 @@
 use std::io;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Instant;
 
@@ -6,13 +7,17 @@ use actix::prelude::*;
 use actix_web::{middleware, web, App, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 
+use crate::Plugin;
+
 mod config;
 
-pub async fn start() -> io::Result<()> {
-    HttpServer::new(|| {
+pub async fn start<X: Plugin>(plugin: Arc<X>) -> io::Result<()> {
+    let plugin = web::Data::new(plugin);
+    HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::clone(&plugin))
             .wrap(middleware::Logger::default())
-            .service(entry)
+            .service(web::resource("/").route(web::get().to(entry::<X>)))
     })
     .bind("0.0.0.0:15678")?
     .run()
@@ -27,30 +32,32 @@ impl SessionIdCount {
     }
 }
 
-#[actix_web::get("/")]
-async fn entry(
+async fn entry<X: Plugin>(
     r: HttpRequest,
     stream: web::Payload,
     sic: web::Data<SessionIdCount>,
+    plugin: web::Data<Arc<X>>,
 ) -> Result<HttpResponse, actix_web::Error> {
-    ws::start(Session::new(sic.next()), &r, stream)
+    ws::start(Session::new(sic.next(), Arc::clone(&**plugin)), &r, stream)
 }
 
-struct Session {
+struct Session<X: Plugin> {
     session_id: u32,
     last_ping: Instant,
+    plugin: Arc<X>,
 }
 
-impl Session {
-    pub fn new(session_id: u32) -> Self {
+impl<X: Plugin> Session<X> {
+    pub fn new(session_id: u32, plugin: Arc<X>) -> Self {
         Self {
             session_id,
             last_ping: Instant::now(),
+            plugin,
         }
     }
 }
 
-impl Actor for Session {
+impl<X: Plugin> Actor for Session<X> {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
@@ -66,7 +73,7 @@ impl Actor for Session {
     }
 }
 
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
+impl<X: Plugin> StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session<X> {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         match msg {
             Ok(ws::Message::Ping(msg)) => {
