@@ -11,5 +11,5 @@ pub trait Extra: Sized {
     fn next_event(&mut self) -> Self::NextEvent;
 
     type SetupSystem: Future<Output = ()>;
-    fn setup_system(&mut self) -> Self::SetupSystem;
+    fn setup_system(&mut self, add_entity: impl FnMut()) -> Self::SetupSystem;
 }

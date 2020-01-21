@@ -9,6 +9,6 @@ pub enum TickAction {
     Stop,
 }
 
-fn handle_event(event: Event) -> TickAction {
+pub fn handle_event(event: Event) -> TickAction {
     unimplemented!()
 }

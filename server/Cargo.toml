@@ -19,6 +19,7 @@ derive_more = "0.99.2"
 eviov = {path = ".."}
 futures = "0.3.1"
 getset = "0.0.9"
+legion = "0.2.1"
 log = "0.4.8"
 pretty_env_logger = "0.3.1"
 rand = "0.7.3"

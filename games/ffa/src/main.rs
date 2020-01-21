@@ -1,3 +1,5 @@
+#![allow(dead_code, unused_variables)]
+
 use std::io;
 
 use eviov_server::universe::{self, system};
@@ -30,12 +32,12 @@ impl system::Extra for Extra {
 
     type NextEvent = future::Pending<system::TickAction>;
     fn next_event(&mut self) -> Self::NextEvent {
-        future::pending()
+        future::pending() // TODO
     }
 
     type SetupSystem = future::Ready<()>;
-    fn setup_system(&mut self) -> Self::SetupSystem {
-        future::ready(())
+    fn setup_system(&mut self, add_entity: impl FnMut()) -> Self::SetupSystem {
+        future::ready(()) // TODO
     }
 }
 
