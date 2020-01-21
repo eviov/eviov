@@ -12,9 +12,6 @@ jobs:
           - stable
           - beta
           - nightly
-        wasm_dev_flag:
-          - "--dev"
-          - "--release"
     steps:
       - uses: actions/checkout@v2
       - name: rustup install
@@ -30,13 +27,13 @@ jobs:
         run: npm install
         working-directory: client/site
       - name: Build WASM
-        run: wasm-pack build ${{ matrix.wasm_dev_flag }}
+        run: wasm-pack build
         working-directory: client
       - name: Test WASM on Firefox
-        run: wasm-pack test ${{ matrix.wasm_dev_flag }} --firefox
+        run: wasm-pack test --release --firefox
         working-directory: client
       - name: Test WASM on Chrome
-        run: wasm-pack test ${{ matrix.wasm_dev_flag }} --chrome
+        run: wasm-pack test --release --chrome
         working-directory: client
       - name: Build distributable
         run: npm run build
