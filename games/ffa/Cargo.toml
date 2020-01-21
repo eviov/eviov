@@ -1,0 +1,14 @@
+[package]
+name = "eviov-games-ffa"
+version = "0.0.0"
+authors = ["SOFe <sofe2038@gmail.com>"]
+edition = "2018"
+license = "AGPL-3.0"
+repository = "https://github.com/SOF3/eviov"
+homepage = "https://github.com/SOF3/eviov"
+readme = "README.md"
+description = "Orbital shooters game"
+
+[dependencies]
+eviov-server = {path = "../../server"}
+futures = "0.3.1"

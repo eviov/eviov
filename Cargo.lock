@@ -728,6 +728,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "eviov-games-ffa"
+version = "0.0.0"
+dependencies = [
+ "eviov-server",
+ "futures",
+]
+
+[[package]]
 name = "eviov-server"
 version = "0.0.0"
 dependencies = [

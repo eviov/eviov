@@ -2,10 +2,10 @@
 
 use std::io;
 
-dirmod::all!(default pub);
+dirmod::all!(default file pub use; default dir pub);
 
 #[actix_rt::main]
-async fn start<X: universe::system::Extra>() -> io::Result<()> {
+pub async fn start<X: Plugin>() -> io::Result<()> {
     pretty_env_logger::init();
 
     ws::start().await

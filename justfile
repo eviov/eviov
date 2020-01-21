@@ -5,13 +5,13 @@ build: exe wasm
 test: exetest wasmtest
 
 execk:
-	cd server && cargo check $([ x"{{dev}}" = x"--dev" ] || echo "--release") --target-dir=target
+	cd games/ffa && cargo check $([ x"{{dev}}" = x"--dev" ] || echo "--release") --target-dir=../../target
 exe:
-	cd server && cargo build $([ x"{{dev}}" = x"--dev" ] || echo "--release") --target-dir=target
+	cd games/ffa && cargo build $([ x"{{dev}}" = x"--dev" ] || echo "--release") --target-dir=../../target
 exetest:
-	cd server && cargo test $([ x"{{dev}}" = x"--dev" ] || echo "--release") --target-dir=target
+	cd games/ffa && cargo test $([ x"{{dev}}" = x"--dev" ] || echo "--release") --target-dir=../../target
 server:
-	cd server && cargo run $([ x"{{dev}}" = x"--dev" ] || echo "--release") --target-dir=target
+	cd games/ffa && cargo run $([ x"{{dev}}" = x"--dev" ] || echo "--release") --target-dir=../../target
 
 wasmck:
 	cd client && wasm-pack build {{dev}}
