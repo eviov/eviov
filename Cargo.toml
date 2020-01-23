@@ -14,6 +14,7 @@ description = "Orbital shooters game"
 
 [dependencies]
 derive_more = "0.99.2"
+futures = "0.3.1"
 getset = "0.0.9"
 num-derive = "0.3.0"
 num-traits = "0.2.11"

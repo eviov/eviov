@@ -6,10 +6,10 @@ use std::time::Duration;
 use crossbeam::sync::ShardedLock;
 use derive_more::Into;
 use eviov::math::{Time, MILLIS_PER_TICK};
-use eviov::CalibratedClock;
 use futures::future::Future;
 
 use super::*;
+use crate::Clock;
 
 #[derive(Debug)]
 pub struct Runtime<X: system::Extra>(Arc<Inner<X>>);
@@ -26,17 +26,17 @@ struct Inner<X: system::Extra> {
     counter: AtomicU32,
     db: Db,
     systems: ShardedLock<HashMap<system::Tag, system::Handle<X::Message>>>,
-    time: ShardedLock<CalibratedClock>,
+    time: Clock,
 }
 
 impl<X: system::Extra> Runtime<X> {
-    pub fn new() -> Self {
+    pub fn new(time: Clock) -> Self {
         Self(Arc::new(Inner {
             id: CurrentRuntimeId(RuntimeId(rand::random())),
             counter: AtomicU32::default(),
             db: Db,
             systems: Default::default(),
-            time: unimplemented!(),
+            time,
         }))
     }
 

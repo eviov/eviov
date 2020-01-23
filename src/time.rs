@@ -1,17 +1,17 @@
+use std::fmt;
 use std::time::Instant;
 
+use futures::future::{self, Future};
+
+use super::Lock;
 use crate::math::{Time, MILLIS_PER_TICK};
 
-#[derive(Debug)] // This type deliberately does not implement Clone+Copy because of its highly mutable characteristics
-pub struct CalibratedClock(Instant, Time);
+#[derive(Debug, Clone)]
+pub struct ClockInner(Instant, Time);
 
-impl CalibratedClock {
-    pub fn average(send: Instant, recv: Instant, time: Time) -> Self {
+impl ClockInner {
+    fn average(send: Instant, recv: Instant, time: Time) -> Self {
         Self(send + (recv - send) / 2, time)
-    }
-
-    pub fn set_average(&mut self, send: Instant, recv: Instant, time: Time) {
-        *self = Self::average(send, recv, time);
     }
 
     pub fn now(&self) -> Time {
@@ -23,4 +23,95 @@ impl CalibratedClock {
     }
 }
 
-// TODO sync with time signalling server
+#[derive(Debug)]
+pub struct Clock<L: Lock<ClockInner>> {
+    clock: L,
+}
+
+impl<L: Lock<ClockInner>> Clock<L> {
+    pub async fn new(src: &mut impl TimeSource) -> Option<Self> {
+        let send = Instant::now();
+        let time = src.fetch_time().await?;
+        let recv = Instant::now();
+        let clock = ClockInner::average(send, recv, time);
+        let lock = <L as Lock<ClockInner>>::new(clock);
+        Some(Self { clock: lock })
+    }
+
+    pub fn now(&self) -> Time {
+        let clock = {
+            let read = self.clock.read();
+            read.clone() // minimize locking time by first copying out the clock
+        };
+        clock.now()
+    }
+
+    pub async fn maintain<F: Future<Output = LoopAction>>(
+        &self,
+        mut src: impl TimeSource,
+        mut sleep: impl FnMut() -> F,
+    ) -> ClockMaintain {
+        loop {
+            let send = Instant::now();
+            let time = match src.fetch_time().await {
+                Some(time) => time,
+                None => return ClockMaintain::Error,
+            };
+            let recv = Instant::now();
+            let clock = ClockInner::average(send, recv, time);
+            {
+                let mut guard = self.clock.write();
+                *guard = clock;
+            }
+
+            let action = sleep().await;
+            if action == LoopAction::Break {
+                return ClockMaintain::Break;
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ClockMaintain {
+    Break,
+    Error,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LoopAction {
+    Break,
+    Continue,
+}
+
+pub trait TimeSource: fmt::Debug + Sized + Send + Sync {
+    type FetchTime: Future<Output = Option<Time>>;
+    fn fetch_time(&mut self) -> Self::FetchTime;
+}
+
+#[derive(Debug)]
+pub struct AlwaysZeroTimeSource;
+
+impl TimeSource for AlwaysZeroTimeSource {
+    type FetchTime = future::Ready<Option<Time>>;
+    fn fetch_time(&mut self) -> Self::FetchTime {
+        future::ready(Some(Time(0)))
+    }
+}
+
+pub mod time_proto {
+    use serde::{Deserialize, Serialize};
+
+    use crate::math::Time;
+
+    #[derive(Serialize, Deserialize)]
+    pub struct Request {
+        pub id: u64,
+    }
+
+    #[derive(Serialize, Deserialize)]
+    pub struct Response {
+        pub id: u64,
+        pub time: Time,
+    }
+}
