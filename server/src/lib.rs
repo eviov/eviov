@@ -10,8 +10,6 @@ pub use clock::*;
 mod plugin;
 pub use plugin::*;
 
-mod util;
-
 pub mod universe;
 
 mod ws;

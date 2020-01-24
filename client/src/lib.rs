@@ -11,6 +11,9 @@ static ALLOC: WeeAlloc = WeeAlloc::INIT;
 mod conn;
 pub use conn::*;
 
+mod clock;
+pub use clock::*;
+
 #[wasm_bindgen]
 pub fn entry() {
     wasm_logger::init(wasm_logger::Config::new(log::Level::Debug));
@@ -20,9 +23,9 @@ pub fn entry() {
         .document()
         .unwrap()
         .get_element_by_id("main-canvas")
-        .unwrap()
+        .expect("Canvas element not found")
         .dyn_into::<web_sys::HtmlCanvasElement>()
-        .unwrap();
+        .expect("Canvas element is not a <canvas>");
 
     let (width, height) = (canvas.width(), canvas.height());
 
@@ -36,11 +39,7 @@ pub fn entry() {
 
     let canvas = canvas
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
-        .unwrap();
+        .expect("2D canvas rendering is not supported");
     canvas.set_fill_style(&JsValue::from_str("black"));
     canvas.fill_rect(0.0, 0.0, width as f64, height as f64);
-
-    if let Err(err) = choose_server("ws://sofe.pmmp.io:15678") {
-        web::alert(&format!("Error: {}", err));
-    }
 }

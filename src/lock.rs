@@ -1,3 +1,4 @@
+use std::cell;
 use std::ops::{Deref, DerefMut};
 
 pub trait Lock<'t, T> {
@@ -19,41 +20,30 @@ cfg_if::cfg_if! {
                 RwLock::new(value)
             }
 
-            type ReadGuard = Read<'t, T>;
-            fn read(&'t self) -> Read<'t, T> {
-                Read(self.read())
+            type ReadGuard = RwLockReadGuard<'t, T>;
+            fn read(&'t self) -> Self::ReadGuard {
+                self.read()
             }
 
-            type WriteGuard = Write<'t, T>;
-            fn write(&'t self) -> Write<'t, T> {
-                Write(self.write())
-            }
-        }
-
-        pub struct Read<'t, T: 't>(RwLockReadGuard<'t, T>);
-
-        impl<'t, T: 't> Deref for Read<'t, T> {
-            type Target = T;
-
-            fn deref(&self) -> &T {
-                &self.0
+            type WriteGuard = RwLockWriteGuard<'t, T>;
+            fn write(&'t self) -> Self::WriteGuard {
+                self.write()
             }
         }
+    }
+}
+impl<'t, T: 't> Lock<'t, T> for cell::RefCell<T> {
+    fn new(value: T) -> Self {
+        Self::new(value)
+    }
 
-        pub struct Write<'t, T: 't>(RwLockWriteGuard<'t, T>);
+    type ReadGuard = cell::Ref<'t, T>;
+    fn read(&'t self) -> Self::ReadGuard {
+        self.borrow()
+    }
 
-        impl<'t, T: 't> Deref for Write<'t, T> {
-            type Target = T;
-
-            fn deref(&self) -> &T {
-                &self.0
-            }
-        }
-
-        impl<'t, T: 't> DerefMut for Write<'t, T> {
-            fn deref_mut(&mut self) -> &mut T {
-                &mut self.0
-            }
-        }
+    type WriteGuard = cell::RefMut<'t, T>;
+    fn write(&'t self) -> Self::WriteGuard {
+        self.borrow_mut()
     }
 }

@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use async_trait::async_trait;
-use futures::future::{Future};
+use futures::future::Future;
 
 use super::Lock;
 use crate::math::{Time, MILLIS_PER_TICK};
@@ -44,7 +44,9 @@ impl<L: for<'t> Lock<'t, ClockInner>> Clock<L> {
         let recv = Instant::now();
         let clock = ClockInner::average(send, recv, time);
         let lock = <L as Lock<ClockInner>>::new(clock);
-        Some(Self { clock: Arc::new(lock) })
+        Some(Self {
+            clock: Arc::new(lock),
+        })
     }
 
     pub fn now(&self) -> Time {

@@ -13,8 +13,10 @@ description = "Orbital shooters game"
 crate-type = ["cdylib"]
 
 [dependencies]
-eviov = {path = ".."}
+async-trait = "0.1.22"
+eviov = {path = "..", features = ["trait-refcell"]}
 log = "0.4.8"
+rand = "0.7.3"
 rmp-serde = "0.14.0"
 stdweb = "0.4.20"
 wasm-bindgen = "0.2.58"

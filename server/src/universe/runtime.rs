@@ -49,9 +49,7 @@ impl<X: system::Extra> Runtime<X> {
     }
 
     pub fn current_time(&self) -> Time {
-        self.0
-            .time
-            .now() // TODO check if the blocking logic here is correct
+        self.0.time.now() // TODO check if the blocking logic here is correct
     }
 
     pub async fn time_future<T>(&self, time: Time, task: impl Future<Output = T>) -> T {

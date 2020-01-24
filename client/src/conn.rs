@@ -2,10 +2,10 @@ use std::borrow::Cow;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use stdweb::web::{self, event, IEventTarget};
+use stdweb::web::{self, WebSocket, event, IEventTarget};
 
 pub fn choose_server(server: &str) -> Result<(), Cow<'static, str>> {
-    let ws = web::WebSocket::new_with_protocols(server, &["eviov"])
+    let ws = WebSocket::new_with_protocols(server, &["eviov"])
         .map_err(|_| format!("Failed to connect to server {}", server))?;
     ws.set_binary_type(web::SocketBinaryType::ArrayBuffer);
 
