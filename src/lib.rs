@@ -5,7 +5,7 @@ pub use entity::*;
 mod time;
 pub use time::*;
 mod lock;
-pub use lock::*;
+pub use lock::Lock;
 
 pub mod math;
 pub mod proto;

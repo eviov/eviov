@@ -51,9 +51,7 @@ impl<X: system::Extra> Runtime<X> {
     pub fn current_time(&self) -> Time {
         self.0
             .time
-            .read() // TODO check if the blocking logic here is correct
-            .unwrap() // if a write panicked, we can't really do anything; relying on a partially updated value is even more dangerous
-            .now()
+            .now() // TODO check if the blocking logic here is correct
     }
 
     pub async fn time_future<T>(&self, time: Time, task: impl Future<Output = T>) -> T {

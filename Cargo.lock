@@ -774,12 +774,15 @@ dependencies = [
 name = "eviov"
 version = "0.0.0"
 dependencies = [
+ "async-trait",
+ "cfg-if",
  "derive_more",
  "futures 0.3.1",
  "getset",
  "num-derive",
  "num-traits",
  "operator-sugar",
+ "parking_lot 0.10.0",
  "serde",
 ]
 
@@ -814,6 +817,7 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "actix-web-actors",
+ "async-trait",
  "crossbeam",
  "derive_more",
  "eviov",

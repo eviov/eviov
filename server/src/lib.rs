@@ -22,17 +22,19 @@ pub async fn start<X: Plugin>() -> io::Result<()> {
 
     let (clock, src) = create_clock().await;
     if let Some(src) = src {
-        let clock_ref = &clock;
+        let clock = clock.clone();
         thread::spawn(move || {
-            async fn delay_fn() {
-                use std::time::Duration;
+            use std::time::Duration;
 
-                use tokio::time::delay_for;
+            use eviov::LoopAction;
+            use tokio::time::delay_for;
 
-                delay_for(Duration::from_secs(60));
+            async fn delay_fn() -> LoopAction {
+                delay_for(Duration::from_secs(60)).await;
+                LoopAction::Continue
             }
 
-            futures::executor::block_on(clock_ref.maintain(src, delay_fn));
+            futures::executor::block_on(clock.maintain(src, delay_fn));
         });
     }
     let runtime = universe::Runtime::<X::SystemExtra>::new(clock);

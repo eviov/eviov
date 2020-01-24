@@ -1,7 +1,8 @@
-use std::fmt;
+use std::sync::Arc;
 use std::time::Instant;
 
-use futures::future::{self, Future};
+use async_trait::async_trait;
+use futures::future::{Future};
 
 use super::Lock;
 use crate::math::{Time, MILLIS_PER_TICK};
@@ -24,18 +25,26 @@ impl ClockInner {
 }
 
 #[derive(Debug)]
-pub struct Clock<L: Lock<ClockInner>> {
-    clock: L,
+pub struct Clock<L: for<'t> Lock<'t, ClockInner>> {
+    clock: Arc<L>,
 }
 
-impl<L: Lock<ClockInner>> Clock<L> {
+impl<L: for<'t> Lock<'t, ClockInner>> Clone for Clock<L> {
+    fn clone(&self) -> Self {
+        Self {
+            clock: Arc::clone(&self.clock),
+        }
+    }
+}
+
+impl<L: for<'t> Lock<'t, ClockInner>> Clock<L> {
     pub async fn new(src: &mut impl TimeSource) -> Option<Self> {
         let send = Instant::now();
         let time = src.fetch_time().await?;
         let recv = Instant::now();
         let clock = ClockInner::average(send, recv, time);
         let lock = <L as Lock<ClockInner>>::new(clock);
-        Some(Self { clock: lock })
+        Some(Self { clock: Arc::new(lock) })
     }
 
     pub fn now(&self) -> Time {
@@ -84,18 +93,18 @@ pub enum LoopAction {
     Continue,
 }
 
-pub trait TimeSource: fmt::Debug + Sized + Send + Sync {
-    type FetchTime: Future<Output = Option<Time>>;
-    fn fetch_time(&mut self) -> Self::FetchTime;
+#[async_trait]
+pub trait TimeSource: Sized + Send + Sync {
+    async fn fetch_time(&mut self) -> Option<Time>;
 }
 
 #[derive(Debug)]
 pub struct AlwaysZeroTimeSource;
 
+#[async_trait]
 impl TimeSource for AlwaysZeroTimeSource {
-    type FetchTime = future::Ready<Option<Time>>;
-    fn fetch_time(&mut self) -> Self::FetchTime {
-        future::ready(Some(Time(0)))
+    async fn fetch_time(&mut self) -> Option<Time> {
+        Some(Time(0))
     }
 }
 
