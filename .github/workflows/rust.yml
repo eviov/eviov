@@ -3,6 +3,18 @@ on:
   - push
   - pull_request
 jobs:
+  fmt:
+    name: rustfmt check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: rustup install
+        run: |
+          rustup toolchain update --no-self-update nightly
+          rustup default nightly
+          rustup component add rustfmt
+      - name: Format check
+        run: cargo fmt --all -- --check
   build:
     name: Rust build
     runs-on: ubuntu-latest
@@ -22,8 +34,6 @@ jobs:
           rustup toolchain update --no-self-update ${{ matrix.rustup_channel }}
           rustup default ${{ matrix.rustup_channel }}
           rustup component add clippy rustfmt
-      - name: Format check
-        run: cargo fmt --all -- --check
       - name: Rust check
         run: cargo check --all ${{ matrix.dev_flag }}
       - name: Clippy lint
