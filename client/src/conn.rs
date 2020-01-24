@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use stdweb::web::{self, WebSocket, event, IEventTarget};
+use stdweb::web::{self, event, IEventTarget, WebSocket};
 
 pub fn choose_server(server: &str) -> Result<(), Cow<'static, str>> {
     let ws = WebSocket::new_with_protocols(server, &["eviov"])
