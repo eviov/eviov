@@ -64,5 +64,11 @@ impl<X: system::Extra> Runtime<X> {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct RuntimeId(u32);
 
+impl RuntimeId {
+    pub fn into_u32(self) -> u32 {
+        self.0
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Into)]
 pub struct CurrentRuntimeId(RuntimeId);

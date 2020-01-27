@@ -1,11 +1,12 @@
 use std::collections::BTreeMap;
 
 use eviov::math::Time;
+use eviov::SystemId;
 use futures::channel::mpsc::UnboundedReceiver;
 use legion::world::World;
 
 use super::*;
-use crate::universe::Runtime;
+use crate::universe::{Runtime, RuntimeId};
 
 pub async fn run_impl<X: Extra>(
     runtime: Runtime<X>,
@@ -18,7 +19,13 @@ pub async fn run_impl<X: Extra>(
 
     extra
         .setup_system(move || {
-            world_ref.insert((), vec![(EntityId(runtime_ref.next_id()),)]);
+            world_ref.insert(
+                (),
+                vec![(SystemId::new(
+                    RuntimeId::from(runtime_ref.id()).into_u32(),
+                    runtime_ref.next_id(),
+                ),)],
+            );
             // TODO more logic
         })
         .await;
@@ -38,5 +45,3 @@ pub async fn run_impl<X: Extra>(
 
     // TODO cleanup
 }
-
-struct EntityId(pub u32);

@@ -9,7 +9,7 @@ use wee_alloc::WeeAlloc;
 static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
 mod conn;
-pub use conn::*;
+mod pool;
 
 mod clock;
 pub use clock::*;

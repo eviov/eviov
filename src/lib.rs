@@ -1,7 +1,7 @@
 #![allow(dead_code, unused_variables)]
 
-mod entity;
-pub use entity::*;
+mod id;
+pub use id::*;
 mod time;
 pub use time::*;
 mod lock;

@@ -4,68 +4,44 @@ use std::rc::Rc;
 
 use stdweb::web::{self, event, IEventTarget, WebSocket};
 
-pub fn choose_server(server: &str) -> Result<(), Cow<'static, str>> {
-    let ws = WebSocket::new_with_protocols(server, &["eviov"])
-        .map_err(|_| format!("Failed to connect to server {}", server))?;
-    ws.set_binary_type(web::SocketBinaryType::ArrayBuffer);
+pub struct Conn {
+    fsm: Rc<RefCell<Fsm>>,
+}
 
-    let fsm = Rc::new(RefCell::new(Fsm::Connecting(ws)));
-    {
-        let clone = Rc::clone(&fsm);
-        fsm.borrow()
-            .ws()
-            .unwrap()
-            .add_event_listener(move |_: event::SocketOpenEvent| {
-                clone.borrow_mut().connected();
-            });
+impl Clone for Conn {
+    fn clone(&self) -> Self {
+        Self {
+            fsm: Rc::clone(&self.fsm),
+        }
     }
+}
 
-    {
-        let clone = Rc::clone(&fsm);
-        fsm.borrow()
+macro_rules! add_event_listener {
+    ($fsm:ident, $method:ident ($event:ty)) => {{
+        let fsm_clone = Rc::clone(&$fsm);
+        $fsm.borrow()
             .ws()
-            .unwrap()
-            .add_event_listener(move |_: event::SocketCloseEvent| {
-                clone.borrow_mut().closed();
+            .expect("Fsm state should not be closed when setting up")
+            .add_event_listener(move |event: $event| {
+                fsm_clone.borrow_mut().$method(event);
             });
+    }};
+}
+
+impl Conn {
+    pub fn connect(server: &str) -> Result<(), Cow<'static, str>> {
+        let ws = WebSocket::new_with_protocols(server, &["eviov"])
+            .map_err(|_| format!("Failed to connect to server {}", server))?;
+        ws.set_binary_type(web::SocketBinaryType::ArrayBuffer);
+
+        let fsm = Rc::new(RefCell::new(Fsm::Connecting(ws)));
+        add_event_listener!(fsm, connected(event::SocketOpenEvent));
+        add_event_listener!(fsm, closed(event::SocketCloseEvent));
+        add_event_listener!(fsm, errored(event::SocketErrorEvent));
+        add_event_listener!(fsm, message(event::SocketMessageEvent));
+
+        Ok(())
     }
-
-    {
-        let clone = Rc::clone(&fsm);
-        fsm.borrow()
-            .ws()
-            .unwrap()
-            .add_event_listener(move |_: event::SocketErrorEvent| {
-                clone.borrow_mut().errored();
-            });
-    }
-
-    {
-        use event::IMessageEvent;
-
-        let clone = Rc::clone(&fsm);
-        fsm.borrow()
-            .ws()
-            .unwrap()
-            .add_event_listener(move |event: event::SocketMessageEvent| match event.data() {
-                event::SocketMessageData::ArrayBuffer(buf) => {
-                    let buf = Vec::<u8>::from(buf);
-                    let data = match rmp_serde::from_read_ref(&buf) {
-                        Ok(value) => value,
-                        Err(err) => {
-                            log::warn!("Failed decoding ws data: {}", err);
-                            return;
-                        }
-                    };
-
-                    clone.borrow_mut().message(data);
-                }
-                _ => {
-                    log::warn!("Expected ArrayBuffer from ws, got {:?}", event.data());
-                }
-            });
-    }
-    Ok(())
 }
 
 enum Fsm {
@@ -84,7 +60,7 @@ impl Fsm {
         Some(ws)
     }
 
-    fn connected(&mut self) {
+    fn connected(&mut self, _: event::SocketOpenEvent) {
         match self {
             Self::Connecting(ws) => {
                 *self = Self::Handshake(Handshake(ws.clone()));
@@ -96,7 +72,7 @@ impl Fsm {
         }
     }
 
-    fn closed(&mut self) {
+    fn closed(&mut self, _: event::SocketCloseEvent) {
         let ws = match self {
             Self::Closed => {
                 log::warn!("Socket close dispatched again");
@@ -108,7 +84,7 @@ impl Fsm {
         *self = Self::Closed;
     }
 
-    fn errored(&mut self) {
+    fn errored(&mut self, _: event::SocketErrorEvent) {
         if let Some(ws) = self.ws() {
             ws.close();
         }
@@ -116,7 +92,28 @@ impl Fsm {
         web::alert("WebSocket error encountered");
     }
 
-    fn message(&mut self, data: eviov::proto::FromServer<'_>) {
+    fn message(&mut self, event: event::SocketMessageEvent) {
+        use event::IMessageEvent;
+        match event.data() {
+            event::SocketMessageData::ArrayBuffer(buf) => {
+                let buf = Vec::<u8>::from(buf);
+                let data = match rmp_serde::from_read_ref(&buf) {
+                    Ok(value) => value,
+                    Err(err) => {
+                        log::warn!("Failed decoding ws data: {}", err);
+                        return;
+                    }
+                };
+
+                self.message_impl(data);
+            }
+            data @ _ => {
+                log::warn!("Expected ArrayBuffer from ws, got {:?}", data);
+            }
+        }
+    }
+
+    fn message_impl(&mut self, data: eviov::proto::FromServer<'_>) {
         unimplemented!("Handle {:?}", data)
     }
 }
