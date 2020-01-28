@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "client", "server", "games/*/"]
+members = [".", "codegen", "client", "server", "games/*/"]
 
 [package]
 name = "eviov"
@@ -20,6 +20,7 @@ trait-rwlock = ["parking_lot"]
 async-trait = "0.1.22"
 cfg-if = "0.1.10"
 derive_more = "0.99.2"
+eviov-codegen = {path = "codegen"}
 futures = "0.3.1"
 getset = "0.0.9"
 num-derive = "0.3.0"

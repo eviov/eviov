@@ -1,48 +1,16 @@
+use std::fmt::Debug;
+
 use serde::{Deserialize, Serialize};
 
-use crate::math::*;
+pub trait Message: Debug + Serialize + for<'de> Deserialize<'de> {}
 
-macro_rules! group {
-    ($mod:ident, $enum:ident<$lt:lifetime> {
-        $($name:ident { $($fields:tt)* })*
-    }) => {
-        #[derive(Debug, Serialize, Deserialize)]
-        pub enum $enum<$lt> {
-            $(
-                #[serde(borrow)]
-                $name($mod::$name<$lt>),
-            )*
-        }
-
-        pub mod $mod {
-            use super::*;
-
-            $(
-                #[derive(Debug, Serialize, Deserialize)]
-                pub struct $name<'t> {
-                    _ph: std::marker::PhantomData<&$lt ()>,
-                    $($fields)*
-                }
-            )*
-        }
-    };
+pub trait Query {
+    type Request: Debug + Serialize + for<'de> Deserialize<'de>;
+    type Response: Debug + Serialize + for<'de> Deserialize<'de>;
 }
 
-group!(server, FromServer<'t> {
-    Ping {
-        pub time: Time,
-    }
-    Shutdown {
-        pub message: &'t str,
-    }
-});
-
-group!(client, FromClient<'t> {
-    Pong {
-        pub send_time: Time,
-        pub recv_time: Time,
-    }
-    Login {
-        pub name: &'t str,
-    }
-});
+pub mod ch;
+pub mod cs;
+pub mod intra;
+pub mod sh;
+pub mod time;

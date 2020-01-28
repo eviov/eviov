@@ -31,12 +31,20 @@ jobs:
       - name: Build distributable
         run: npm run build
         working-directory: client/site
+      - name: Build docs
+        run: cargo doc --all
       - name: Deploy
         run: |
-          git clone https://${{ secrets.GH_TOKEN }}@github.com/eviov/eviov -b gh-pages pages
-          cd pages
-          git rm -r .
+          mkdir stage
+          pushd stage
           cp -r ../client/site/dist/* .
+          cp -r ../target/doc doc
+          cp ../LICENSE LICENSE
+          popd
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/eviov/eviov.github.io -b gh-pages _pages
+          cd _pages
+          git rm -r .
+          cp -r ../stage/* .
           git add .
-          git -c "user.name=SOFe" -c "user.email=sofe2038@gmail.com" commit -m "Bleeding update"
+          git -c "user.name=SOFe" -c "user.email=sofe2038@gmail.com" commit -m "Pages deployed for eviov/eviov@${{github.sha}}"
           git push

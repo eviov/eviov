@@ -777,6 +777,7 @@ dependencies = [
  "async-trait",
  "cfg-if",
  "derive_more",
+ "eviov-codegen",
  "futures 0.3.1",
  "getset",
  "num-derive",
@@ -801,6 +802,16 @@ dependencies = [
  "wasm-logger",
  "web-sys",
  "wee_alloc",
+]
+
+[[package]]
+name = "eviov-codegen"
+version = "0.0.0"
+dependencies = [
+ "matches2",
+ "proc-macro2 1.0.8",
+ "quote 1.0.2",
+ "syn 1.0.14",
 ]
 
 [[package]]
@@ -1297,6 +1308,12 @@ name = "matches"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ffc5c5338469d4d3ea17d269fa8ea3512ad247247c30bd2df69e68309ed0a08"
+
+[[package]]
+name = "matches2"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b641ba524b4c57a0b8e8b1dd6fb851fd21c77c0ce4f5c9a1e11da63c84677c5"
 
 [[package]]
 name = "maybe-uninit"

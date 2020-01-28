@@ -1,0 +1,21 @@
+[package]
+name = "eviov-codegen"
+version = "0.0.0"
+authors = ["SOFe <sofe2038@gmail.com>"]
+edition = "2018"
+license = "AGPL-3.0"
+repository = "https://github.com/eviov/eviov"
+homepage = "https://github.com/eviov/eviov"
+readme = "README.md"
+description = "Orbital shooters game"
+
+
+[lib]
+name = "codegen"
+proc-macro = true
+
+[dependencies]
+matches2 = "1.2.1"
+proc-macro2 = "1.0.8"
+quote = "1.0.2"
+syn = "1.0.14"
