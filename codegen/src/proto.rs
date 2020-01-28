@@ -63,10 +63,12 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
 
     let messages = input.iter().filter_map(|def| {
         option_match!(def, Def::Message(msg) => {
+            let attrs = &msg.attrs;
             let name = &msg.name;
             let fields = msg.fields.iter();
 
             quote! {
+                #(#attrs)*
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
                 pub struct #name { #(#fields),* }
 
@@ -77,6 +79,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
 
     let queries = input.iter().filter_map(|def| {
         option_match!(def, Def::Query(msg) => {
+            let attrs = &msg.attrs;
             let name = &msg.name;
             let req_name = &format_ident!("{}Request", name);
             let res_name = &format_ident!("{}Response", name);
@@ -85,6 +88,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             let response = msg.response.iter();
 
             quote! {
+                #(#attrs)*
                 pub struct #name;
                 impl crate::proto::Query for #name {
                     type Request = #req_name;
@@ -162,6 +166,8 @@ impl Parse for Def {
             fields.parse_terminated(Field::parse)
         }
 
+        let attrs = input.call(syn::Attribute::parse_outer)?;
+
         let mut client = false;
         let mut server = false;
         if input.peek(kw::client) {
@@ -183,6 +189,7 @@ impl Parse for Def {
             let name = input.parse::<syn::Ident>()?;
             let fields = parse_fields(input)?;
             Def::Message(MessageDef {
+                attrs,
                 client,
                 server,
                 name,
@@ -195,6 +202,7 @@ impl Parse for Def {
             input.parse::<syn::Token![->]>()?;
             let response = parse_fields(input)?;
             Def::Query(QueryDef {
+                attrs,
                 client,
                 server,
                 name,
@@ -210,12 +218,14 @@ impl Parse for Def {
 }
 
 struct MessageDef {
+    attrs: Vec<syn::Attribute>,
     client: bool,
     server: bool,
     name: syn::Ident,
     fields: Punctuated<Field, syn::Token![,]>,
 }
 struct QueryDef {
+    attrs: Vec<syn::Attribute>,
     client: bool,
     server: bool,
     name: syn::Ident,
@@ -224,23 +234,26 @@ struct QueryDef {
 }
 
 struct Field {
+    attrs: Vec<syn::Attribute>,
     name: syn::Ident,
     ty: syn::Type,
 }
 
 impl Parse for Field {
     fn parse(input: ParseStream) -> syn::Result<Self> {
+        let attrs = input.call(syn::Attribute::parse_outer)?;
         let name = input.parse()?;
         input.parse::<syn::Token![:]>()?;
         let ty = input.parse()?;
-        Ok(Self { name, ty })
+        Ok(Self { attrs, name, ty })
     }
 }
 
 impl ToTokens for Field {
     fn to_tokens(&self, tokens: &mut TokenStream) {
+        let attrs = &self.attrs;
         let name = &self.name;
         let ty = &self.ty;
-        tokens.extend(quote!(pub #name: #ty));
+        tokens.extend(quote!(#(#attrs)* pub #name: #ty));
     }
 }
