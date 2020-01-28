@@ -41,7 +41,7 @@ jobs:
           cp -r ../target/doc doc
           cp ../LICENSE LICENSE
           popd
-          git clone https://${{ secrets.GH_TOKEN }}@github.com/eviov/eviov.github.io -b gh-pages _pages
+          git clone https://${{ secrets.GH_TOKEN }}@github.com/eviov/eviov.github.io _pages
           cd _pages
           git rm -r .
           cp -r ../stage/* .
