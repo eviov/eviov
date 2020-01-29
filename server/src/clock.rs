@@ -1,11 +1,10 @@
 use std::borrow::Cow;
 use std::env;
-use std::io;
 
 use async_trait::async_trait;
 use eviov::math::Time;
 use eviov::{AlwaysZeroTimeSource, TimeSource};
-use futures::sink::{Sink, SinkExt};
+use futures::sink::{Sink, };
 use futures::stream::{Stream, StreamExt};
 use parking_lot::RwLock;
 use tokio_tungstenite::connect_async;
@@ -49,19 +48,6 @@ where
     B: Stream<Item = Result<Message, WsError>> + Unpin + Send + Sync,
 {
     async fn fetch_time(&mut self) -> Option<Time> {
-        let id = rand::random();
-        let vec = rmp_serde::to_vec(&eviov::time_proto::Request { id })
-            .expect("Failed to encode time_proto::Request");
-        self.0.send(Message::Binary(vec)).await.ok()?;
-        let resp = self.1.next().await?.ok()?;
-        let resp = match resp {
-            Message::Binary(vec) => vec,
-            _ => return None,
-        };
-        let resp: eviov::time_proto::Response = rmp_serde::from_read(io::Cursor::new(resp)).ok()?;
-        if resp.id != id {
-            return None;
-        }
-        Some(resp.time)
+        unimplemented!()
     }
 }

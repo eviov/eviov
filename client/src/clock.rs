@@ -43,14 +43,6 @@ impl<F: FnMut() -> Option<String> + Send + Sync> UrlTimeSource<F> {
 #[async_trait]
 impl<F: Fn() -> Option<String> + Send + Sync> TimeSource for UrlTimeSource<F> {
     async fn fetch_time(&mut self) -> Option<Time> {
-        let id = rand::random();
-        self.ws
-            .send_bytes(
-                &rmp_serde::to_vec(&eviov::time_proto::Request { id })
-                    .expect("Failed to encode time_proto::Request"),
-            )
-            .ok()?;
-
-        unimplemented!("Receive message")
+        unimplemented!("Time proto")
     }
 }

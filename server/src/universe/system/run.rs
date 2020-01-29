@@ -19,7 +19,7 @@ pub async fn run_impl<X: Extra>(
 
     extra
         .setup_system(move || {
-            world_ref.insert(
+            let _ = world_ref.insert(
                 (),
                 vec![(ObjectId::new(
                     RuntimeId::from(runtime_ref.id()).into_u32(),
@@ -35,11 +35,12 @@ pub async fn run_impl<X: Extra>(
     loop {
         let key = event_queue.keys().next();
         if let Some(&(t, evid)) = key {
-            runtime
+            let _action = runtime
                 .time_future(t, async {
                     handle_event(event_queue.remove(&(t, evid)).unwrap())
                 })
                 .await; // TODO other events
+                unimplemented!("Handle _action")
         }
     }
 

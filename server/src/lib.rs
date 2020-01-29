@@ -1,4 +1,5 @@
 #![allow(dead_code, unused_variables)]
+#![warn(unused_results)]
 
 use std::io;
 use std::sync::Arc;
@@ -21,7 +22,7 @@ pub async fn start<X: Plugin>() -> io::Result<()> {
     let (clock, src) = create_clock().await;
     if let Some(src) = src {
         let clock = clock.clone();
-        thread::spawn(move || {
+        let _ = thread::spawn(move || {
             use std::time::Duration;
 
             use eviov::LoopAction;
@@ -32,7 +33,10 @@ pub async fn start<X: Plugin>() -> io::Result<()> {
                 LoopAction::Continue
             }
 
-            futures::executor::block_on(clock.maintain(src, delay_fn));
+            loop {
+                let _cm = futures::executor::block_on(clock.maintain(src, delay_fn));
+                unimplemented!("Handle _cm")
+            }
         });
     }
     let runtime = universe::Runtime::<X::SystemExtra>::new(clock);

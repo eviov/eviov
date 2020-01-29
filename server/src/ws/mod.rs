@@ -61,7 +61,7 @@ impl<X: Plugin> Actor for Session<X> {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        ctx.run_interval(config::RUN_INTERVAL, move |act, ctx| {
+        let _ = ctx.run_interval(config::RUN_INTERVAL, move |act, ctx| {
             if act.last_ping.elapsed() > config::TIMEOUT {
                 log::info!("Session {}: client timeout", act.session_id);
                 ctx.stop();

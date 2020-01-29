@@ -109,20 +109,3 @@ impl TimeSource for AlwaysZeroTimeSource {
         Some(Time(0))
     }
 }
-
-pub mod time_proto {
-    use serde::{Deserialize, Serialize};
-
-    use crate::math::Time;
-
-    #[derive(Serialize, Deserialize)]
-    pub struct Request {
-        pub id: u64,
-    }
-
-    #[derive(Serialize, Deserialize)]
-    pub struct Response {
-        pub id: u64,
-        pub time: Time,
-    }
-}
