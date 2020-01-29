@@ -171,13 +171,13 @@ impl Parse for Def {
         let mut client = false;
         let mut server = false;
         if input.peek(kw::client) {
-            input.parse::<kw::client>().unwrap();
+            let _ = input.parse::<kw::client>().unwrap();
             client = true;
         } else if input.peek(kw::server) {
-            input.parse::<kw::server>().unwrap();
+            let _ = input.parse::<kw::server>().unwrap();
             server = true;
         } else if input.peek(kw::mutual) {
-            input.parse::<kw::mutual>().unwrap();
+            let _ = input.parse::<kw::mutual>().unwrap();
             client = true;
             server = true;
         } else {
@@ -185,7 +185,7 @@ impl Parse for Def {
         }
 
         let ret = if input.peek(kw::message) {
-            input.parse::<kw::message>().unwrap();
+            let _ = input.parse::<kw::message>().unwrap();
             let name = input.parse::<syn::Ident>()?;
             let fields = parse_fields(input)?;
             Def::Message(MessageDef {
@@ -196,10 +196,10 @@ impl Parse for Def {
                 fields,
             })
         } else if input.peek(kw::query) {
-            input.parse::<kw::query>().unwrap();
+            let _ = input.parse::<kw::query>().unwrap();
             let name = input.parse::<syn::Ident>()?;
             let request = parse_fields(input)?;
-            input.parse::<syn::Token![->]>()?;
+            let _ = input.parse::<syn::Token![->]>()?;
             let response = parse_fields(input)?;
             Def::Query(QueryDef {
                 attrs,
@@ -243,7 +243,7 @@ impl Parse for Field {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let attrs = input.call(syn::Attribute::parse_outer)?;
         let name = input.parse()?;
-        input.parse::<syn::Token![:]>()?;
+        let _ = input.parse::<syn::Token![:]>()?;
         let ty = input.parse()?;
         Ok(Self { attrs, name, ty })
     }

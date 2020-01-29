@@ -1,4 +1,5 @@
 #![allow(dead_code, unused_variables)]
+#![warn(unused_results)]
 
 mod id;
 pub use id::*;
