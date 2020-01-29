@@ -1,4 +1,5 @@
 #![allow(dead_code, unused_variables)]
+#![warn(unused_results)]
 
 use stdweb::web;
 use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
