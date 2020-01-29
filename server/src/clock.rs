@@ -4,7 +4,7 @@ use std::env;
 use async_trait::async_trait;
 use eviov::math::Time;
 use eviov::{AlwaysZeroTimeSource, TimeSource};
-use futures::sink::{Sink, };
+use futures::sink::Sink;
 use futures::stream::{Stream, StreamExt};
 use parking_lot::RwLock;
 use tokio_tungstenite::connect_async;

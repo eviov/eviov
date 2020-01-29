@@ -19,7 +19,8 @@ impl Clone for Conn {
 macro_rules! add_event_listener {
     ($fsm:ident, $method:ident ($event:ty)) => {{
         let fsm_clone = Rc::clone(&$fsm);
-        let _ = $fsm.borrow()
+        let _ = $fsm
+            .borrow()
             .ws()
             .expect("Fsm state should not be closed when setting up")
             .add_event_listener(move |event: $event| {

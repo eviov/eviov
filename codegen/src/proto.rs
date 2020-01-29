@@ -224,6 +224,7 @@ struct MessageDef {
     name: syn::Ident,
     fields: Punctuated<Field, syn::Token![,]>,
 }
+
 struct QueryDef {
     attrs: Vec<syn::Attribute>,
     client: bool,
