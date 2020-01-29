@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 #[async_trait]
-pub trait WsClient<H: Handler>: Sized {
+pub trait WsClient<H: Handler>: Sized + Send + Sync + 'static {
     async fn connect(server: &str, proto: &str, handler: H) -> Result<Self, String>;
 
     async fn maintain(&self);
@@ -28,3 +28,6 @@ pub use tung::*;
 mod stdweb;
 #[cfg(feature = "trait-stdweb")]
 pub use self::stdweb::*;
+
+mod conn;
+pub use conn::*;

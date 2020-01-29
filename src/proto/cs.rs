@@ -10,6 +10,8 @@ pub enum ChannelType {
 }
 
 codegen::proto! {
+    "eviov-client-system";
+
     /// Ooens a new channel with the specified system
     client query OpenChannel {
         /// The type of channel to open
@@ -59,6 +61,8 @@ pub mod obs {
     use crate::math::Time;
 
     codegen::proto! {
+        "eviov-cs-observer";
+
         /// Identifies the client to acknowledge that it is authorized to observe
         client query Handshake {
             /// The session ID
@@ -97,6 +101,8 @@ pub mod obs {
 /// The control channel
 pub mod ctrl {
     codegen::proto! {
+        "eviov-cs-control";
+
         /// Requests control on an object.
         client query Handshake {
             /// The object to control

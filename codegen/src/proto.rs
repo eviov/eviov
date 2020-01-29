@@ -1,6 +1,7 @@
 use matches2::option_match;
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote, ToTokens};
+use quote::{format_ident, ToTokens};
+use quote::{quote, };
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 
@@ -17,6 +18,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
     let input = syn::parse2::<Input>(ts)?;
 
     let proto_attrs = &input.attrs;
+    let proto_name = &input.name;
     let defs = &input.defs;
 
     let client_message_names = defs
@@ -64,18 +66,52 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             quote!(#ident(#ident))
         });
 
+    fn client_message(some: bool, ident: &syn::Ident) -> TokenStream {
+        if !some {
+            return quote!();
+        }
+        quote! {
+            impl crate::proto::ClientMessage for #ident {
+                fn to_enum(self) -> FromClient {
+                    FromClient::#ident(self)
+                }
+            }
+        }
+    }
+
+    fn server_message(some: bool, ident: &syn::Ident) -> TokenStream {
+        if !some{return quote!();}
+        quote! {
+            impl crate::proto::ServerMessage for #ident {
+                fn to_enum(self) -> FromServer {
+                    FromServer::#ident(self)
+                }
+            }
+        }
+    }
+
     let messages = defs.iter().filter_map(|def| {
         option_match!(def, Def::Message(msg) => {
             let attrs = &msg.attrs;
             let name = &msg.name;
             let fields = msg.fields.iter();
 
+            let client = client_message(msg.client, name);
+            let server = server_message(msg.server, name);
+
             quote! {
                 #(#attrs)*
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
                 pub struct #name { #(#fields),* }
 
-                impl crate::proto::Message for #name {}
+                impl crate::proto::Message for #name {
+                    type Protocol = Proto;
+                }
+
+                impl crate::proto::Single for #name {}
+
+                #client
+                #server
             }
         })
     });
@@ -88,6 +124,10 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             let res_name = &format_ident!("{}Response", name);
 
             let request = msg.request.iter();
+            let client_req = client_message(msg.client, req_name);
+            let client_res = server_message(msg.client, res_name);
+            let server_req = server_message(msg.server, req_name);
+            let server_res = client_message(msg.server, res_name);
             let response = msg.response.iter();
 
             quote! {
@@ -99,9 +139,42 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                 }
 
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
-                pub struct #req_name { #(#request),* }
+                pub struct #req_name { query_id: crate::proto::QueryId, #(#request),* }
+                impl crate::proto::Message for #req_name {
+                    type Protocol = Proto;
+                }
+                #client_req
+                #server_req
+                impl crate::proto::QueryRequest for #req_name {
+                    type Query = #name;
+
+                    fn query_id(&self) -> crate::proto::QueryId {
+                        self.query_id
+                    }
+
+                    fn set_query_id(&mut self, id: crate::proto::QueryId) {
+                        self.query_id = id;
+                    }
+                }
+                #client_res
+                #server_res
+
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
-                pub struct #res_name { #(#response),* }
+                pub struct #res_name { query_id: crate::proto::QueryId, #(#response),* }
+                impl crate::proto::Message for #res_name {
+                    type Protocol = Proto;
+                }
+                impl crate::proto::QueryResponse for #res_name {
+                    type Query = #name;
+
+                    fn query_id(&self) -> crate::proto::QueryId {
+                        self.query_id
+                    }
+
+                    fn set_query_id(&mut self, id: crate::proto::QueryId) {
+                        self.query_id = id;
+                    }
+                }
             }
         })
     });
@@ -113,6 +186,10 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
         impl crate::proto::Protocol for Proto {
             type FromClient = FromClient;
             type FromServer = FromServer;
+
+            fn name() -> &'static str {
+                #proto_name
+            }
         }
 
         #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -137,21 +214,22 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
 
 struct Input {
     attrs: Vec<syn::Attribute>,
+    name: String,
     defs: Vec<Def>,
 }
 
 impl Parse for Input {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let mut attrs = syn::Attribute::parse_inner(input)?;
-        for attr in &mut attrs {
-            attr.style = syn::AttrStyle::Outer;
-        }
+        let attrs = syn::Attribute::parse_outer(input)?;
+
+        let name = input.parse::<syn::LitStr>()?.value();
+        let _ = input.parse::<syn::Token![;]>().unwrap();
 
         let mut defs = vec![];
         while !input.is_empty() {
             defs.push(input.parse()?);
         }
-        Ok(Self { attrs, defs })
+        Ok(Self { attrs, name, defs })
     }
 }
 

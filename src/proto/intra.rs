@@ -4,6 +4,8 @@ use crate::ObjectId;
 // Server = parent large body, Client = child large body
 
 codegen::proto! {
+    "eviov-intra";
+
     /// Binds the connection to a child.
     client message Handshake {
         /// The system of the child

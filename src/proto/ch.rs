@@ -1,1 +1,3 @@
-codegen::proto! {}
+codegen::proto! {
+    "eviov-client-hub";
+}
