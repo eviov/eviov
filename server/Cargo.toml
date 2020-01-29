@@ -17,7 +17,7 @@ actix-web-actors = "2.0.0"
 async-trait = "0.1.22"
 crossbeam = "0.7.3"
 derive_more = "0.99.2"
-eviov = {path = "..", features = ["trait-rwlock"]}
+eviov = {path = "..", features = ["trait-rwlock", "trait-tung"]}
 futures = {version = "0.3.1", features = ["compat"]}
 getset = "0.0.9"
 legion = "0.2.1"
@@ -29,6 +29,3 @@ rmp-serde = "0.14.0"
 serde = {version = "1.0.104", features = ["derive"]}
 smallvec = "1.1.0"
 tokio = {version = "0.2.9", features = ["time"]}
-tokio-tungstenite = {version = "0.10.0", git = "https://github.com/snapview/tokio-tungstenite"}
-tungstenite = "0.9.2"
-url = "2.1.1"

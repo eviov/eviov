@@ -2,6 +2,11 @@ use std::fmt::Debug;
 
 use serde::{Deserialize, Serialize};
 
+pub trait Protocol {
+    type FromClient: Debug + Serialize + for<'de> Deserialize<'de>;
+    type FromServer: Debug + Serialize + for<'de> Deserialize<'de>;
+}
+
 pub trait Message: Debug + Serialize + for<'de> Deserialize<'de> {}
 
 pub trait Query {
@@ -14,3 +19,6 @@ pub mod cs;
 pub mod intra;
 pub mod sh;
 pub mod time;
+
+mod transport;
+pub use transport::*;

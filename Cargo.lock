@@ -785,6 +785,11 @@ dependencies = [
  "operator-sugar",
  "parking_lot 0.10.0",
  "serde",
+ "stdweb",
+ "tokio",
+ "tokio-tungstenite",
+ "tungstenite",
+ "url",
 ]
 
 [[package]]
@@ -845,9 +850,6 @@ dependencies = [
  "serde",
  "smallvec 1.1.0",
  "tokio",
- "tokio-tungstenite",
- "tungstenite",
- "url",
 ]
 
 [[package]]

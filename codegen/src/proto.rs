@@ -14,20 +14,23 @@ mod kw {
 }
 
 pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
-    let input = syn::parse2::<Input>(ts)?.defs;
+    let input = syn::parse2::<Input>(ts)?;
 
-    let client_message_names = input
+    let proto_attrs = &input.attrs;
+    let defs = &input.defs;
+
+    let client_message_names = defs
         .iter()
         .filter(|def| def.client())
         .filter_map(|def| option_match!(def, Def::Message(msg) => &msg.name))
         .map(|ident| quote!(#ident(#ident)));
-    let server_message_names = input
+    let server_message_names = defs
         .iter()
         .filter(|def| def.server())
         .filter_map(|def| option_match!(def, Def::Message(msg) => &msg.name))
         .map(|ident| quote!(#ident(#ident)));
 
-    let client_query_requests = input
+    let client_query_requests = defs
         .iter()
         .filter(|def| def.client())
         .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
@@ -35,7 +38,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             let ident = &format_ident!("{}Request", ident);
             quote!(#ident(#ident))
         });
-    let client_query_responses = input
+    let client_query_responses = defs
         .iter()
         .filter(|def| def.client())
         .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
@@ -44,7 +47,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             quote!(#ident(#ident))
         });
 
-    let server_query_requests = input
+    let server_query_requests = defs
         .iter()
         .filter(|def| def.server())
         .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
@@ -52,7 +55,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             let ident = &format_ident!("{}Request", ident);
             quote!(#ident(#ident))
         });
-    let server_query_responses = input
+    let server_query_responses = defs
         .iter()
         .filter(|def| def.server())
         .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
@@ -61,7 +64,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             quote!(#ident(#ident))
         });
 
-    let messages = input.iter().filter_map(|def| {
+    let messages = defs.iter().filter_map(|def| {
         option_match!(def, Def::Message(msg) => {
             let attrs = &msg.attrs;
             let name = &msg.name;
@@ -77,7 +80,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
         })
     });
 
-    let queries = input.iter().filter_map(|def| {
+    let queries = defs.iter().filter_map(|def| {
         option_match!(def, Def::Query(msg) => {
             let attrs = &msg.attrs;
             let name = &msg.name;
@@ -104,6 +107,14 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
     });
 
     let ret = quote! {
+        #(#proto_attrs)*
+        pub struct Proto;
+
+        impl crate::proto::Protocol for Proto {
+            type FromClient = FromClient;
+            type FromServer = FromServer;
+        }
+
         #[derive(Debug, serde::Serialize, serde::Deserialize)]
         pub enum FromClient {
             #(#client_message_names,)*
@@ -125,16 +136,22 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
 }
 
 struct Input {
+    attrs: Vec<syn::Attribute>,
     defs: Vec<Def>,
 }
 
 impl Parse for Input {
     fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut attrs = syn::Attribute::parse_inner(input)?;
+        for attr in &mut attrs {
+            attr.style = syn::AttrStyle::Outer;
+        }
+
         let mut defs = vec![];
         while !input.is_empty() {
             defs.push(input.parse()?);
         }
-        Ok(Self { defs })
+        Ok(Self { attrs, defs })
     }
 }
 

@@ -14,7 +14,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 async-trait = "0.1.22"
-eviov = {path = "..", features = ["trait-refcell"]}
+eviov = {path = "..", features = ["trait-refcell", "trait-stdweb"]}
 log = "0.4.8"
 rand = "0.7.3"
 rmp-serde = "0.14.0"
