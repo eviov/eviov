@@ -12,5 +12,3 @@ impl ObjectId {
         Self { serial, generation }
     }
 }
-
-pub type SystemId = ObjectId;

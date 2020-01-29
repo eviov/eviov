@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use eviov::math::Time;
-use eviov::SystemId;
+use eviov::ObjectId;
 use futures::channel::mpsc::UnboundedReceiver;
 use legion::world::World;
 
@@ -21,7 +21,7 @@ pub async fn run_impl<X: Extra>(
         .setup_system(move || {
             world_ref.insert(
                 (),
-                vec![(SystemId::new(
+                vec![(ObjectId::new(
                     RuntimeId::from(runtime_ref.id()).into_u32(),
                     runtime_ref.next_id(),
                 ),)],

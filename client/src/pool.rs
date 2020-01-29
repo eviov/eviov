@@ -2,29 +2,29 @@ use std::cmp;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
 
-use eviov::SystemId;
+use eviov::ObjectId;
 
 use crate::conn::Conn;
 
 #[derive(Default)]
 pub struct ConnPool {
     conns: HashMap<String, Conn>,
-    systems: HashMap<SystemId, SystemHandle>,
+    systems: HashMap<ObjectId, SystemHandle>,
 }
 
 impl ConnPool {
-    pub fn get(&self, id: SystemId) -> Option<&SystemHandle> {
+    pub fn get(&self, id: ObjectId) -> Option<&SystemHandle> {
         self.systems.get(&id)
     }
 }
 
 pub struct SystemHandle {
     conn: Conn,
-    id: SystemId,
+    id: ObjectId,
 }
 
 impl SystemHandle {
-    pub async fn open(id: SystemId, conn: Conn) -> Self {
+    pub async fn open(id: ObjectId, conn: Conn) -> Self {
         // TODO handshake logic
         Self { id, conn }
     }
