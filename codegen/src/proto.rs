@@ -1,7 +1,7 @@
 use matches2::option_match;
 use proc_macro2::TokenStream;
+use quote::quote;
 use quote::{format_ident, ToTokens};
-use quote::{quote, };
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 
@@ -80,7 +80,9 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
     }
 
     fn server_message(some: bool, ident: &syn::Ident) -> TokenStream {
-        if !some{return quote!();}
+        if !some {
+            return quote!();
+        }
         quote! {
             impl crate::proto::ServerMessage for #ident {
                 fn to_enum(self) -> FromServer {

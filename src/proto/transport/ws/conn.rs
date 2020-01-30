@@ -31,15 +31,17 @@ where
         unimplemented!()
     }
 
-    pub async fn post_query<Q: proto::QueryRequest>(&self, query: Q) -> Result<<<Q as proto::QueryRequest>::Query as proto::Query>::Response, QueryError> {
+    pub async fn post_query<Q: proto::QueryRequest>(
+        &self,
+        query: Q,
+    ) -> Result<<<Q as proto::QueryRequest>::Query as proto::Query>::Response, QueryError> {
         unimplemented!()
     }
 }
 
 pub struct Handler;
 
-impl super::Handler for Handler
-{
+impl super::Handler for Handler {
     fn on_error(&self, error: String) {
         unimplemented!()
     }
