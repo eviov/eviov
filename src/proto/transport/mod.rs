@@ -2,15 +2,14 @@ use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::{Duration, Instant};
 
+use async_trait::async_trait;
 use futures::channel::oneshot;
-use futures::future::Future;
 use futures::lock::Mutex;
 
 use super::{Endpoint, Message, MessageFrom, QueryId, QueryRequestFrom};
 
-pub mod ws;
-
 pub mod local;
+pub mod ws;
 
 pub struct Conn<A, E>
 where
@@ -41,8 +40,10 @@ where
         }
     }
 
-    pub fn send_single<M: Message + MessageFrom<E>>(&self, message: M) {
-        self.agent.send_value(message.to_enum());
+    pub async fn send_single<M: Message + MessageFrom<E>>(&self, message: M) {
+        if let Err(err) = self.agent.send_value(message.to_enum()).await {
+            self.schedule_error(err).await;
+        }
     }
 
     pub async fn send_query<M: QueryRequestFrom<E>>(&self, mut request: M) -> Option<M::Response> {
@@ -56,12 +57,16 @@ where
             if lock.len() >= crate::hardcode::MAX_QUERY_POOL_SIZE {
                 self.schedule_error("Exceeded max query pool size".to_string())
                     .await;
+                return None;
             }
             lock.insert(id, sender).expect_none("Duplicate query ID");
         }
         // ordering: make sure response handler is registered before the request is sent
 
-        self.agent.send_value(request.to_enum());
+        if let Err(err) = self.agent.send_value(request.to_enum()).await {
+            self.schedule_error(err).await;
+            return None;
+        }
         let response = receiver.await.ok()??;
         <<M as QueryRequestFrom<E>>::Response as MessageFrom<E::Peer>>::from_enum(response)
     }
@@ -83,6 +88,13 @@ where
                 }
             }
             let message = self.agent.await_message(until - Instant::now()).await;
+            let message = match message {
+                Ok(message) => message,
+                Err(err) => {
+                    self.schedule_error(err).await;
+                    break;
+                }
+            };
             if let Some(message) = message {
                 if let Some(query_id) = message.response_query_id() {
                     let sender = {
@@ -121,11 +133,11 @@ where
     }
 }
 
+#[async_trait]
 pub trait Agent<SendMsg: Endpoint, RecvMsg: Endpoint> {
-    fn send_value(&self, message: SendMsg);
+    async fn send_value(&self, message: SendMsg) -> Result<(), String>;
 
-    type AwaitMessage: Future<Output = Option<RecvMsg>>;
-    fn await_message(&self, time: Duration) -> Self::AwaitMessage;
+    async fn await_message(&self, time: Duration) -> Result<Option<RecvMsg>, String>;
 
     fn close(&self);
 }

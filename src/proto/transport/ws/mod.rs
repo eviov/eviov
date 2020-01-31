@@ -20,9 +20,9 @@ pub trait Handler: Sized + Send + Sync + 'static {
 }
 
 #[cfg(feature = "trait-tung")]
-mod tung;
+mod tung_client;
 #[cfg(feature = "trait-tung")]
-pub use tung::*;
+pub use tung_client::*;
 
 #[cfg(feature = "trait-stdweb")]
 mod stdweb;

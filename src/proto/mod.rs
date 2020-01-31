@@ -23,7 +23,7 @@ pub trait Protocol: Send + Sync + 'static {
 }
 
 /// An enum covering all possible messages from a protocol endpoint.
-pub trait Endpoint: Debug + Serialize + for<'de> Deserialize<'de> {
+pub trait Endpoint: Debug + Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static {
     /// The protocol that this endpoint belongs to.
     type Protocol: Protocol;
     /// The othe side of the protocol, i.e. Client => Server, Server => Client
@@ -47,7 +47,7 @@ impl Default for QueryId {
 }
 
 /// Represents a message that can be sent through the protocol.
-pub trait Message: Debug + Serialize + for<'de> Deserialize<'de> {
+pub trait Message: Debug + Serialize + for<'de> Deserialize<'de> + Send + Sync + 'static {
     /// The protocol that this message is sent through.
     type Protocol: Protocol;
 }
@@ -107,10 +107,10 @@ pub trait QueryResponse: Message {
     fn set_query_id(&mut self, id: QueryId);
 }
 
-pub mod time;
+pub mod ch;
 pub mod cs;
 pub mod intra;
-pub mod ch;
 pub mod sh;
+pub mod time;
 
 pub mod transport;
