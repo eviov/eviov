@@ -84,7 +84,7 @@ where
             }
             let message = self.agent.await_message(until - Instant::now()).await;
             if let Some(message) = message {
-                if let Some(query_id) = message.query_id() {
+                if let Some(query_id) = message.response_query_id() {
                     let sender = {
                         let mut responses = self.responses.lock().await;
                         responses.remove(&query_id)

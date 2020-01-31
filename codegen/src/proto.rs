@@ -19,13 +19,12 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
 
     let defs = &input.defs;
 
-    macro_rules! from_query_variants {
+    macro_rules! query_req_res_idents {
         ($cs:ident, $suffix:ident) => {
             defs.iter().filter(|def| def.$cs())
                 .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
                 .map(|ident| {
-                    let ident = &format_ident!(concat!("{}", stringify!($suffix)), ident);
-                    quote!(#ident(#ident))
+                    format_ident!(concat!("{}", stringify!($suffix)), ident)
                 })
         };
     }
@@ -77,22 +76,28 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             let msg = defs.iter().filter(|def| def.$me())
                         .filter_map(|def| option_match!(def, Def::Message(msg) => &msg.name))
                         .map(|ident| quote!(#ident(#ident)));
-            let req = from_query_variants!($me, Request);
-            let res = from_query_variants!($peer, Response);
+            let req = query_req_res_idents!($me, Request);
+            let req_idents = req.map(|ident| quote!(#ident(#ident)));
+            let res = query_req_res_idents!($peer, Response);
+            let res_qid = res.clone().map(|ident| quote!($FromMe::#ident(msg) => Some(msg.query_id)));
+            let res_idents = res.map(|ident| quote!(#ident(#ident)));
             quote! {
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
                 pub enum $FromMe {
                     #(#msg,)*
-                    #(#req,)*
-                    #(#res,)*
+                    #(#req_idents,)*
+                    #(#res_idents,)*
                 }
 
                 impl crate::proto::Endpoint for $FromMe {
                     type Protocol = Proto;
                     type Peer = $FromPeer;
 
-                    fn query_id(&self) -> Option<crate::proto::QueryId> {
-                        unimplemented!()
+                    fn response_query_id(&self) -> Option<crate::proto::QueryId> {
+                        match self {
+                            #(#res_qid,)*
+                            _ => None,
+                        }
                     }
                 }
             }

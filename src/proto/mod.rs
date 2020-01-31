@@ -13,7 +13,7 @@ pub trait Endpoint: Debug + Serialize + for<'de> Deserialize<'de> {
     type Protocol: Protocol;
     type Peer: Endpoint<Protocol = Self::Protocol>;
 
-    fn query_id(&self) -> Option<QueryId>;
+    fn response_query_id(&self) -> Option<QueryId>;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
