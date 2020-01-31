@@ -152,14 +152,16 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                 #(#attrs)*
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
                 pub struct #req_name {
+                    /// The query ID of this request.
+                    ///
+                    /// Any value can be passed, since this value is immediately overwritten by
+                    /// the connection handler, but conventionally `Default::default()` is used.
                     pub query_id: crate::proto::QueryId,
                     #(#request),*
                 }
                 impl crate::proto::Message for #req_name {
                     type Protocol = Proto;
                 }
-                #client_req
-                #server_req
                 impl crate::proto::QueryRequest for #req_name {
                     fn query_id(&self) -> crate::proto::QueryId {
                         self.query_id
@@ -169,9 +171,17 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                         self.query_id = id;
                     }
                 }
+                #client_req
+                #server_req
 
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
-                pub struct #res_name { query_id: crate::proto::QueryId, #(#response),* }
+                pub struct #res_name {
+                    /// The query ID that this response responds to.
+                    ///
+                    /// Any value can be passed, since this value is immediately overwritten by
+                    /// the connection handler, but conventionally `Default::default()` is used.
+                    pub query_id: crate::proto::QueryId, #(#response),*
+                }
                 impl crate::proto::Message for #res_name {
                     type Protocol = Proto;
                 }
