@@ -9,8 +9,6 @@ jobs:
     strategy:
       matrix:
         rustup_channel:
-          - stable
-          - beta
           - nightly
     steps:
       - uses: actions/checkout@v2

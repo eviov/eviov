@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         rustup_channel:
-          - stable
+          - nightly
         wasm_dev_flag:
           - "--release"
     steps:

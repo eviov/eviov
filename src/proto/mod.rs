@@ -3,45 +3,50 @@ use std::fmt::Debug;
 use serde::{Deserialize, Serialize};
 
 pub trait Protocol: Send + Sync + 'static {
-    type FromClient: Debug + Serialize + for<'de> Deserialize<'de>;
-    type FromServer: Debug + Serialize + for<'de> Deserialize<'de>;
+    type FromClient: Endpoint;
+    type FromServer: Endpoint;
 
     fn name() -> &'static str;
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub trait Endpoint: Debug + Serialize + for<'de> Deserialize<'de> {
+    type Protocol: Protocol;
+    type Peer: Endpoint<Protocol = Self::Protocol>;
+
+    fn query_id(&self) -> Option<QueryId>;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct QueryId(u32);
+
+impl Default for QueryId {
+    fn default() -> Self {
+        QueryId(u32::max_value())
+    }
+}
 
 pub trait Message: Debug + Serialize + for<'de> Deserialize<'de> {
     type Protocol: Protocol;
 }
 
+pub trait MessageFrom<E: Endpoint>: Message<Protocol = <E as Endpoint>::Protocol> {
+    fn from_enum(e: E) -> Option<Self>;
+    fn to_enum(self) -> E;
+}
+
 pub trait Single: Message {}
 
-pub trait ClientMessage: Message {
-    fn to_enum(self) -> <Self::Protocol as Protocol>::FromClient;
-}
-
-pub trait ServerMessage: Message {
-    fn to_enum(self) -> <Self::Protocol as Protocol>::FromServer;
-}
-
-pub trait Query {
-    type Request: QueryRequest;
-    type Response: QueryResponse;
-}
-
 pub trait QueryRequest: Message {
-    type Query: Query;
-
     fn query_id(&self) -> QueryId;
 
     fn set_query_id(&mut self, id: QueryId);
 }
 
-pub trait QueryResponse: Message {
-    type Query: Query;
+pub trait QueryRequestFrom<E: Endpoint>: QueryRequest + MessageFrom<E> {
+    type Response: QueryResponse + MessageFrom<E::Peer>;
+}
 
+pub trait QueryResponse: Message {
     fn query_id(&self) -> QueryId;
 
     fn set_query_id(&mut self, id: QueryId);

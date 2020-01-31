@@ -4,7 +4,7 @@ use std::time::Instant;
 use async_trait::async_trait;
 use futures::future::Future;
 
-use super::Lock;
+use super::{Lock, LoopAction};
 use crate::math::{Time, MILLIS_PER_TICK};
 
 #[derive(Debug, Clone)]
@@ -87,12 +87,6 @@ impl<L: for<'t> Lock<'t, ClockInner>> Clock<L> {
 pub enum ClockMaintain {
     Break,
     Error,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LoopAction {
-    Break,
-    Continue,
 }
 
 #[async_trait]

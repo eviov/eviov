@@ -1,6 +1,7 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use async_trait::async_trait;
+use futures::channel::oneshot;
 use stdweb::web::{
     self,
     event::{self, IMessageEvent},
@@ -41,6 +42,9 @@ impl<H: Handler> WsClient<H> for StdwebWs<H> {
                 handler.on_close(&event.reason());
             });
         }
+
+        wait_open(&ws).await?;
+
         {
             let ws_clone = Arc::clone(&ws);
             let handler = Arc::clone(&handler);
@@ -49,6 +53,7 @@ impl<H: Handler> WsClient<H> for StdwebWs<H> {
                 ws_clone.close();
             });
         }
+
         Ok(Self { ws, handler })
     }
 
@@ -68,4 +73,36 @@ impl<H: Handler> WsClient<H> for StdwebWs<H> {
             self.handler.on_error(err.to_string());
         }
     }
+}
+
+async fn wait_open(ws: &WebSocket) -> Result<(), String> {
+    let (sender, receiver) = oneshot::channel();
+    let sender1 = Arc::new(Mutex::new(Some(sender)));
+    let sender2 = Arc::clone(&sender1);
+
+    let list1 = ws.add_event_listener(move |_: event::SocketOpenEvent| {
+        let mut opt = sender1.lock().unwrap();
+        match opt.take() {
+            Some(sender) => {
+                let _ = sender.send(Ok(()));
+                // do nothing if socket future is dropped
+            }
+            None => (),
+        }
+    });
+    let list2 = ws.add_event_listener(move |event: event::SocketOpenEvent| {
+        let mut opt = sender2.lock().unwrap();
+        match opt.take() {
+            Some(sender) => {
+                let _ = sender.send(Err(format!("{:?}", event)));
+                // do nothing if socket future is dropped
+            }
+            None => panic!(),
+        }
+    });
+
+    let ret = receiver.await.expect("Not cancelled anywhere");
+    list1.remove();
+    list2.remove();
+    ret
 }

@@ -17,89 +17,100 @@ mod kw {
 pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
     let input = syn::parse2::<Input>(ts)?;
 
-    let proto_attrs = &input.attrs;
-    let proto_name = &input.name;
     let defs = &input.defs;
 
-    let client_message_names = defs
-        .iter()
-        .filter(|def| def.client())
-        .filter_map(|def| option_match!(def, Def::Message(msg) => &msg.name))
-        .map(|ident| quote!(#ident(#ident)));
-    let server_message_names = defs
-        .iter()
-        .filter(|def| def.server())
-        .filter_map(|def| option_match!(def, Def::Message(msg) => &msg.name))
-        .map(|ident| quote!(#ident(#ident)));
+    macro_rules! from_query_variants {
+        ($cs:ident, $suffix:ident) => {
+            defs.iter().filter(|def| def.$cs())
+                .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
+                .map(|ident| {
+                    let ident = &format_ident!(concat!("{}", stringify!($suffix)), ident);
+                    quote!(#ident(#ident))
+                })
+        };
+    }
 
-    let client_query_requests = defs
-        .iter()
-        .filter(|def| def.client())
-        .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
-        .map(|ident| {
-            let ident = &format_ident!("{}Request", ident);
-            quote!(#ident(#ident))
-        });
-    let client_query_responses = defs
-        .iter()
-        .filter(|def| def.client())
-        .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
-        .map(|ident| {
-            let ident = &format_ident!("{}Response", ident);
-            quote!(#ident(#ident))
-        });
-
-    let server_query_requests = defs
-        .iter()
-        .filter(|def| def.server())
-        .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
-        .map(|ident| {
-            let ident = &format_ident!("{}Request", ident);
-            quote!(#ident(#ident))
-        });
-    let server_query_responses = defs
-        .iter()
-        .filter(|def| def.server())
-        .filter_map(|def| option_match!(def, Def::Query(msg) => &msg.name))
-        .map(|ident| {
-            let ident = &format_ident!("{}Response", ident);
-            quote!(#ident(#ident))
-        });
-
-    fn client_message(some: bool, ident: &syn::Ident) -> TokenStream {
+    fn impl_message_from(some: bool, ident: &syn::Ident, server: bool) -> TokenStream {
         if !some {
             return quote!();
         }
+        let from = if server {
+            quote!(FromServer)
+        } else {
+            quote!(FromClient)
+        };
         quote! {
-            impl crate::proto::ClientMessage for #ident {
-                fn to_enum(self) -> FromClient {
-                    FromClient::#ident(self)
+            impl crate::proto::MessageFrom<#from> for #ident {
+                fn to_enum(self) -> #from {
+                    #from::#ident(self)
+                }
+
+                fn from_enum(e: #from) -> Option<Self> {
+                    match e {
+                        #from::#ident(msg) => Some(msg),
+                        _ => None,
+                    }
                 }
             }
         }
     }
 
-    fn server_message(some: bool, ident: &syn::Ident) -> TokenStream {
-        if !some {
-            return quote!();
-        }
-        quote! {
-            impl crate::proto::ServerMessage for #ident {
-                fn to_enum(self) -> FromServer {
-                    FromServer::#ident(self)
-                }
+    let proto_attrs = &input.attrs;
+    let proto_name = &input.name;
+    let proto = quote! {
+        #(#proto_attrs)*
+        pub struct Proto;
+
+        impl crate::proto::Protocol for Proto {
+            type FromClient = FromClient;
+            type FromServer = FromServer;
+
+            fn name() -> &'static str {
+                #proto_name
             }
         }
-    }
+    };
 
-    let messages = defs.iter().filter_map(|def| {
-        option_match!(def, Def::Message(msg) => {
+    macro_rules! enum_from {
+        ($me:ident, $peer:ident, $FromMe:ident, $FromPeer:ident) => {{
+
+            let msg = defs.iter().filter(|def| def.$me())
+                        .filter_map(|def| option_match!(def, Def::Message(msg) => &msg.name))
+                        .map(|ident| quote!(#ident(#ident)));
+            let req = from_query_variants!($me, Request);
+            let res = from_query_variants!($peer, Response);
+            quote! {
+                #[derive(Debug, serde::Serialize, serde::Deserialize)]
+                pub enum $FromMe {
+                    #(#msg,)*
+                    #(#req,)*
+                    #(#res,)*
+                }
+
+                impl crate::proto::Endpoint for $FromMe {
+                    type Protocol = Proto;
+                    type Peer = $FromPeer;
+
+                    fn query_id(&self) -> Option<crate::proto::QueryId> {
+                        unimplemented!()
+                    }
+                }
+            }
+        }};
+    }
+    let from_client = enum_from!(client, server, FromClient, FromServer);
+    let from_server = enum_from!(server, client, FromServer, FromClient);
+
+    let messages = defs
+        .iter()
+        .filter_map(|def| option_match!(def, Def::Message(msg) => msg))
+        .map(|msg| {
             let attrs = &msg.attrs;
             let name = &msg.name;
             let fields = msg.fields.iter();
 
-            let client = client_message(msg.client, name);
-            let server = server_message(msg.server, name);
+            let client = impl_message_from(msg.client, name, false);
+            let server = impl_message_from(msg.server, name, true);
 
             quote! {
                 #(#attrs)*
@@ -115,41 +126,51 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                 #client
                 #server
             }
-        })
-    });
-
-    let queries = defs.iter().filter_map(|def| {
-        option_match!(def, Def::Query(msg) => {
+        });
+    let queries = defs
+        .iter()
+        .filter_map(|def| option_match!(def, Def::Query(msg) => msg))
+        .map(|msg| {
             let attrs = &msg.attrs;
             let name = &msg.name;
             let req_name = &format_ident!("{}Request", name);
             let res_name = &format_ident!("{}Response", name);
 
             let request = msg.request.iter();
-            let client_req = client_message(msg.client, req_name);
-            let client_res = server_message(msg.client, res_name);
-            let server_req = server_message(msg.server, req_name);
-            let server_res = client_message(msg.server, res_name);
+            let client_req = impl_message_from(msg.client, req_name, false);
+            let client_res = impl_message_from(msg.client, res_name, true);
+            let server_req = impl_message_from(msg.server, req_name, true);
+            let server_res = impl_message_from(msg.server, res_name, false);
             let response = msg.response.iter();
 
             quote! {
                 #(#attrs)*
-                pub struct #name;
-                impl crate::proto::Query for #name {
-                    type Request = #req_name;
-                    type Response = #res_name;
-                }
-
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
-                pub struct #req_name { query_id: crate::proto::QueryId, #(#request),* }
+                pub struct #req_name {
+                    pub query_id: crate::proto::QueryId,
+                    #(#request),*
+                }
                 impl crate::proto::Message for #req_name {
                     type Protocol = Proto;
                 }
                 #client_req
                 #server_req
                 impl crate::proto::QueryRequest for #req_name {
-                    type Query = #name;
+                    fn query_id(&self) -> crate::proto::QueryId {
+                        self.query_id
+                    }
 
+                    fn set_query_id(&mut self, id: crate::proto::QueryId) {
+                        self.query_id = id;
+                    }
+                }
+
+                #[derive(Debug, serde::Serialize, serde::Deserialize)]
+                pub struct #res_name { query_id: crate::proto::QueryId, #(#response),* }
+                impl crate::proto::Message for #res_name {
+                    type Protocol = Proto;
+                }
+                impl crate::proto::QueryResponse for #res_name {
                     fn query_id(&self) -> crate::proto::QueryId {
                         self.query_id
                     }
@@ -160,54 +181,13 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                 }
                 #client_res
                 #server_res
-
-                #[derive(Debug, serde::Serialize, serde::Deserialize)]
-                pub struct #res_name { query_id: crate::proto::QueryId, #(#response),* }
-                impl crate::proto::Message for #res_name {
-                    type Protocol = Proto;
-                }
-                impl crate::proto::QueryResponse for #res_name {
-                    type Query = #name;
-
-                    fn query_id(&self) -> crate::proto::QueryId {
-                        self.query_id
-                    }
-
-                    fn set_query_id(&mut self, id: crate::proto::QueryId) {
-                        self.query_id = id;
-                    }
-                }
             }
-        })
-    });
+        });
 
     let ret = quote! {
-        #(#proto_attrs)*
-        pub struct Proto;
-
-        impl crate::proto::Protocol for Proto {
-            type FromClient = FromClient;
-            type FromServer = FromServer;
-
-            fn name() -> &'static str {
-                #proto_name
-            }
-        }
-
-        #[derive(Debug, serde::Serialize, serde::Deserialize)]
-        pub enum FromClient {
-            #(#client_message_names,)*
-            #(#client_query_requests,)*
-            #(#server_query_responses,)*
-        }
-
-        #[derive(Debug, serde::Serialize, serde::Deserialize)]
-        pub enum FromServer {
-            #(#server_message_names,)*
-            #(#server_query_requests,)*
-            #(#client_query_responses,)*
-        }
-
+        #proto
+        #from_client
+        #from_server
         #(#messages)*
         #(#queries)*
     };
