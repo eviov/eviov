@@ -56,7 +56,7 @@ impl<E: Endpoint> TungClient<E> {
 #[async_trait]
 impl<E: Endpoint> Agent<E, E::Peer> for TungClient<E> {
     async fn send_value(&self, message: E) -> Result<(), String> {
-        let bytes = rmp_serde::to_vec(&message).expect("Failed to encode message with rmp");
+        let bytes = rmp_serde::to_vec(&message).expect("Failed to rmp-encode message");
         {
             let mut wss = self.wss.lock().await;
             let result = wss.send(Message::Binary(bytes)).await;

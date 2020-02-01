@@ -8,8 +8,18 @@ use futures::lock::Mutex;
 
 use super::{Endpoint, Message, MessageFrom, QueryId, QueryRequestFrom};
 
-pub mod local;
-pub mod ws;
+mod local;
+pub use local::*;
+
+#[cfg(feature = "trait-tung")]
+mod tung;
+#[cfg(feature = "trait-tung")]
+pub use tung::*;
+
+#[cfg(feature = "trait-stdweb")]
+mod stdweb;
+#[cfg(feature = "trait-stdweb")]
+pub use self::stdweb::*;
 
 pub struct Conn<A, E>
 where
