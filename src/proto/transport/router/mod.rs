@@ -110,10 +110,10 @@ impl<C: WsClient> OutPool<C> {
 
             client
                 .send_message(<<Me as Endpoint>::Protocol as Protocol>::name().as_bytes())
-                .await;
+                .await?;
             let challenge = recv(&client).await?;
             let reply = challenge_fn(&challenge);
-            client.send_message(&reply).await;
+            client.send_message(&reply).await?;
 
             let result: ChallengeResult =
                 rmp_serde::from_read(io::Cursor::new(recv(&client).await?))

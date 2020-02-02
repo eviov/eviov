@@ -2,11 +2,7 @@ use std::marker::PhantomData;
 use std::sync::{Arc, Mutex};
 
 use futures::channel::oneshot;
-use stdweb::web::{
-    self,
-    event::{self, IMessageEvent},
-    IEventTarget, WebSocket,
-};
+use stdweb::web::{self, event, IEventTarget, WebSocket};
 
 use crate::proto::{Endpoint, Protocol};
 

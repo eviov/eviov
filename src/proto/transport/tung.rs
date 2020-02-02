@@ -114,7 +114,8 @@ impl WsClient for TungClient {
     }
 
     async fn close(&self) {
-        let lock = self.wss.lock().await;
-        lock.close(None).await; // the close frame is not used for communication
+        let mut lock = self.wss.lock().await;
+        let _ = lock.close(None).await; // the close frame is not used for communication
+                                        // even if an IO error occurred during close, we don't care because we're already gone
     }
 }

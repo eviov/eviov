@@ -1,5 +1,5 @@
 use std::fmt;
-use std::time::{Duration, };
+use std::time::Duration;
 
 use async_trait::async_trait;
 

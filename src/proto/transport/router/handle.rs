@@ -7,7 +7,7 @@ use futures::lock::Mutex;
 use futures::sink::SinkExt;
 use futures::stream::StreamExt;
 
-use crate::proto::{Endpoint, MessageFrom, Single, QueryId,QueryRequestFrom};
+use crate::proto::{Endpoint, MessageFrom, QueryId, QueryRequestFrom, Single};
 
 pub struct Handle<SendMsg: Endpoint> {
     send: Mutex<mpsc::UnboundedSender<SendMsg>>,
@@ -19,7 +19,10 @@ pub struct Handle<SendMsg: Endpoint> {
 }
 
 impl<SendMsg: Endpoint> Handle<SendMsg> {
-    pub fn new(send: mpsc::UnboundedSender<SendMsg>, recv: mpsc::UnboundedReceiver<SendMsg::Peer>) -> Self {
+    pub fn new(
+        send: mpsc::UnboundedSender<SendMsg>,
+        recv: mpsc::UnboundedReceiver<SendMsg::Peer>,
+    ) -> Self {
         Self {
             send: Mutex::new(send),
             recv: Mutex::new(recv),
@@ -38,7 +41,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         let _ = send.send(message.to_enum()).await; // send error is not significant
     }
 
-    pub async fn send_query<M>(&self, query: M) -> Result<M::Response, String>
+    pub async fn send_query<M>(&self, mut query: M) -> Result<M::Response, String>
     where
         M: QueryRequestFrom<SendMsg>,
     {
@@ -50,7 +53,9 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         let (sender, receiver) = oneshot::channel();
         {
             let mut query_handlers = self.query_handlers.lock().await;
-            query_handlers.insert(query_id, sender);
+            query_handlers
+                .insert(query_id, sender)
+                .expect_none("Duplicate query ID");
         }
 
         {
@@ -73,7 +78,8 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         if let Some(msg) = M::Response::from_enum(msg) {
             Ok(msg)
         } else {
-            self.schedule_error("Query response has incompatible type").await;
+            self.schedule_error("Query response has incompatible type")
+                .await;
             self.check_error().await?;
             unreachable!("check_error() should break after calling schedule_error()")
         }
@@ -92,17 +98,17 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
                     "Race condition: two routines tried to receive the same connection handle"
                 ),
             };
-            let msg: Option<Option<SendMsg::Peer>> = timeout(until, recv.next()).await; // TODO fix timeout
+            let msg: Result<Option<SendMsg::Peer>, _> =
+                crate::timeout::tokio::timeout(until - Instant::now(), recv.next()).await; // TODO fix timeout
 
             let msg = match msg {
-                Some(Some(msg)) => msg,
-                Some(None) => {
-                    self.schedule_error("End of receive stream")
-                        .await;
+                Ok(Some(msg)) => msg,
+                Ok(None) => {
+                    self.schedule_error("End of receive stream").await;
                     self.check_error().await?;
                     unreachable!("check_error() should break after calling schedule_error()")
                 }
-                None => return Ok(None),
+                Err(_) => return Ok(None),
             };
 
             if let Some(query_id) = msg.response_query_id() {
@@ -112,10 +118,13 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
                 };
                 if let Some(sender) = sender {
                     let _ = sender.send(msg);
-                    // do nothing if the receiver stopped awaiting
-                    // (although this shouldn't happen right now)
+                // do nothing if the receiver stopped awaiting
+                // (although this shouldn't happen right now)
                 } else {
-                    self.schedule_error("Received response message with unassociated or obsolete query ID").await;
+                    self.schedule_error(
+                        "Received response message with unassociated or obsolete query ID",
+                    )
+                    .await;
                     self.check_error().await?;
                 }
                 continue;
@@ -157,7 +166,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         let guard = self.error.lock().await;
         match &*guard {
             Some(err) => Err(err.clone()),
-            None => Ok(())
+            None => Ok(()),
         }
     }
 }
