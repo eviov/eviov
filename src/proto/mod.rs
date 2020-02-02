@@ -9,6 +9,7 @@
 //! do not try to implement them by hand.
 
 use std::fmt::Debug;
+use type_equals::TypeEquals;
 
 use serde::{Deserialize, Serialize};
 
@@ -27,13 +28,33 @@ pub trait Endpoint: Debug + Serialize + for<'de> Deserialize<'de> + Send + Sync 
     /// The protocol that this endpoint belongs to.
     type Protocol: Protocol;
     /// The othe side of the protocol, i.e. Client => Server, Server => Client
-    type Peer: Endpoint<Protocol = Self::Protocol>;
+    type Peer: Endpoint<Protocol = Self::Protocol, Peer = Self>;
+
+    /// Retrieves the request query ID of the enum value.
+    ///
+    /// If the enum value represents a query request, this returns the query ID of the request.
+    /// Otherwise, this returns `None`.
+    fn request_query_id(&self) -> Option<QueryId>;
 
     /// Retrieves the response query ID of the enum value.
     ///
     /// If the enum value represents a query response, this returns the query ID of the response.
     /// Otherwise, this returns `None`.
     fn response_query_id(&self) -> Option<QueryId>;
+}
+
+/// A marker trait indicating that the endpoint is the client side of the protocol
+pub trait ClientEndpoint {}
+impl<T: Endpoint> ClientEndpoint for T where
+    <<T as Endpoint>::Protocol as Protocol>::FromClient: TypeEquals<Other = T>
+{
+}
+
+/// A marker trait indicating that the endpoint is the server side of the protocol
+pub trait ServerEndpoint {}
+impl<T: Endpoint> ServerEndpoint for T where
+    <<T as Endpoint>::Protocol as Protocol>::FromServer: TypeEquals<Other = T>
+{
 }
 
 /// Wraps the ID of a query.
@@ -108,7 +129,9 @@ pub trait QueryResponse: Message {
 }
 
 pub mod ch;
-pub mod cs;
+mod cs;
+pub use cs::ctrl as cs_ctrl;
+pub use cs::obs as cs_obs;
 pub mod intra;
 pub mod sh;
 pub mod time;

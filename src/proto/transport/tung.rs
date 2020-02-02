@@ -1,5 +1,3 @@
-use std::io::Cursor;
-use std::marker::PhantomData;
 use std::time::Duration;
 
 use async_trait::async_trait;
@@ -13,16 +11,16 @@ use tokio_tungstenite::{
     WebSocketStream,
 };
 
-use crate::proto::{transport::Agent, Endpoint};
+use super::WsClient;
 
 type Wss = WebSocketStream<TcpStream>;
 
-pub struct TungClient<E: Endpoint> {
+#[derive(Debug)]
+pub struct TungClient {
     wss: Mutex<Wss>,
-    _ph: PhantomData<E>,
 }
 
-impl<E: Endpoint> TungClient<E> {
+impl TungClient {
     #[inline]
     fn handle_write_err(
         wss: &mut Wss,
@@ -54,12 +52,19 @@ impl<E: Endpoint> TungClient<E> {
 }
 
 #[async_trait]
-impl<E: Endpoint> Agent<E, E::Peer> for TungClient<E> {
-    async fn send_value(&self, message: E) -> Result<(), String> {
-        let bytes = rmp_serde::to_vec(&message).expect("Failed to rmp-encode message");
+impl WsClient for TungClient {
+    async fn open(server: &str) -> Result<Self, String> {
+        let (wss, _) = tokio_tungstenite::connect_async(server)
+            .await
+            .map_err(|err| err.to_string())?;
+        let wss = Mutex::new(wss);
+        Ok(Self { wss })
+    }
+
+    async fn send_message(&self, bytes: &[u8]) -> Result<(), String> {
         {
             let mut wss = self.wss.lock().await;
-            let result = wss.send(Message::Binary(bytes)).await;
+            let result = wss.send(Message::Binary(bytes.to_vec())).await;
             if let Err(err) = result {
                 Self::handle_write_err(&mut wss, err, false).await?;
             }
@@ -67,7 +72,7 @@ impl<E: Endpoint> Agent<E, E::Peer> for TungClient<E> {
         Ok(())
     }
 
-    async fn await_message(&self, time: Duration) -> Result<Option<E::Peer>, String> {
+    async fn await_message(&self, time: Duration) -> Result<Option<Vec<u8>>, String> {
         loop {
             let result = {
                 let mut wss = self.wss.lock().await;
@@ -104,13 +109,12 @@ impl<E: Endpoint> Agent<E, E::Peer> for TungClient<E> {
                     return Err(String::new());
                 }
             };
-            let e: E::Peer =
-                rmp_serde::from_read(Cursor::new(&message)).map_err(|err| err.to_string())?;
-            break Ok(Some(e));
+            break Ok(Some(message));
         }
     }
 
-    fn close(&self) {
-        unimplemented!()
+    async fn close(&self) {
+        let lock = self.wss.lock().await;
+        lock.close(None).await; // the close frame is not used for communication
     }
 }

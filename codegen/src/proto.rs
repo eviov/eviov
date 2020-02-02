@@ -12,6 +12,8 @@ mod kw {
 
     syn::custom_keyword!(message);
     syn::custom_keyword!(query);
+
+    syn::custom_keyword!(name);
 }
 
 pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
@@ -77,6 +79,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                         .filter_map(|def| option_match!(def, Def::Message(msg) => &msg.name))
                         .map(|ident| quote!(#ident(#ident)));
             let req = query_req_res_idents!($me, Request);
+            let req_qid = req.clone().map(|ident| quote!($FromMe::#ident(msg) => Some(msg.query_id)));
             let req_idents = req.map(|ident| quote!(#ident(#ident)));
             let res = query_req_res_idents!($peer, Response);
             let res_qid = res.clone().map(|ident| quote!($FromMe::#ident(msg) => Some(msg.query_id)));
@@ -92,6 +95,13 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                 impl crate::proto::Endpoint for $FromMe {
                     type Protocol = Proto;
                     type Peer = $FromPeer;
+
+                    fn request_query_id(&self) -> Option<crate::proto::QueryId> {
+                        match self {
+                            #(#req_qid,)*
+                            _ => None,
+                        }
+                    }
 
                     fn response_query_id(&self) -> Option<crate::proto::QueryId> {
                         match self {
@@ -219,8 +229,10 @@ impl Parse for Input {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let attrs = syn::Attribute::parse_outer(input)?;
 
+        let _ = input.parse::<kw::name>()?;
+        let _ = input.parse::<syn::Token![=]>().unwrap();
         let name = input.parse::<syn::LitStr>()?.value();
-        let _ = input.parse::<syn::Token![;]>().unwrap();
+        let _ = input.parse::<syn::Token![;]>()?;
 
         let mut defs = vec![];
         while !input.is_empty() {

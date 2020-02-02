@@ -759,11 +759,14 @@ dependencies = [
  "num-traits",
  "operator-sugar",
  "parking_lot 0.10.0",
+ "ring",
  "rmp-serde",
  "serde",
  "stdweb",
  "tokio",
  "tokio-tungstenite",
+ "type-equals",
+ "typemap",
  "url",
 ]
 
@@ -1709,6 +1712,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "ring"
+version = "0.16.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "113f53b644c5442e20ff3a299be3d6c61ba143737af5bd2ab298e248a7575b2d"
+dependencies = [
+ "cc",
+ "lazy_static",
+ "libc",
+ "spin",
+ "untrusted",
+ "web-sys",
+ "winapi 0.3.8",
+]
+
+[[package]]
 name = "rmp"
 version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1720,9 +1738,9 @@ dependencies = [
 
 [[package]]
 name = "rmp-serde"
-version = "0.14.1"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e7eb83b1ac8504b5df96292d53e140b899fb3e95bc53e7784755e5e221465c7"
+checksum = "4a31c0798045f039ace94e0166f76478b3ba83116ec7c9d4bc934c5b13b8df21"
 dependencies = [
  "byteorder",
  "rmp",
@@ -1899,6 +1917,12 @@ name = "sourcefile"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4bf77cb82ba8453b42b6ae1d692e4cdc92f9a47beaf89a847c8be83f4e328ad3"
+
+[[package]]
+name = "spin"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "stdweb"
@@ -2102,6 +2126,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "traitobject"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "efd1f82c56340fdf16f2a953d7bda4f8fdffba13d93b00844c25572110b26079"
+
+[[package]]
 name = "trust-dns-proto"
 version = "0.18.0-alpha.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2160,6 +2190,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "type-equals"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a84e1896346ff3dc15668ce862ebcf159da02a836dde7e9ef0e0d2e8a10f1ceb"
+
+[[package]]
+name = "typemap"
+version = "0.3.3"
+source = "git+https://github.com/SOF3/rust-typemap#faf2d16a25605363ed6be131211440afebb255bb"
+dependencies = [
+ "unsafe-any",
+]
+
+[[package]]
 name = "typenum"
 version = "1.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2200,6 +2244,21 @@ name = "unicode-xid"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "826e7639553986605ec5979c7dd957c7895e93eabed50ab2ffa7f6128a75097c"
+
+[[package]]
+name = "unsafe-any"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f30360d7979f5e9c6e6cea48af192ea8fab4afb3cf72597154b8f08935bc9c7f"
+dependencies = [
+ "traitobject",
+]
+
+[[package]]
+name = "untrusted"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "60369ef7a31de49bcb3f6ca728d4ba7300d9a1658f94c727d4cab8c8d9f4aece"
 
 [[package]]
 name = "url"

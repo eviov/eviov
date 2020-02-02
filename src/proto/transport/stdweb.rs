@@ -1,7 +1,6 @@
 use std::marker::PhantomData;
 use std::sync::{Arc, Mutex};
 
-use async_trait::async_trait;
 use futures::channel::oneshot;
 use stdweb::web::{
     self,
@@ -9,7 +8,7 @@ use stdweb::web::{
     IEventTarget, WebSocket,
 };
 
-use crate::proto::{transport::Agent, Endpoint, Protocol};
+use crate::proto::{Endpoint, Protocol};
 
 pub struct StdwebWs<E: Endpoint> {
     ws: Arc<WebSocket>,

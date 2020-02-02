@@ -1,3 +1,3 @@
 codegen::proto! {
-    "eviov-client-hub";
+    name = "eviov-client-hub";
 }

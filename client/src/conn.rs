@@ -97,18 +97,7 @@ impl Fsm {
     fn message(&mut self, event: event::SocketMessageEvent) {
         use event::IMessageEvent;
         match event.data() {
-            event::SocketMessageData::ArrayBuffer(buf) => {
-                let buf = Vec::<u8>::from(buf);
-                let _data: eviov::proto::cs::FromServer = match rmp_serde::from_read_ref(&buf) {
-                    Ok(value) => value,
-                    Err(err) => {
-                        log::warn!("Failed decoding ws data: {}", err);
-                        return;
-                    }
-                };
-
-                unimplemented!()
-            }
+            event::SocketMessageData::ArrayBuffer(_buf) => unimplemented!(),
             data @ _ => {
                 log::warn!("Expected ArrayBuffer from ws, got {:?}", data);
             }
