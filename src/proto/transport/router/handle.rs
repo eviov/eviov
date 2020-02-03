@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::Arc;
 use std::time::Instant;
 
 use futures::channel::{mpsc, oneshot};
@@ -7,11 +8,11 @@ use futures::lock::Mutex;
 use futures::sink::SinkExt;
 use futures::stream::StreamExt;
 
-use crate::proto::{Endpoint, MessageFrom, QueryId, QueryRequestFrom, Single};
+use crate::proto::{Endpoint, Handler, MessageFrom, QueryId, QueryRequestFrom, Single};
 
 #[derive(Debug)]
 pub struct Handle<SendMsg: Endpoint> {
-    send: Mutex<mpsc::UnboundedSender<SendMsg>>,
+    send: Arc<Mutex<mpsc::UnboundedSender<SendMsg>>>,
     recv: Mutex<mpsc::UnboundedReceiver<SendMsg::Peer>>,
 
     error: Mutex<Option<String>>,
@@ -19,13 +20,14 @@ pub struct Handle<SendMsg: Endpoint> {
     query_handlers: Mutex<HashMap<QueryId, oneshot::Sender<SendMsg::Peer>>>,
 }
 
-impl<SendMsg: Endpoint> Handle<SendMsg> {
+impl<SendMsg: Endpoint> Handle<SendMsg>
+{
     pub fn new(
         send: mpsc::UnboundedSender<SendMsg>,
         recv: mpsc::UnboundedReceiver<SendMsg::Peer>,
     ) -> Self {
         Self {
-            send: Mutex::new(send),
+            send: Arc::new(Mutex::new(send)),
             recv: Mutex::new(recv),
 
             error: Mutex::new(None),
@@ -86,21 +88,28 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         }
     }
 
-    pub async fn receive_message(&self, until: Instant) -> Result<Option<SendMsg::Peer>, String> {
-        // no problem that we lock recv for a long time, since it is a bug if there are two
-        // routines trying to receive from the same connection handle simultaneously.
+    pub async fn heartbeat<H>(&self, until: Instant, handler: Arc<H>, context: crate::Context<impl crate::ContextImpl>) -> Result<(), String>
+where
+    H: Handler<Endpoint = SendMsg>,
+    {
+        let mut recv = match self.recv.try_lock() {
+            Some(guard) => guard,
+            None => panic!(
+                "Race condition: two routines tried to receive the same connection handle"
+                ),
+        };
 
         loop {
             self.check_error().await?;
 
-            let mut recv = match self.recv.try_lock() {
-                Some(guard) => guard,
-                None => panic!(
-                    "Race condition: two routines tried to receive the same connection handle"
-                ),
-            };
-            let msg: Result<Option<SendMsg::Peer>, _> =
-                crate::timeout(until - Instant::now(), recv.next()).await; // TODO fix timeout
+            // no problem that we lock recv for a long time, since it is a bug if there are two
+            // routines trying to receive from the same connection handle simultaneously.
+
+            let now = Instant::now(); // store the duration, to avoid race conditions
+            if until <= now {
+                return Ok(()); // timeout
+            }
+            let msg: Result<Option<SendMsg::Peer>, _> = context.timeout(until - now, recv.next()).await;
 
             let msg = match msg {
                 Ok(Some(msg)) => msg,
@@ -109,7 +118,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
                     self.check_error().await?;
                     unreachable!("check_error() should break after calling schedule_error()")
                 }
-                Err(_) => return Ok(None),
+                Err(_) => return Ok(()), // timeout reached
             };
 
             if let Some(query_id) = msg.response_query_id() {
@@ -119,23 +128,28 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
                 };
                 if let Some(sender) = sender {
                     let _ = sender.send(msg);
-                // do nothing if the receiver stopped awaiting
-                // (although this shouldn't happen right now)
+                    // do nothing if the receiver stopped awaiting
+                    // (although this shouldn't happen right now)
                 } else {
                     self.schedule_error(
                         "Received response message with unassociated or obsolete query ID",
-                    )
-                    .await;
+                        )
+                        .await;
                     self.check_error().await?;
                 }
-                continue;
-            } else if let Some(query_id) = msg.request_query_id() {
-                // TODO handle query
-                continue;
             } else {
-                break Ok(Some(msg));
+                let send = Arc::clone(&self.send);
+                let handler = Arc::clone(&handler);
+                let future = async move {
+                    if let Some(resp) = handler.handle_message(msg).await {
+                        let mut send = send.lock().await;
+                        let _ = send.send(resp).await; // send error is not significant
+                    }
+                };
+                context.spawn(future);
             }
         }
+        // this loop always breaks at the `timeout` function
     }
 
     async fn schedule_error(&self, err: impl Into<String>) {

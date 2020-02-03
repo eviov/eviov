@@ -1,5 +1,6 @@
+use heck::*;
 use matches2::option_match;
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use quote::{format_ident, ToTokens};
 use syn::parse::{Parse, ParseStream};
@@ -31,7 +32,12 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
         };
     }
 
-    fn impl_message_from(some: bool, ident: &syn::Ident, server: bool) -> TokenStream {
+    fn impl_message_from(
+        some: bool,
+        ident: &syn::Ident,
+        server: bool,
+        response: Option<&syn::Ident>,
+    ) -> TokenStream {
         if !some {
             return quote!();
         }
@@ -39,6 +45,16 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             quote!(Server)
         } else {
             quote!(Client)
+        };
+
+        let resp = if let Some(response) = response {
+            quote! {
+                impl crate::proto::QueryRequestFrom<#from> for #ident {
+                    type Response = #response;
+                }
+            }
+        } else {
+            quote!()
         };
         quote! {
             impl crate::proto::MessageFrom<#from> for #ident {
@@ -53,6 +69,8 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                     }
                 }
             }
+
+            #resp
         }
     }
 
@@ -73,28 +91,33 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
     };
 
     macro_rules! enum_from {
-        ($me:ident, $peer:ident, $FromMe:ident, $FromPeer:ident) => {{
+        ($me:ident, $peer:ident) => {{
+            let me_camel = stringify!($me).to_camel_case();
+            let me_camel_ident = syn::Ident::new(&me_camel, Span::call_site());
+            let peer_camel = stringify!($peer).to_camel_case();
+            let peer_camel_ident = syn::Ident::new(&peer_camel, Span::call_site());
 
             let msg = defs.iter().filter(|def| def.$me())
-                        .filter_map(|def| option_match!(def, Def::Message(msg) => &msg.name))
-                        .map(|ident| quote!(#ident(#ident)));
+                        .filter_map(|def| option_match!(def, Def::Message(msg) => &msg.name));
+            let msg_arms = msg.clone().map(|ident| quote!(#ident(#ident)));
             let req = query_req_res_idents!($me, Request);
-            let req_qid = req.clone().map(|ident| quote!($FromMe::#ident(msg) => Some(msg.query_id)));
-            let req_idents = req.map(|ident| quote!(#ident(#ident)));
+            let req_qid = req.clone().map(|ident| quote!(#me_camel_ident::#ident(msg) => Some(msg.query_id)));
+            let req_idents = req.clone().map(|ident| quote!(#ident(#ident)));
             let res = query_req_res_idents!($peer, Response);
-            let res_qid = res.clone().map(|ident| quote!($FromMe::#ident(msg) => Some(msg.query_id)));
+            let res_qid = res.clone().map(|ident| quote!(#me_camel_ident::#ident(msg) => Some(msg.query_id)));
             let res_idents = res.map(|ident| quote!(#ident(#ident)));
-            quote! {
+
+            let endpoint = quote! {
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
-                pub enum $FromMe {
-                    #(#msg,)*
+                pub enum #me_camel_ident {
+                    #(#msg_arms,)*
                     #(#req_idents,)*
                     #(#res_idents,)*
                 }
 
-                impl crate::proto::Endpoint for $FromMe {
+                impl crate::proto::Endpoint for #me_camel_ident {
                     type Protocol = Proto;
-                    type Peer = $FromPeer;
+                    type Peer = #peer_camel_ident;
 
                     fn request_query_id(&self) -> Option<crate::proto::QueryId> {
                         match self {
@@ -110,11 +133,72 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                         }
                     }
                 }
+            };
+
+            let peer_handler_wrapper = &format_ident!("{}HandlerWrapper", peer_camel);
+            let peer_handler = &format_ident!("{}Handler", peer_camel);
+
+            let (handle_message_arms, handle_message_methods): (Vec<_>, Vec<_>) = msg.map(|ident| {
+                let ident = &ident;
+                let method_name = &syn::Ident::new(&format!("Handle{}", ident).to_snake_case(), ident.span());
+                (quote! {
+                    #me_camel_ident::#ident(message) => {
+                        (self.0).#method_name(message).await;
+                        None
+                    }
+                }, quote! {
+                    async fn #method_name(&self, message: #ident);
+                })
+            }).unzip();
+            let (handle_request_arms, handle_request_methods): (Vec<_>, Vec<_>) = req.map(|ident| {
+                let ident = &ident;
+                let method_name = &syn::Ident::new(&format!("Handle{}", ident).to_snake_case(), ident.span());
+                (quote! {
+                    #me_camel_ident::#ident(request) => {
+                        use crate::proto::MessageFrom;
+
+                        let query_id = request.query_id;
+                        let mut response = (self.0).#method_name(request).await;
+                        response.query_id = query_id;
+                        Some(response.to_enum())
+                    }
+                }, quote! {
+                    async fn #method_name(&self, request: #ident) -> <#ident as crate::proto::QueryRequestFrom<#me_camel_ident>>::Response;
+                })
+            }).unzip();
+
+            let handler = quote! {
+                #[derive(Debug)]
+                pub struct #peer_handler_wrapper<H: #peer_handler>(pub H);
+
+                #[::async_trait::async_trait]
+                impl<H: #peer_handler>  crate::proto::Handler for #peer_handler_wrapper<H>{
+                    type Endpoint = #peer_camel_ident;
+
+                    async fn handle_message(&self, e: #me_camel_ident) -> Option<Self::Endpoint> {
+                        match e {
+                            #(#handle_request_arms,)*
+                            #(#handle_message_arms,)*
+                            _ => unreachable!("handle_message() should not handle response messages"),
+                        }
+                    }
+                }
+
+                #[::async_trait::async_trait]
+                pub trait #peer_handler: Sized + Send + Sync + 'static {
+                    #(#handle_request_methods)*
+                    #(#handle_message_methods)*
+                }
+            };
+
+            quote! {
+                #endpoint
+                #handler
             }
         }};
     }
-    let from_client = enum_from!(client, server, Client, Server);
-    let from_server = enum_from!(server, client, Server, Client);
+    let from_client = enum_from!(client, server);
+    let from_server = enum_from!(server, client);
 
     let messages = defs
         .iter()
@@ -124,8 +208,8 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             let name = &msg.name;
             let fields = msg.fields.iter();
 
-            let client = impl_message_from(msg.client, name, false);
-            let server = impl_message_from(msg.server, name, true);
+            let client = impl_message_from(msg.client, name, false, None);
+            let server = impl_message_from(msg.server, name, true, None);
 
             quote! {
                 #(#attrs)*
@@ -152,10 +236,10 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             let res_name = &format_ident!("{}Response", name);
 
             let request = msg.request.iter();
-            let client_req = impl_message_from(msg.client, req_name, false);
-            let client_res = impl_message_from(msg.client, res_name, true);
-            let server_req = impl_message_from(msg.server, req_name, true);
-            let server_res = impl_message_from(msg.server, res_name, false);
+            let client_req = impl_message_from(msg.client, req_name, false, Some(res_name));
+            let client_res = impl_message_from(msg.client, res_name, true, None);
+            let server_req = impl_message_from(msg.server, req_name, true, Some(res_name));
+            let server_res = impl_message_from(msg.server, res_name, false, None);
             let response = msg.response.iter();
 
             quote! {
@@ -216,6 +300,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
         #(#messages)*
         #(#queries)*
     };
+    //println!("=================\n=============\n{}", &ret);
     Ok(ret)
 }
 

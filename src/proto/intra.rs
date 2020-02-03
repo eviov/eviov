@@ -1,9 +1,11 @@
 use crate::math::{Eci, Time};
 use crate::ObjectId;
 
-// Server = parent large body, Client = child large body
-
 codegen::proto! {
+    /// Communication between systems.
+    ///
+    /// In this protocol, the server is the parent system, and the client is the child system.
+
     name = "eviov-intra";
 
     /// Binds the connection to a child.

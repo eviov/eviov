@@ -791,6 +791,7 @@ dependencies = [
 name = "eviov-codegen"
 version = "0.0.0"
 dependencies = [
+ "heck",
  "matches2",
  "proc-macro2 1.0.8",
  "quote 1.0.2",

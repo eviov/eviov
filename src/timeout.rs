@@ -36,9 +36,6 @@ mod tokio {
 
     use futures::future::{self, Either, Future};
 
-    pub fn delay(duration: Duration) -> tokio::time::Delay {
-        tokio::time::delay_for(duration)
-    }
 
     pub async fn timeout<T, F: Future<Output = T> + Unpin>(
         duration: Duration,
