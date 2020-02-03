@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use async_trait::async_trait;
 use derive_more::From;
-use futures::future::{self, Either, Future,FutureExt};
+use futures::future::{self, Either, Future, FutureExt};
 
 #[async_trait]
 pub trait ContextImpl: Sized + Send + Sync + 'static {

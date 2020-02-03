@@ -20,8 +20,7 @@ pub struct Handle<SendMsg: Endpoint> {
     query_handlers: Mutex<HashMap<QueryId, oneshot::Sender<SendMsg::Peer>>>,
 }
 
-impl<SendMsg: Endpoint> Handle<SendMsg>
-{
+impl<SendMsg: Endpoint> Handle<SendMsg> {
     pub fn new(
         send: mpsc::UnboundedSender<SendMsg>,
         recv: mpsc::UnboundedReceiver<SendMsg::Peer>,
@@ -88,15 +87,20 @@ impl<SendMsg: Endpoint> Handle<SendMsg>
         }
     }
 
-    pub async fn heartbeat<H>(&self, until: Instant, handler: Arc<H>, context: crate::Context<impl crate::ContextImpl>) -> Result<(), String>
-where
-    H: Handler<Endpoint = SendMsg>,
+    pub async fn heartbeat<H>(
+        &self,
+        until: Instant,
+        handler: Arc<H>,
+        context: crate::Context<impl crate::ContextImpl>,
+    ) -> Result<(), String>
+    where
+        H: Handler<Endpoint = SendMsg>,
     {
         let mut recv = match self.recv.try_lock() {
             Some(guard) => guard,
-            None => panic!(
-                "Race condition: two routines tried to receive the same connection handle"
-                ),
+            None => {
+                panic!("Race condition: two routines tried to receive the same connection handle")
+            }
         };
 
         loop {
@@ -109,7 +113,8 @@ where
             if until <= now {
                 return Ok(()); // timeout
             }
-            let msg: Result<Option<SendMsg::Peer>, _> = context.timeout(until - now, recv.next()).await;
+            let msg: Result<Option<SendMsg::Peer>, _> =
+                context.timeout(until - now, recv.next()).await;
 
             let msg = match msg {
                 Ok(Some(msg)) => msg,
@@ -127,14 +132,14 @@ where
                     query_handlers.remove(&query_id)
                 };
                 if let Some(sender) = sender {
-                    let _ = sender.send(msg);
                     // do nothing if the receiver stopped awaiting
                     // (although this shouldn't happen right now)
+                    let _ = sender.send(msg);
                 } else {
                     self.schedule_error(
                         "Received response message with unassociated or obsolete query ID",
-                        )
-                        .await;
+                    )
+                    .await;
                     self.check_error().await?;
                 }
             } else {
