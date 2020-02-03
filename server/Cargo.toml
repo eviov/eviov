@@ -17,7 +17,7 @@ actix-web-actors = "2.0.0"
 async-trait = "0.1.22"
 crossbeam = "0.7.3"
 derive_more = "0.99.2"
-eviov = {path = "..", features = ["trait-rwlock", "trait-tung", "trait-tokio"]}
+eviov = {path = "..", default-features = false, features = ["not-wasm"]}
 futures = {version = "0.3.1", features = ["compat"]}
 getset = "0.0.9"
 legion = "0.2.1"

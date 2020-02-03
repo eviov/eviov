@@ -1,5 +1,5 @@
-#[cfg(feature = "trait-stdweb")]
-pub mod stdweb {
+#[cfg(target_arch = "wasm32")]
+mod stdweb {
     use std::time::Duration;
 
     use futures::channel::oneshot;
@@ -27,9 +27,11 @@ pub mod stdweb {
         }
     }
 }
+#[cfg(target_arch = "wasm32")]
+pub use self::stdweb::*;
 
-#[cfg(feature = "trait-tokio")]
-pub mod tokio {
+#[cfg(not(target_arch = "wasm32"))]
+mod tokio {
     use std::time::Duration;
 
     use futures::future::{self, Either, Future};
@@ -48,3 +50,5 @@ pub mod tokio {
         }
     }
 }
+#[cfg(not(target_arch = "wasm32"))]
+pub use self::tokio::*;

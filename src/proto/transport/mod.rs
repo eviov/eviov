@@ -6,14 +6,14 @@ use async_trait::async_trait;
 mod router;
 pub use router::*;
 
-#[cfg(feature = "trait-tung")]
+#[cfg(not(target_arch = "wasm32"))]
 mod tung;
-#[cfg(feature = "trait-tung")]
+#[cfg(not(target_arch = "wasm32"))]
 pub use tung::*;
 
-#[cfg(feature = "trait-stdweb")]
+#[cfg(target_arch = "wasm32")]
 mod stdweb;
-#[cfg(feature = "trait-stdweb")]
+#[cfg(target_arch = "wasm32")]
 pub use self::stdweb::*;
 
 #[async_trait]

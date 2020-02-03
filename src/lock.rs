@@ -12,7 +12,7 @@ pub trait Lock<'t, T> {
 }
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "trait-rwlock")] {
+    if #[cfg(not(target_arch = "wasm32"))] {
         use parking_lot::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
         impl<'t, T: 't> Lock<'t, T> for RwLock<T> {
@@ -32,6 +32,7 @@ cfg_if::cfg_if! {
         }
     }
 }
+
 impl<'t, T: 't> Lock<'t, T> for cell::RefCell<T> {
     fn new(value: T) -> Self {
         Self::new(value)

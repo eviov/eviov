@@ -13,11 +13,9 @@ readme = "README.md"
 description = "Orbital shooters game"
 
 [features]
-trait-refcell = []
-trait-rwlock = ["parking_lot"]
-trait-tung = ["tokio-tungstenite", "tokio", "url", "parking_lot"]
-trait-stdweb = ["stdweb"]
-trait-tokio = ["tokio"]
+default = ["wasm", "not-wasm"]
+wasm = ["stdweb"]
+not-wasm = ["parking_lot", "tokio", "tokio-tungstenite", "url"]
 
 [dependencies]
 async-trait = "0.1.22"

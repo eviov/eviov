@@ -99,7 +99,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
                 ),
             };
             let msg: Result<Option<SendMsg::Peer>, _> =
-                crate::timeout::tokio::timeout(until - Instant::now(), recv.next()).await; // TODO fix timeout
+                crate::timeout(until - Instant::now(), recv.next()).await; // TODO fix timeout
 
             let msg = match msg {
                 Ok(Some(msg)) => msg,

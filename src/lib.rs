@@ -7,8 +7,9 @@ pub use id::*;
 mod time;
 pub use time::*;
 mod lock;
-pub mod timeout;
 pub use lock::Lock;
+mod timeout;
+pub use timeout::*;
 
 pub mod hardcode;
 pub mod math;
