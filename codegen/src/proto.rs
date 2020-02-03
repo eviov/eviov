@@ -36,9 +36,9 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             return quote!();
         }
         let from = if server {
-            quote!(FromServer)
+            quote!(Server)
         } else {
-            quote!(FromClient)
+            quote!(Client)
         };
         quote! {
             impl crate::proto::MessageFrom<#from> for #ident {
@@ -63,8 +63,8 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
         pub struct Proto;
 
         impl crate::proto::Protocol for Proto {
-            type FromClient = FromClient;
-            type FromServer = FromServer;
+            type Client = Client;
+            type Server = Server;
 
             fn name() -> &'static str {
                 #proto_name
@@ -113,8 +113,8 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             }
         }};
     }
-    let from_client = enum_from!(client, server, FromClient, FromServer);
-    let from_server = enum_from!(server, client, FromServer, FromClient);
+    let from_client = enum_from!(client, server, Client, Server);
+    let from_server = enum_from!(server, client, Server, Client);
 
     let messages = defs
         .iter()

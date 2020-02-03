@@ -9,6 +9,7 @@ use futures::stream::StreamExt;
 
 use crate::proto::{Endpoint, MessageFrom, QueryId, QueryRequestFrom, Single};
 
+#[derive(Debug)]
 pub struct Handle<SendMsg: Endpoint> {
     send: Mutex<mpsc::UnboundedSender<SendMsg>>,
     recv: Mutex<mpsc::UnboundedReceiver<SendMsg::Peer>>,

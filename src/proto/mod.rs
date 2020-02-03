@@ -17,8 +17,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// This trait is implemented by unit structs, which exist only for type inference.
 pub trait Protocol: Send + Sync + 'static {
-    type FromClient: Endpoint;
-    type FromServer: Endpoint;
+    type Client: Endpoint;
+    type Server: Endpoint;
 
     fn name() -> &'static str;
 }
@@ -46,14 +46,14 @@ pub trait Endpoint: Debug + Serialize + for<'de> Deserialize<'de> + Send + Sync 
 /// A marker trait indicating that the endpoint is the client side of the protocol
 pub trait ClientEndpoint {}
 impl<T: Endpoint> ClientEndpoint for T where
-    <<T as Endpoint>::Protocol as Protocol>::FromClient: TypeEquals<Other = T>
+    <<T as Endpoint>::Protocol as Protocol>::Client: TypeEquals<Other = T>
 {
 }
 
 /// A marker trait indicating that the endpoint is the server side of the protocol
 pub trait ServerEndpoint {}
 impl<T: Endpoint> ServerEndpoint for T where
-    <<T as Endpoint>::Protocol as Protocol>::FromServer: TypeEquals<Other = T>
+    <<T as Endpoint>::Protocol as Protocol>::Server: TypeEquals<Other = T>
 {
 }
 

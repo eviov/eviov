@@ -16,9 +16,9 @@ impl Default for AllReceivers {
         macro_rules! protos {
             ($($proto:ident),* $(,)?) => {
                 $(
-                    map.insert::<typemap::K<Receivers<proto::$proto::FromClient>>>(Receivers::default())
+                    map.insert::<typemap::K<Receivers<proto::$proto::Client>>>(Receivers::default())
                         .expect_none("Duplicate insert");
-                    map.insert::<typemap::K<Receivers<proto::$proto::FromServer>>>(Receivers::default())
+                    map.insert::<typemap::K<Receivers<proto::$proto::Server>>>(Receivers::default())
                         .expect_none("Duplicate insert");
                 )*
             };
