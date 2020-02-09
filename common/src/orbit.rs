@@ -1,5 +1,6 @@
 use eviov_types::{Eci, Mass, Time, Vector};
 
+/// Denotes an orbit, sensitive to initial time (the true anomaly).
 #[derive(Debug)]
 pub struct Orbit {
     /// Gravitational constant times mass
@@ -15,6 +16,7 @@ pub struct Orbit {
 }
 
 impl Orbit {
+    /// Evaluates the orbit from the momentary ECI and mass of the parent.
     pub fn from_mass_eci(mass: Mass, eci: Eci) -> Self {
         // Reference: https://space.stackexchange.com/a/2590/29538
         // TODO: perform analysis on numerical issues
@@ -51,6 +53,7 @@ impl Orbit {
         }
     }
 
+    /// Returns the state of the orbit at the specified instant.
     pub fn instant(&self, t: Time) -> OrbitInstant<'_> {
         let Time(t) = t;
 
@@ -61,6 +64,7 @@ impl Orbit {
     }
 }
 
+/// The information calculated about the orbit at the specified instant.
 pub struct OrbitInstant<'t> {
     orbit: &'t Orbit,
     m: f64,

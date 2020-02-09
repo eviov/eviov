@@ -1,6 +1,11 @@
+//! The main common crate for the client and servers.
+//!
+//! This crate reexports items defined in other subcrates.
+
 #![feature(type_alias_impl_trait, option_expect_none)]
 #![allow(dead_code, unused_variables, unreachable_code)]
 #![warn(
+    missing_docs,
     unused_results,
     unused_qualifications,
     variant_size_differences,
@@ -24,17 +29,17 @@
 
 pub use eviov_context::*;
 pub use eviov_types::*;
-pub mod proto {
-    pub use eviov_proto::*;
-}
-pub mod transport {
-    pub use eviov_transport::*;
-}
+pub use eviov_proto as proto;
+pub use eviov_transport as transport;
 
-pub mod orbit;
+mod orbit;
+pub use orbit::*;
 
+/// General-purpose enum to denote the termination action of a looping function.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LoopAction {
+    /// Stop executing the loop
     Break,
+    /// Continue executing the loop
     Continue,
 }
