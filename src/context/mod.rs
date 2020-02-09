@@ -4,10 +4,10 @@ use async_trait::async_trait;
 use derive_more::From;
 use futures::future::{self, Either, Future, FutureExt};
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(feature = "wasm")]
 pub mod wasm;
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(feature = "not-wasm")]
 pub mod tokio;
 
 #[async_trait]
