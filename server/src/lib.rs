@@ -36,7 +36,7 @@ fn create_clock() -> ! {
     unimplemented!()
 }
 
-#[actix_rt::main]
+#[tokio::main]
 pub async fn start<X: Plugin>() -> io::Result<()> {
     pretty_env_logger::init();
 

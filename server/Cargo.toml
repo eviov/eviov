@@ -10,10 +10,6 @@ readme = "README.md"
 description = "Orbital shooters game"
 
 [dependencies]
-actix = "0.9.0"
-actix-rt = "1.0.0"
-actix-web = "2.0.0"
-actix-web-actors = "2.0.0"
 async-trait = "0.1.22"
 crossbeam = "0.7.3"
 derive_more = "0.99.2"
@@ -28,4 +24,5 @@ rand = "0.7.3"
 rmp-serde = "0.14.0"
 serde = {version = "1.0.104", features = ["derive"]}
 smallvec = "1.1.0"
-tokio = {version = "0.2.9", features = ["time"]}
+tokio = {version = "0.2.11", features = ["macros", "rt-threaded", "tcp", "time"]}
+tokio-tungstenite = "0.10.1"
