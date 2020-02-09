@@ -1,6 +1,6 @@
 /// The observer channel
 pub mod obs {
-    use crate::math::Time;
+    use eviov_types::Time;
 
     codegen::proto! {
         name = "eviov-cs-observer";
@@ -36,19 +36,21 @@ pub mod obs {
 
     #[derive(Debug, serde::Serialize, serde::Deserialize)]
     pub enum EventContent {
-        Accel(crate::ObjectId), // add info
+        Accel(eviov_types::ObjectId), // add info
     }
 }
 
 /// The control channel
 pub mod ctrl {
+    use eviov_types::ObjectId;
+
     codegen::proto! {
         name = "eviov-cs-control";
 
         /// Requests control on an object.
         client query Handshake {
             /// The object to control
-            object: crate::ObjectId,
+            object: ObjectId,
             /// The password to authenticate control
             password: u64,
         } -> {

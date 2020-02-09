@@ -2,14 +2,13 @@ use std::collections::HashMap;
 use std::io;
 use std::sync::Arc;
 
+use eviov_proto::{ClientEndpoint, Endpoint, Protocol};
+use eviov_types::ObjectId;
 use futures::channel::mpsc;
 use futures::lock::Mutex;
 use serde::{Deserialize, Serialize};
 
 use super::WsClient;
-use crate::hardcode;
-use crate::proto::{ClientEndpoint, Endpoint, Protocol};
-use crate::ObjectId;
 
 mod receiver;
 use receiver::AllReceivers;
@@ -101,7 +100,7 @@ impl<C: WsClient> OutPool<C> {
             let client = C::open(server).await?;
 
             async fn recv<C: WsClient>(client: &C) -> Result<Vec<u8>, OpenError> {
-                match client.await_message(hardcode::OPEN_CONN_TIMEOUT).await {
+                match client.await_message(crate::OPEN_CONN_TIMEOUT).await {
                     Ok(Some(challenge)) => Ok(challenge),
                     Ok(None) => Err(OpenError::Timeout),
                     Err(err) => Err(OpenError::Io(err)),

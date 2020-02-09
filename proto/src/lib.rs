@@ -1,9 +1,32 @@
+#![allow(dead_code, unused_variables, unreachable_code)]
+#![warn(
+    unused_results,
+    unused_qualifications,
+    variant_size_differences,
+    clippy::checked_conversions,
+    clippy::needless_borrow,
+    clippy::shadow_unrelated,
+    clippy::wrong_pub_self_convention
+)]
+#![deny(
+    anonymous_parameters,
+    bare_trait_objects,
+    clippy::as_conversions,
+    clippy::clone_on_ref_ptr,
+    clippy::float_cmp_const,
+    clippy::if_not_else,
+    clippy::indexing_slicing,
+    clippy::option_unwrap_used,
+    clippy::result_unwrap_used
+)]
+#![cfg_attr(not(debug_assertions), deny(warnings, clippy::dbg_macro,))]
+
 //! Internal connection protocols.
 //!
-//! There are 5 types of connections, as in the submodules `time`, `cs`, `intra`, `ch` and `sh`.
-//! Refer to the documentation of those submodules for details.
+//! There are 5 types of connections, as in the modules `time`, `cs`, `intra`, `ch` and `sh`.
+//! Refer to the documentation of those modules for details.
 //!
-//! This module also exposes a number of top-level traits, to be implemented by protocol
+//! This crates also exposes a number of top-level traits, to be implemented by protocol
 //! implementations.
 //! These traits are intended to be implemented by the `codegen::proto!` macro;
 //! do not try to implement them by hand.
@@ -11,9 +34,8 @@
 use std::fmt::Debug;
 
 use async_trait::async_trait;
-use type_equals::TypeEquals;
-
 use serde::{Deserialize, Serialize};
+use type_equals::TypeEquals;
 
 /// A type representing a connection protocol.
 ///
@@ -83,7 +105,7 @@ impl<T: Endpoint> ServerEndpoint for T where
 
 /// Wraps the ID of a query.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub struct QueryId(u32);
+pub struct QueryId(pub u32);
 
 impl Default for QueryId {
     fn default() -> Self {
@@ -159,5 +181,3 @@ pub use cs::obs as cs_obs;
 pub mod intra;
 pub mod sh;
 pub mod time;
-
-pub mod transport;

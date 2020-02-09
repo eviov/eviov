@@ -1,5 +1,4 @@
-use crate::math::{Eci, Time};
-use crate::ObjectId;
+use eviov_types::{Eci, ObjectId, Time};
 
 codegen::proto! {
     /// Communication between systems.

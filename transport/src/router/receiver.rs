@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::fmt;
 
 use super::Handle;
-use crate::proto::{self, Endpoint};
-use crate::ObjectId;
+use eviov_proto::Endpoint;
+use eviov_types::ObjectId;
 
 pub struct AllReceivers {
     map: typemap::ShareDebugMap,
@@ -16,9 +16,9 @@ impl Default for AllReceivers {
         macro_rules! protos {
             ($($proto:ident),* $(,)?) => {
                 $(
-                    map.insert::<typemap::K<Receivers<proto::$proto::Client>>>(Receivers::default())
+                    map.insert::<typemap::K<Receivers<eviov_proto::$proto::Client>>>(Receivers::default())
                         .expect_none("Duplicate insert");
-                    map.insert::<typemap::K<Receivers<proto::$proto::Server>>>(Receivers::default())
+                    map.insert::<typemap::K<Receivers<eviov_proto::$proto::Server>>>(Receivers::default())
                         .expect_none("Duplicate insert");
                 )*
             };

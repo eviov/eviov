@@ -1,7 +1,6 @@
 use std::collections::BTreeMap;
 
-use eviov::math::Time;
-use eviov::ObjectId;
+use eviov::{ObjectId, Time};
 use futures::channel::mpsc::UnboundedReceiver;
 use legion::world::World;
 
@@ -37,7 +36,11 @@ pub async fn run_impl<X: Extra>(
         if let Some(&(t, evid)) = key {
             let _action = runtime
                 .time_future(t, async {
-                    handle_event(event_queue.remove(&(t, evid)).expect("Race condition detected"))
+                    handle_event(
+                        event_queue
+                            .remove(&(t, evid))
+                            .expect("Race condition detected"),
+                    )
                 })
                 .await; // TODO other events
             unimplemented!("Handle _action")

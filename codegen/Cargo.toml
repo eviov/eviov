@@ -9,7 +9,6 @@ homepage = "https://github.com/eviov/eviov"
 readme = "README.md"
 description = "Orbital shooters game"
 
-
 [lib]
 name = "codegen"
 proc-macro = true

@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_variables)]
 #![warn(
     unused_results,
     unused_qualifications,
@@ -20,16 +21,14 @@
 )]
 #![cfg_attr(not(debug_assertions), deny(warnings, clippy::dbg_macro,))]
 
-extern crate proc_macro;
+mod eci;
+pub use eci::*;
 
-use proc_macro::TokenStream;
+mod id;
+pub use id::*;
 
-#[path = "proto.rs"]
-mod proto_;
+mod unit;
+pub use unit::*;
 
-#[proc_macro]
-pub fn proto(ts: TokenStream) -> TokenStream {
-    proto_::main(ts.into())
-        .unwrap_or_else(|err| err.to_compile_error())
-        .into()
-}
+mod vector;
+pub use vector::*;

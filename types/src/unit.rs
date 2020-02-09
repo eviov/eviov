@@ -2,13 +2,6 @@ use derive_more::{Add, Sub};
 use num_derive::{Num, NumOps, One, Zero};
 use serde::{Deserialize, Serialize};
 
-mod eci;
-pub use eci::*;
-mod orbit;
-pub use orbit::*;
-mod vector;
-pub use vector::*;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Add, Sub)]
 pub struct Time(pub i32);
 
@@ -22,7 +15,7 @@ macro_rules! float_unit {
             Num, NumOps, Zero, One,
             //Add, Sub, Mul, Div, Rem, Num
         )]
-        pub struct $name(f32);
+        pub struct $name(pub f32);
 
         impl From<$name> for f32 {
             fn from(from: $name) -> f32 {

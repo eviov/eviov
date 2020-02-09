@@ -8,7 +8,7 @@ use futures::lock::Mutex;
 use futures::sink::SinkExt;
 use futures::stream::StreamExt;
 
-use crate::proto::{Endpoint, Handler, MessageFrom, QueryId, QueryRequestFrom, Single};
+use eviov_proto::{Endpoint, Handler, MessageFrom, QueryId, QueryRequestFrom, Single};
 
 #[derive(Debug)]
 pub struct Handle<SendMsg: Endpoint> {
@@ -91,7 +91,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         &self,
         until: Instant,
         handler: Arc<H>,
-        context: crate::Context<impl crate::ContextImpl>,
+        context: eviov_context::Context<impl eviov_context::ContextImpl>,
     ) -> Result<(), String>
     where
         H: Handler<Endpoint = SendMsg>,

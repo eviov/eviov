@@ -1,4 +1,4 @@
-use crate::math::Time;
+use eviov_types::Time;
 
 codegen::proto! {
     /// Time synchronization.

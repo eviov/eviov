@@ -9,9 +9,6 @@ homepage = "https://github.com/eviov/eviov"
 readme = "README.md"
 description = "Orbital shooters game"
 
-[features]
-strict = ["eviov/strict"]
-
 [dependencies]
 actix = "0.9.0"
 actix-rt = "1.0.0"
@@ -20,7 +17,7 @@ actix-web-actors = "2.0.0"
 async-trait = "0.1.22"
 crossbeam = "0.7.3"
 derive_more = "0.99.2"
-eviov = {path = "..", default-features = false, features = ["not-wasm"]}
+eviov = {path = "../common", default-features = false, features = ["not-wasm"]}
 futures = {version = "0.3.1", features = ["compat"]}
 getset = "0.0.9"
 legion = "0.2.1"

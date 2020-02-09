@@ -3,14 +3,14 @@ use std::time::Duration;
 use async_trait::async_trait;
 use futures::future::Future;
 
-use crate::context::ContextImpl;
+use crate::ContextImpl;
 
-pub struct TokioContext;
+pub struct WasmContext;
 
 #[async_trait]
-impl ContextImpl for TokioContext {
+impl ContextImpl for WasmContext {
     fn spawn_future<F: Future<Output = ()> + Send + 'static>(&self, fut: F) {
-        let _ = tokio::spawn(fut); // we don't need to join the result
+        wasm_bindgen_futures::spawn_local(fut);
     }
 
     async fn sleep(&self, duration: Duration) {

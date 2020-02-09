@@ -1,4 +1,4 @@
-use super::*;
+use eviov_types::{Eci, Mass, Time, Vector};
 
 #[derive(Debug)]
 pub struct Orbit {

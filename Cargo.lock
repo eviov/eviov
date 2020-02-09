@@ -751,7 +751,10 @@ dependencies = [
  "async-trait",
  "cfg-if",
  "derive_more",
- "eviov-codegen",
+ "eviov-context",
+ "eviov-proto",
+ "eviov-transport",
+ "eviov-types",
  "futures 0.3.4",
  "getset",
  "log",
@@ -800,11 +803,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "eviov-context"
+version = "0.0.0"
+dependencies = [
+ "async-trait",
+ "derive_more",
+ "eviov-codegen",
+ "futures 0.3.4",
+ "stdweb",
+ "tokio",
+ "wasm-bindgen-futures",
+]
+
+[[package]]
 name = "eviov-games-ffa"
 version = "0.0.0"
 dependencies = [
  "eviov-server",
  "futures 0.3.4",
+]
+
+[[package]]
+name = "eviov-proto"
+version = "0.0.0"
+dependencies = [
+ "async-trait",
+ "derive_more",
+ "eviov-codegen",
+ "eviov-types",
+ "futures 0.3.4",
+ "serde",
+ "type-equals",
 ]
 
 [[package]]
@@ -830,6 +859,38 @@ dependencies = [
  "serde",
  "smallvec 1.2.0",
  "tokio",
+]
+
+[[package]]
+name = "eviov-transport"
+version = "0.0.0"
+dependencies = [
+ "async-trait",
+ "eviov-context",
+ "eviov-proto",
+ "eviov-types",
+ "futures 0.3.4",
+ "parking_lot 0.10.0",
+ "ring",
+ "rmp-serde",
+ "serde",
+ "stdweb",
+ "tokio",
+ "tokio-tungstenite",
+ "typemap",
+ "url",
+]
+
+[[package]]
+name = "eviov-types"
+version = "0.0.0"
+dependencies = [
+ "derive_more",
+ "getset",
+ "num-derive",
+ "num-traits",
+ "operator-sugar",
+ "serde",
 ]
 
 [[package]]

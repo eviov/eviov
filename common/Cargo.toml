@@ -1,0 +1,41 @@
+[package]
+name = "eviov"
+version = "0.0.0"
+authors = ["SOFe <sofe2038@gmail.com>"]
+edition = "2018"
+license = "AGPL-3.0"
+repository = "https://github.com/eviov/eviov"
+homepage = "https://github.com/eviov/eviov"
+readme = "README.md"
+description = "Orbital shooters game"
+
+[features]
+default = ["wasm", "not-wasm"]
+wasm = ["stdweb", "eviov-context/wasm", "eviov-transport/wasm"]
+not-wasm = ["parking_lot", "tokio", "tokio-tungstenite", "url", "eviov-context/not-wasm", "eviov-transport/wasm"]
+
+[dependencies]
+async-trait = "0.1.22"
+cfg-if = "0.1.10"
+derive_more = "0.99.2"
+eviov-context = {path = "../context"}
+eviov-proto = {path = "../proto"}
+eviov-transport = {path = "../transport"}
+eviov-types = {path = "../types"}
+futures = "0.3.1"
+getset = "0.0.9"
+log = "0.4.8"
+num-derive = "0.3.0"
+num-traits = "0.2.11"
+operator-sugar = "0.1.2"
+parking_lot = {version = "0.10.0", optional = true}
+ring = "0.16.10"
+rmp-serde = "0.14.0"
+serde = {version = "1.0.104", features = ["derive"]}
+stdweb = {version = "0.4.20", optional = true}
+tokio = {version = "0.2.9", features = ["net", "time"], optional = true}
+tokio-tungstenite = {version = "0.10.1", optional = true}
+type-equals = "0.1.0"
+typemap = {version = "0.3.3", git = "https://github.com/SOF3/rust-typemap"}
+url = {version = "2.1.1", optional = true}
+wasm-bindgen-futures = {version = "0.4.8", optional = true}

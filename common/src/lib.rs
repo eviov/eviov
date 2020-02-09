@@ -7,7 +7,7 @@
     clippy::checked_conversions,
     clippy::needless_borrow,
     clippy::shadow_unrelated,
-    clippy::wrong_pub_self_convention,
+    clippy::wrong_pub_self_convention
 )]
 #![deny(
     anonymous_parameters,
@@ -18,21 +18,20 @@
     clippy::if_not_else,
     clippy::indexing_slicing,
     clippy::option_unwrap_used,
-    clippy::result_unwrap_used,
+    clippy::result_unwrap_used
 )]
-#![cfg_attr(not(debug_assertions), deny(
-    warnings,
-    clippy::dbg_macro,
-))]
+#![cfg_attr(not(debug_assertions), deny(warnings, clippy::dbg_macro,))]
 
-mod id;
-pub use id::*;
-mod context;
-pub use context::*;
+pub use eviov_context::*;
+pub use eviov_types::*;
+pub mod proto {
+    pub use eviov_proto::*;
+}
+pub mod transport {
+    pub use eviov_transport::*;
+}
 
-pub mod hardcode;
-pub mod math;
-pub mod proto;
+pub mod orbit;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LoopAction {

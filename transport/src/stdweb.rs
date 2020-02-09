@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use futures::channel::oneshot;
 use stdweb::web::{self, event, IEventTarget, WebSocket};
 
-use crate::proto::{Endpoint, Protocol};
+use eviov_proto::{Endpoint, Protocol};
 
 pub struct StdwebWs<E: Endpoint> {
     ws: Arc<WebSocket>,

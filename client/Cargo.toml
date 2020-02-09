@@ -12,12 +12,9 @@ description = "Orbital shooters game"
 [lib]
 crate-type = ["cdylib"]
 
-[features]
-strict = ["eviov/strict"]
-
 [dependencies]
 async-trait = "0.1.22"
-eviov = {path = "..", default-features = false, features = ["wasm"]}
+eviov = {path = "../common", default-features = false, features = ["wasm"]}
 log = "0.4.8"
 rand = "0.7.3"
 rmp-serde = "0.14.0"

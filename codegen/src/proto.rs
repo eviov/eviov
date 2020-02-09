@@ -1,3 +1,5 @@
+#![allow(clippy::result_unwrap_used)] // Allow result.unwrap(), since it is used very extensively in parsing
+
 use heck::*;
 use matches2::option_match;
 use proc_macro2::{Span, TokenStream};
@@ -17,6 +19,7 @@ mod kw {
     syn::custom_keyword!(name);
 }
 
+#[allow(clippy::cognitive_complexity)]
 pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
     let input = syn::parse2::<Input>(ts)?;
 
@@ -49,7 +52,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
 
         let resp = if let Some(response) = response {
             quote! {
-                impl crate::proto::QueryRequestFrom<#from> for #ident {
+                impl crate::QueryRequestFrom<#from> for #ident {
                     type Response = #response;
                 }
             }
@@ -57,7 +60,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
             quote!()
         };
         quote! {
-            impl crate::proto::MessageFrom<#from> for #ident {
+            impl crate::MessageFrom<#from> for #ident {
                 fn to_enum(self) -> #from {
                     #from::#ident(self)
                 }
@@ -80,7 +83,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
         #(#proto_attrs)*
         pub struct Proto;
 
-        impl crate::proto::Protocol for Proto {
+        impl crate::Protocol for Proto {
             type Client = Client;
             type Server = Server;
 
@@ -115,18 +118,18 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                     #(#res_idents,)*
                 }
 
-                impl crate::proto::Endpoint for #me_camel_ident {
+                impl crate::Endpoint for #me_camel_ident {
                     type Protocol = Proto;
                     type Peer = #peer_camel_ident;
 
-                    fn request_query_id(&self) -> Option<crate::proto::QueryId> {
+                    fn request_query_id(&self) -> Option<crate::QueryId> {
                         match self {
                             #(#req_qid,)*
                             _ => None,
                         }
                     }
 
-                    fn response_query_id(&self) -> Option<crate::proto::QueryId> {
+                    fn response_query_id(&self) -> Option<crate::QueryId> {
                         match self {
                             #(#res_qid,)*
                             _ => None,
@@ -155,7 +158,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                 let method_name = &syn::Ident::new(&format!("Handle{}", ident).to_snake_case(), ident.span());
                 (quote! {
                     #me_camel_ident::#ident(request) => {
-                        use crate::proto::MessageFrom;
+                        use crate::MessageFrom;
 
                         let query_id = request.query_id;
                         let mut response = (self.0).#method_name(request).await;
@@ -163,7 +166,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                         Some(response.to_enum())
                     }
                 }, quote! {
-                    async fn #method_name(&self, request: #ident) -> <#ident as crate::proto::QueryRequestFrom<#me_camel_ident>>::Response;
+                    async fn #method_name(&self, request: #ident) -> <#ident as crate::QueryRequestFrom<#me_camel_ident>>::Response;
                 })
             }).unzip();
 
@@ -172,7 +175,7 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                 pub struct #peer_handler_wrapper<H: #peer_handler>(pub H);
 
                 #[::async_trait::async_trait]
-                impl<H: #peer_handler>  crate::proto::Handler for #peer_handler_wrapper<H>{
+                impl<H: #peer_handler>  crate::Handler for #peer_handler_wrapper<H>{
                     type Endpoint = #peer_camel_ident;
 
                     async fn handle_message(&self, e: #me_camel_ident) -> Option<Self::Endpoint> {
@@ -216,11 +219,11 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                 #[derive(Debug, serde::Serialize, serde::Deserialize)]
                 pub struct #name { #(#fields),* }
 
-                impl crate::proto::Message for #name {
+                impl crate::Message for #name {
                     type Protocol = Proto;
                 }
 
-                impl crate::proto::Single for #name {}
+                impl crate::Single for #name {}
 
                 #client
                 #server
@@ -250,18 +253,18 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                     ///
                     /// Any value can be passed, since this value is immediately overwritten by
                     /// the connection handler, but conventionally `Default::default()` is used.
-                    pub query_id: crate::proto::QueryId,
+                    pub query_id: crate::QueryId,
                     #(#request),*
                 }
-                impl crate::proto::Message for #req_name {
+                impl crate::Message for #req_name {
                     type Protocol = Proto;
                 }
-                impl crate::proto::QueryRequest for #req_name {
-                    fn query_id(&self) -> crate::proto::QueryId {
+                impl crate::QueryRequest for #req_name {
+                    fn query_id(&self) -> crate::QueryId {
                         self.query_id
                     }
 
-                    fn set_query_id(&mut self, id: crate::proto::QueryId) {
+                    fn set_query_id(&mut self, id: crate::QueryId) {
                         self.query_id = id;
                     }
                 }
@@ -274,17 +277,17 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
                     ///
                     /// Any value can be passed, since this value is immediately overwritten by
                     /// the connection handler, but conventionally `Default::default()` is used.
-                    pub query_id: crate::proto::QueryId, #(#response),*
+                    pub query_id: crate::QueryId, #(#response),*
                 }
-                impl crate::proto::Message for #res_name {
+                impl crate::Message for #res_name {
                     type Protocol = Proto;
                 }
-                impl crate::proto::QueryResponse for #res_name {
-                    fn query_id(&self) -> crate::proto::QueryId {
+                impl crate::QueryResponse for #res_name {
+                    fn query_id(&self) -> crate::QueryId {
                         self.query_id
                     }
 
-                    fn set_query_id(&mut self, id: crate::proto::QueryId) {
+                    fn set_query_id(&mut self, id: crate::QueryId) {
                         self.query_id = id;
                     }
                 }

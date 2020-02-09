@@ -7,7 +7,7 @@
     clippy::checked_conversions,
     clippy::needless_borrow,
     clippy::shadow_unrelated,
-    clippy::wrong_pub_self_convention,
+    clippy::wrong_pub_self_convention
 )]
 #![deny(
     anonymous_parameters,
@@ -18,12 +18,9 @@
     clippy::if_not_else,
     clippy::indexing_slicing,
     clippy::option_unwrap_used,
-    clippy::result_unwrap_used,
+    clippy::result_unwrap_used
 )]
-#![cfg_attr(not(debug_assertions), deny(
-    warnings,
-    clippy::dbg_macro,
-))]
+#![cfg_attr(not(debug_assertions), deny(warnings, clippy::dbg_macro,))]
 
 use std::io;
 use std::sync::Arc;

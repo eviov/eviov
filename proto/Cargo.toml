@@ -1,0 +1,19 @@
+[package]
+name = "eviov-proto"
+version = "0.0.0"
+authors = ["SOFe <sofe2038@gmail.com>"]
+edition = "2018"
+license = "AGPL-3.0"
+repository = "https://github.com/eviov/eviov"
+homepage = "https://github.com/eviov/eviov"
+readme = "README.md"
+description = "eviov protocol structs"
+
+[dependencies]
+async-trait = "0.1.22"
+derive_more = "0.99.2"
+eviov-codegen = {path = "../codegen"}
+eviov-types = {path = "../types"}
+futures = "0.3.1"
+serde = {version = "1.0.104", features = ["derive"]}
+type-equals = "0.1.0"
