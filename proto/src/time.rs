@@ -1,3 +1,5 @@
+//! Time synchronization
+
 use eviov_types::Time;
 
 codegen::proto! {

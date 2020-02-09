@@ -1,8 +1,13 @@
+//! Client-system communications.
+
 /// The observer channel
 pub mod obs {
-    use eviov_types::Time;
+    use eviov_types::{ObjectId,Eci,Time,Vector,Length};
+    use serde::{Serialize, Deserialize};
 
     codegen::proto! {
+        /// Client-system observer channel
+
         name = "eviov-cs-observer";
 
         /// Identifies the client to acknowledge that it is authorized to observe
@@ -34,9 +39,22 @@ pub mod obs {
         server message Close {}
     }
 
-    #[derive(Debug, serde::Serialize, serde::Deserialize)]
+    /// Contents of an event.
+    #[derive(Debug, Serialize, Deserialize)]
     pub enum EventContent {
-        Accel(eviov_types::ObjectId), // add info
+        /// The ECI and acceleration of an object has changed.
+        Accel(AccelEvent), // add info
+    }
+
+    /// Data for an acceleration event.
+    #[derive(Debug, Serialize, Deserialize)]
+    pub struct AccelEvent {
+        /// The object described in this event.
+        pub object: ObjectId,
+        /// The new acceleration of the object.
+        pub accel: Vector<Length>,
+        /// The ECI posvel of the object.
+        pub eci: Eci,
     }
 }
 
@@ -45,6 +63,8 @@ pub mod ctrl {
     use eviov_types::ObjectId;
 
     codegen::proto! {
+        /// Client-system controller channel.
+
         name = "eviov-cs-control";
 
         /// Requests control on an object.

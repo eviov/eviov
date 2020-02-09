@@ -1,3 +1,5 @@
+//! Communication between systems.
+
 use eviov_types::{Eci, ObjectId, Time};
 
 codegen::proto! {
@@ -33,6 +35,7 @@ codegen::proto! {
         session: u64,
     }
 
+    /// Transfers a child to the peer system.
     mutual query TransferChild {
         /// A full copy of the object to transfer
         object: FullObject,
@@ -49,6 +52,7 @@ codegen::proto! {
     }
 }
 
+/// The full information about an object
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct FullObject {
     id: ObjectId,

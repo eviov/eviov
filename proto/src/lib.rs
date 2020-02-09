@@ -1,5 +1,6 @@
 #![allow(dead_code, unused_variables, unreachable_code)]
 #![warn(
+    missing_docs,
     unused_results,
     unused_qualifications,
     variant_size_differences,
@@ -41,9 +42,12 @@ use type_equals::TypeEquals;
 ///
 /// This trait is implemented by unit structs, which exist only for type inference.
 pub trait Protocol: Send + Sync + 'static {
+    /// The client endpoint struct
     type Client: Endpoint;
+    /// The server endpoint struct
     type Server: Endpoint;
 
+    /// The protocol name.
     fn name() -> &'static str;
 }
 
@@ -73,6 +77,7 @@ pub trait Endpoint: Debug + Serialize + for<'de> Deserialize<'de> + Send + Sync 
 /// the `codegen` crate instead.
 #[async_trait]
 pub trait Handler: Sized + Send + Sync + 'static {
+    /// The endpoint that this handler is run on.
     type Endpoint: Endpoint;
 
     /// Handles the message.
