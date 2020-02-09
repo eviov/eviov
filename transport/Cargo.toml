@@ -10,7 +10,6 @@ readme = "README.md"
 description = "eviov communications framework"
 
 [features]
-default = ["wasm", "not-wasm"]
 wasm = ["stdweb", "eviov-context/wasm"]
 not-wasm = ["parking_lot", "tokio", "tokio-tungstenite", "url", "eviov-context/not-wasm"]
 

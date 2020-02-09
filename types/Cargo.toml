@@ -9,9 +9,6 @@ homepage = "https://github.com/eviov/eviov"
 readme = "README.md"
 description = "eviov ID and unit newtypes"
 
-[features]
-strict = []
-
 [dependencies]
 derive_more = "0.99.2"
 getset = "0.0.9"

@@ -10,7 +10,6 @@ readme = "README.md"
 description = "Orbital shooters game"
 
 [features]
-default = ["wasm", "not-wasm"]
 wasm = ["stdweb", "eviov-context/wasm", "eviov-transport/wasm"]
 not-wasm = ["parking_lot", "tokio", "tokio-tungstenite", "url", "eviov-context/not-wasm", "eviov-transport/wasm"]
 

@@ -10,7 +10,6 @@ readme = "README.md"
 description = "platform-dependent (wasm/native) adapters for eviov"
 
 [features]
-default = ["wasm", "not-wasm"]
 wasm = ["stdweb", "wasm-bindgen-futures"]
 not-wasm = ["tokio"]
 
