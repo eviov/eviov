@@ -33,7 +33,7 @@ jobs:
         run: npm run build
         working-directory: client/site
       - name: Build docs
-        run: cargo doc --all
+        run: cargo doc --all --document-private-items
       - name: Deploy
         run: |
           mkdir stage
