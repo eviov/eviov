@@ -30,21 +30,21 @@ impl SystemHandle {
     }
 }
 
-impl cmp::PartialEq for SystemHandle {
+impl PartialEq for SystemHandle {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
     }
 }
 
-impl cmp::Eq for SystemHandle {}
+impl Eq for SystemHandle {}
 
-impl cmp::Ord for SystemHandle {
+impl Ord for SystemHandle {
     fn cmp(&self, other: &Self) -> cmp::Ordering {
         self.id.cmp(&other.id)
     }
 }
 
-impl cmp::PartialOrd for SystemHandle {
+impl PartialOrd for SystemHandle {
     fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
         Some(self.cmp(other))
     }

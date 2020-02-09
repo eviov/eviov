@@ -47,13 +47,13 @@ impl Conn {
 }
 
 enum Fsm {
-    Connecting(web::WebSocket),
+    Connecting(WebSocket),
     Handshake(Handshake),
     Closed,
 }
 
 impl Fsm {
-    fn ws(&self) -> Option<&web::WebSocket> {
+    fn ws(&self) -> Option<&WebSocket> {
         let ws = match self {
             Self::Connecting(ws) => ws,
             Self::Handshake(Handshake(ws)) => ws,
@@ -105,4 +105,4 @@ impl Fsm {
     }
 }
 
-struct Handshake(web::WebSocket);
+struct Handshake(WebSocket);

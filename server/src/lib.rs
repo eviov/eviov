@@ -1,6 +1,7 @@
 #![feature(never_type)]
 #![allow(dead_code, unused_variables, unreachable_code)]
-#![warn(unused_results)]
+#![warn(unused_results, unused_qualifications, variant_size_differences)]
+#![deny(anonymous_parameters, bare_trait_objects)]
 
 use std::io;
 use std::sync::Arc;
