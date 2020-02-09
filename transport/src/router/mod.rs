@@ -20,12 +20,20 @@ pub use error::*;
 mod handle;
 pub use handle::Handle;
 
+/// The main communications manager for a process.
 pub struct Router<C: WsClient> {
     receivers: Mutex<AllReceivers>,
     out_pool: OutPool<C>,
 }
 
 impl<C: WsClient> Router<C> {
+    /// Opens an internal communication within this process.
+    ///
+    /// # Return values
+    /// Returns a handle to communicate with the peer node.
+    ///
+    /// # Errors
+    /// This method errors if the specified node is not managed in this process.
     pub async fn open_internal<Me: Endpoint>(
         &self,
         id: ObjectId,
@@ -45,6 +53,13 @@ impl<C: WsClient> Router<C> {
         Ok(Handle::new(send_me, recv_peer))
     }
 
+    /// Opens an external communication with a node on another process.
+    ///
+    /// # Parameters
+    /// - `server`: the socket address (with port) of the peer.
+    /// - `id`: the object ID of the peer node.
+    /// - `challenge_fn`: a function that takes an input byte slice and returns a byte vector,
+    /// answering the login challenge.
     pub async fn open_external<Me>(
         &mut self,
         server: &str,
@@ -68,17 +83,22 @@ impl<C: WsClient> Router<C> {
     }
 }
 
+/// The message returned by the server after receiving the challenge.
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ChallengeResult {
+    /// Challenge is accepted.
     Ok,
+    /// Challenge has failed. Socket should be closed immediately.
     Fail,
 }
 
+/// The pool of reusable external connections.
 struct OutPool<C: WsClient> {
     clients: Mutex<HashMap<String, Arc<C>>>, // TODO figure out how to use (String, &'static str) as HashMap key without allocating a new string
 }
 
 impl<C: WsClient> OutPool<C> {
+    /// Returns an external connection, opening a new one if absent.
     async fn get_or_open<Me, F>(&self, server: &str, challenge_fn: F) -> Result<Arc<C>, OpenError>
     where
         Me: Endpoint + ClientEndpoint,

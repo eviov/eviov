@@ -1,6 +1,7 @@
 #![feature(option_expect_none)]
 #![allow(dead_code, unused_variables, unreachable_code)]
 #![warn(
+    missing_docs,
     unused_results,
     unused_qualifications,
     variant_size_differences,
@@ -22,6 +23,8 @@
 )]
 #![cfg_attr(not(debug_assertions), deny(warnings, clippy::dbg_macro,))]
 
+//! eviov communications framework
+
 use std::fmt;
 use std::time::Duration;
 
@@ -40,17 +43,24 @@ mod stdweb;
 #[cfg(feature = "wasm")]
 pub use self::stdweb::*;
 
+/// The maximum query pool size for each connection.
 pub const MAX_QUERY_POOL_SIZE: usize = 1000;
 
+/// The duration to wait for before a query pool timeouts.
 pub const OPEN_CONN_TIMEOUT: Duration = Duration::from_secs(10);
 
+/// The abstraction for a network-capable websocket client.
 #[async_trait]
 pub trait WsClient: Sized + fmt::Debug {
+    /// Opens the connection to the server.
     async fn open(server: &str) -> Result<Self, String>;
 
+    /// Sends a message to the peer.
     async fn send_message(&self, message: &[u8]) -> Result<(), String>;
 
+    /// Receives a message from the peer for the specified duration.
     async fn await_message(&self, time: Duration) -> Result<Option<Vec<u8>>, String>;
 
+    /// Closes the conneciton.
     async fn close(&self);
 }

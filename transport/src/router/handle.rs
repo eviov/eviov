@@ -10,6 +10,7 @@ use futures::stream::StreamExt;
 
 use eviov_proto::{Endpoint, Handler, MessageFrom, QueryId, QueryRequestFrom, Single};
 
+/// A channel sender/receiver abstraction for both local and websocket communication.
 #[derive(Debug)]
 pub struct Handle<SendMsg: Endpoint> {
     send: Arc<Mutex<mpsc::UnboundedSender<SendMsg>>>,
@@ -21,6 +22,7 @@ pub struct Handle<SendMsg: Endpoint> {
 }
 
 impl<SendMsg: Endpoint> Handle<SendMsg> {
+    /// Opens a new commuincation handle.
     pub fn new(
         send: mpsc::UnboundedSender<SendMsg>,
         recv: mpsc::UnboundedReceiver<SendMsg::Peer>,
@@ -35,6 +37,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         }
     }
 
+    /// Sends a single message.
     pub async fn send_single<M>(&self, message: M)
     where
         M: MessageFrom<SendMsg> + Single,
@@ -43,6 +46,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         let _ = send.send(message.to_enum()).await; // send error is not significant
     }
 
+    /// Sends a query, returning its response.
     pub async fn send_query<M>(&self, mut query: M) -> Result<M::Response, String>
     where
         M: QueryRequestFrom<SendMsg>,
@@ -87,6 +91,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         }
     }
 
+    /// Executes regulatory code until the specified instant.
     pub async fn heartbeat<H>(
         &self,
         until: Instant,
@@ -157,6 +162,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         // this loop always breaks at the `timeout` function
     }
 
+    /// Schedules an error to be triggered at the next heartbeat.
     async fn schedule_error(&self, err: impl Into<String>) {
         {
             let mut lock = self.error.lock().await;
@@ -182,6 +188,7 @@ impl<SendMsg: Endpoint> Handle<SendMsg> {
         }
     }
 
+    /// Checks if an error is scheduled.
     async fn check_error(&self) -> Result<(), String> {
         let guard = self.error.lock().await;
         match &*guard {

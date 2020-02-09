@@ -1,6 +1,8 @@
 use std::fmt;
 
+/// Error for opening internal communication.
 pub enum InternalOpenError {
+    /// The requested object does not exist.
     NoSuchObject,
 }
 
@@ -12,10 +14,15 @@ impl fmt::Display for InternalOpenError {
     }
 }
 
+/// Error for opening external or internal communication.
 pub enum OpenError {
+    /// An internal error happened on the peer.
     Internal(InternalOpenError),
+    /// The login challenge failed.
     ChallengeFailed,
+    /// The login has timed out.
     Timeout,
+    /// An IO error occurred.
     Io(String),
 }
 
