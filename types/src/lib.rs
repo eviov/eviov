@@ -1,5 +1,8 @@
+//! eviov ID and unit newtypes
+
 #![allow(dead_code, unused_variables)]
 #![warn(
+    missing_docs,
     unused_results,
     unused_qualifications,
     variant_size_differences,
