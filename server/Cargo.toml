@@ -18,7 +18,7 @@ async-trait = "0.1.22"
 crossbeam = "0.7.3"
 derive_more = "0.99.2"
 eviov = {path = "..", default-features = false, features = ["not-wasm"]}
-futures = {version = "0.3.1", features = ["compat"]}
+futures = {version = "0.3.4", features = ["compat"]}
 getset = "0.0.9"
 legion = "0.2.1"
 log = "0.4.8"

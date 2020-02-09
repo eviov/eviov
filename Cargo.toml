@@ -22,7 +22,7 @@ async-trait = "0.1.22"
 cfg-if = "0.1.10"
 derive_more = "0.99.2"
 eviov-codegen = {path = "codegen"}
-futures = "0.3.1"
+futures = "0.3.4"
 getset = "0.0.9"
 log = "0.4.8"
 num-derive = "0.3.0"
