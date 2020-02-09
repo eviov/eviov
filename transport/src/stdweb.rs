@@ -6,12 +6,14 @@ use stdweb::web::{self, event, IEventTarget, WebSocket};
 
 use eviov_proto::{Endpoint, Protocol};
 
+/// The implementation of websocket on wasm
 pub struct StdwebWs<E: Endpoint> {
     ws: Arc<WebSocket>,
     _ph: PhantomData<E>,
 }
 
 impl<E: Endpoint> StdwebWs<E> {
+    /// Opens a connection.
     pub fn new(server: &str) -> Result<Self, String> {
         let ws = WebSocket::new_with_protocols(server, &[E::Protocol::name()])
             .map_err(|err| err.to_string())?;
