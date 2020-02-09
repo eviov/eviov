@@ -17,7 +17,7 @@ async-trait = "0.1.22"
 eviov = {path = "..", default-features = false, features = ["wasm"]}
 log = "0.4.8"
 rand = "0.7.3"
-rmp-serde = "0.14.0"
+rmp-serde = "0.14.2"
 stdweb = "0.4.20"
 wasm-bindgen = "0.2.58"
 wasm-logger = "0.2.0"
