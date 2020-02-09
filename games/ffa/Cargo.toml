@@ -9,6 +9,9 @@ homepage = "https://github.com/eviov/eviov"
 readme = "README.md"
 description = "Orbital shooters game"
 
+[features]
+strict = ["eviov-server/strict"]
+
 [dependencies]
 eviov-server = {path = "../../server"}
 futures = "0.3.1"

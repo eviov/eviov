@@ -44,7 +44,7 @@ impl TungClient {
                     }
                     Ok(())
                 }
-                err @ _ => Err(err.to_string()),
+                err => Err(err.to_string()),
             }
         }
         .boxed()

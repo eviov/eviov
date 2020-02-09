@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::convert::TryFrom;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
@@ -55,9 +56,12 @@ impl<X: system::Extra> Runtime<X> {
 
     pub async fn time_future<T>(&self, time: Time, task: impl Future<Output = T>) -> T {
         let remain = time - self.current_time();
-        // TODO assess whether we need to take the cost calibrating the sleep
-        let millis = remain.0 * MILLIS_PER_TICK;
-        tokio::time::delay_for(Duration::from_millis(millis as u64)).await;
+        if remain.0 > 0 {
+            // TODO assess whether we need to take the cost calibrating the sleep
+            let millis =
+                u32::try_from(remain.0).expect("Checked in the if block") * MILLIS_PER_TICK;
+            tokio::time::delay_for(Duration::from_millis(u64::from(millis))).await;
+        }
         task.await
     }
 }

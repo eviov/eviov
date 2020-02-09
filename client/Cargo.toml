@@ -12,6 +12,9 @@ description = "Orbital shooters game"
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+strict = ["eviov/strict"]
+
 [dependencies]
 async-trait = "0.1.22"
 eviov = {path = "..", default-features = false, features = ["wasm"]}

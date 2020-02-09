@@ -31,17 +31,13 @@ async fn wait_open(ws: &WebSocket) -> Result<(), String> {
     let sender2 = Arc::clone(&sender1);
 
     let list1 = ws.add_event_listener(move |_: event::SocketOpenEvent| {
-        let mut opt = sender1.lock().unwrap();
-        match opt.take() {
-            Some(sender) => {
-                let _ = sender.send(Ok(()));
-                // do nothing if socket future is dropped
-            }
-            None => (),
+        let mut opt = sender1.lock().expect("Event recursion detected");
+        if let Some(sender) = opt.take() {
+            let _ = sender.send(Ok(()));
         }
     });
     let list2 = ws.add_event_listener(move |event: event::SocketOpenEvent| {
-        let mut opt = sender2.lock().unwrap();
+        let mut opt = sender2.lock().expect("Event recursion detected");
         match opt.take() {
             Some(sender) => {
                 let _ = sender.send(Err(format!("{:?}", event)));

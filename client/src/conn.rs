@@ -80,7 +80,7 @@ impl Fsm {
                 log::warn!("Socket close dispatched again");
                 return;
             }
-            _ => self.ws().unwrap(),
+            _ => self.ws().expect("ws is present in all non-closed states"),
         };
         ws.close();
         *self = Self::Closed;
@@ -98,7 +98,7 @@ impl Fsm {
         use event::IMessageEvent;
         match event.data() {
             event::SocketMessageData::ArrayBuffer(_buf) => unimplemented!(),
-            data @ _ => {
+            data => {
                 log::warn!("Expected ArrayBuffer from ws, got {:?}", data);
             }
         }

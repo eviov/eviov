@@ -1,6 +1,28 @@
 #![allow(dead_code, unused_variables)]
-#![warn(unused_results, unused_qualifications, variant_size_differences)]
-#![deny(anonymous_parameters, bare_trait_objects)]
+#![warn(
+    unused_results,
+    unused_qualifications,
+    variant_size_differences,
+    clippy::checked_conversions,
+    clippy::needless_borrow,
+    clippy::shadow_unrelated,
+    clippy::wrong_pub_self_convention,
+)]
+#![deny(
+    anonymous_parameters,
+    bare_trait_objects,
+    clippy::as_conversions,
+    clippy::clone_on_ref_ptr,
+    clippy::float_cmp_const,
+    clippy::if_not_else,
+    clippy::indexing_slicing,
+    clippy::option_unwrap_used,
+    clippy::result_unwrap_used,
+)]
+#![cfg_attr(not(debug_assertions), deny(
+    warnings,
+    clippy::dbg_macro,
+))]
 
 use stdweb::web;
 use wasm_bindgen::prelude::{wasm_bindgen, JsValue};
@@ -18,9 +40,9 @@ pub fn entry() {
     wasm_logger::init(wasm_logger::Config::new(log::Level::Debug));
 
     let canvas = web_sys::window()
-        .unwrap()
+        .expect("DOM error")
         .document()
-        .unwrap()
+        .expect("DOM error")
         .get_element_by_id("main-canvas")
         .expect("Canvas element not found")
         .dyn_into::<web_sys::HtmlCanvasElement>()
@@ -40,5 +62,5 @@ pub fn entry() {
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
         .expect("2D canvas rendering is not supported");
     canvas.set_fill_style(&JsValue::from_str("black"));
-    canvas.fill_rect(0.0, 0.0, width as f64, height as f64);
+    canvas.fill_rect(0.0, 0.0, f64::from(width), f64::from(height));
 }

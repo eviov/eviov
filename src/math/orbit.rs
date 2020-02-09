@@ -19,17 +19,17 @@ impl Orbit {
         // Reference: https://space.stackexchange.com/a/2590/29538
         // TODO: perform analysis on numerical issues
 
-        let mu = f32::from(mass) as f64;
+        let mu = f64::from(f32::from(mass));
 
         // Increase precision first
         let Vector(rx, ry) = eci.position();
-        let rx = rx.0 as f64;
-        let ry = ry.0 as f64;
+        let rx = f64::from(rx.0);
+        let ry = f64::from(ry.0);
         let rm = (rx * rx + ry * ry).sqrt();
 
         let Vector(vx, vy) = eci.velocity();
-        let vx = vx.0 as f64;
-        let vy = vy.0 as f64;
+        let vx = f64::from(vx.0);
+        let vy = f64::from(vy.0);
 
         let h = rx * vy - ry * vx;
 
@@ -56,7 +56,7 @@ impl Orbit {
 
         OrbitInstant {
             orbit: self,
-            m: t as f64 * (self.mu / self.a / self.a / self.a).sqrt() + self.m0,
+            m: f64::from(t) * (self.mu / self.a / self.a / self.a).sqrt() + self.m0,
         }
     }
 }

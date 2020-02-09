@@ -22,7 +22,7 @@ pub fn run<X: Extra>(
         runtime: runtime.id().into(),
     };
     let (messages, messages_recv) = mpsc::unbounded();
-    let runtime: Runtime<X> = Clone::clone(&runtime);
+    let runtime: Runtime<X> = Runtime::clone(runtime);
     (
         tag,
         Handle { messages },

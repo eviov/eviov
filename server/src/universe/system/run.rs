@@ -37,7 +37,7 @@ pub async fn run_impl<X: Extra>(
         if let Some(&(t, evid)) = key {
             let _action = runtime
                 .time_future(t, async {
-                    handle_event(event_queue.remove(&(t, evid)).unwrap())
+                    handle_event(event_queue.remove(&(t, evid)).expect("Race condition detected"))
                 })
                 .await; // TODO other events
             unimplemented!("Handle _action")

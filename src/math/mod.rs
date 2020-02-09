@@ -12,7 +12,7 @@ pub use vector::*;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Add, Sub)]
 pub struct Time(pub i32);
 
-pub const MILLIS_PER_TICK: i32 = 20;
+pub const MILLIS_PER_TICK: u32 = 20;
 
 macro_rules! float_unit {
     ($($name:ident,)*) => { $(

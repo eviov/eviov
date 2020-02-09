@@ -60,6 +60,7 @@ impl<Me: Endpoint> Receivers<Me> {
     pub fn get(&self, id: ObjectId) -> Option<&dyn Receiver<Me>> {
         use std::ops::Deref;
 
+        #[allow(clippy::borrowed_box)]
         let boxed: &Box<_> = self.map.get(&id)?;
         Some(boxed.deref())
     }
@@ -67,6 +68,7 @@ impl<Me: Endpoint> Receivers<Me> {
     pub fn get_mut(&mut self, id: ObjectId) -> Option<&mut dyn Receiver<Me>> {
         use std::ops::DerefMut;
 
+        #[allow(clippy::borrowed_box)]
         let boxed: &mut Box<_> = self.map.get_mut(&id)?;
         Some(boxed.deref_mut())
     }

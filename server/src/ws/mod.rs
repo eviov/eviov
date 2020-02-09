@@ -90,14 +90,6 @@ impl<X: Plugin> StreamHandler<Result<ws::Message, ws::ProtocolError>> for Sessio
                 );
             }
             Ok(ws::Message::Binary(data)) => {
-                let _data = match rmp_serde::from_read_ref(&data) {
-                    Ok(data) => data,
-                    Err(_) => {
-                        log::info!("Session {}: Received malformed data", self.session_id);
-                        ctx.stop();
-                        return;
-                    }
-                };
                 // TODO delegate data
             }
             Ok(ws::Message::Close(_)) => {

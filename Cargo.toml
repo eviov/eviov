@@ -17,6 +17,8 @@ default = ["wasm", "not-wasm"]
 wasm = ["stdweb", "wasm-bindgen-futures"]
 not-wasm = ["parking_lot", "tokio", "tokio-tungstenite", "url"]
 
+strict = []
+
 [dependencies]
 async-trait = "0.1.22"
 cfg-if = "0.1.10"

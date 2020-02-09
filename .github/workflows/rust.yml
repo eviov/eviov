@@ -35,6 +35,6 @@ jobs:
       - name: Rust check
         run: cargo check --all ${{ matrix.dev_flag }}
       - name: Clippy lint
-        run: cargo clippy --all -- -D warnings
+        run: cargo clippy --all ${{ matrix.dev_flag }}
       - name: Rust test
         run: cargo test --all ${{ matrix.dev_flag }}
