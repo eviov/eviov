@@ -7,7 +7,7 @@ license = "AGPL-3.0"
 repository = "https://github.com/eviov/eviov"
 homepage = "https://github.com/eviov/eviov"
 readme = "README.md"
-description = "Orbital shooters game"
+description = "Code generation crate for eviov"
 
 [lib]
 name = "codegen"
