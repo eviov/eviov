@@ -5,6 +5,7 @@ use futures::future::Future;
 
 use crate::ContextImpl;
 
+/// `ContextImpl` implementation for `TokioContext`.
 pub struct TokioContext;
 
 #[async_trait]

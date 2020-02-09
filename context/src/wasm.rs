@@ -5,6 +5,7 @@ use futures::future::Future;
 
 use crate::ContextImpl;
 
+/// `ContextImpl` implementation for `WasmContext`.
 pub struct WasmContext;
 
 #[async_trait]
