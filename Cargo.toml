@@ -14,7 +14,7 @@ description = "Orbital shooters game"
 
 [features]
 default = ["wasm", "not-wasm"]
-wasm = ["stdweb"]
+wasm = ["stdweb", "wasm-bindgen-futures"]
 not-wasm = ["parking_lot", "tokio", "tokio-tungstenite", "url"]
 
 [dependencies]
@@ -38,6 +38,7 @@ tokio-tungstenite = {version = "0.10.1", optional = true}
 type-equals = "0.1.0"
 typemap = {version = "0.3.3", git = "https://github.com/SOF3/rust-typemap"}
 url = {version = "2.1.1", optional = true}
+wasm-bindgen-futures = {version = "0.4.8", optional = true}
 
 [profile.release]
 opt-level = 3 # change to "s" or "z" when we need to

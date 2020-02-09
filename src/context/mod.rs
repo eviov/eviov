@@ -4,6 +4,12 @@ use async_trait::async_trait;
 use derive_more::From;
 use futures::future::{self, Either, Future, FutureExt};
 
+#[cfg(target_arch = "wasm32")]
+pub mod wasm;
+
+#[cfg(not(target_arch = "wasm32"))]
+pub mod tokio;
+
 #[async_trait]
 pub trait ContextImpl: Sized + Send + Sync + 'static {
     fn spawn_future<F: Future<Output = ()> + Send + 'static>(&self, fut: F);

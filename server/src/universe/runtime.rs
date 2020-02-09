@@ -9,7 +9,8 @@ use eviov::math::{Time, MILLIS_PER_TICK};
 use futures::future::Future;
 
 use super::*;
-use crate::Clock;
+
+type Clock = !;
 
 #[derive(Debug)]
 pub struct Runtime<X: system::Extra>(Arc<Inner<X>>);
@@ -49,7 +50,7 @@ impl<X: system::Extra> Runtime<X> {
     }
 
     pub fn current_time(&self) -> Time {
-        self.0.time.now() // TODO check if the blocking logic here is correct
+        unimplemented!()
     }
 
     pub async fn time_future<T>(&self, time: Time, task: impl Future<Output = T>) -> T {

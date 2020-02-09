@@ -768,6 +768,7 @@ dependencies = [
  "type-equals",
  "typemap",
  "url",
+ "wasm-bindgen-futures",
 ]
 
 [[package]]

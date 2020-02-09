@@ -12,9 +12,6 @@ static ALLOC: WeeAlloc = WeeAlloc::INIT;
 mod conn;
 mod pool;
 
-mod clock;
-pub use clock::*;
-
 #[wasm_bindgen]
 pub fn entry() {
     wasm_logger::init(wasm_logger::Config::new(log::Level::Debug));
