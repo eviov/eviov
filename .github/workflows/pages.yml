@@ -1,6 +1,8 @@
 name: Client Pages Deployment
 on:
-  - push
+  push:
+    branches:
+      - master
 jobs:
   build:
     name: WASM build
