@@ -3,7 +3,7 @@
 use heck::*;
 use matches2::option_match;
 use proc_macro2::{Span, TokenStream};
-use quote::{format_ident, ToTokens, quote, quote_spanned};
+use quote::{format_ident, quote, quote_spanned, ToTokens};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -27,19 +27,16 @@ pub fn main(ts: TokenStream) -> syn::Result<TokenStream> {
 
     macro_rules! query_req_res_idents {
         ($cs:ident, $suffix:ident) => {
-            defs.iter().filter(|def| def.$cs())
-                .filter_map(|def| {
-                    match def {
-                        Def::Query(msg) => {
-                            Some((
-                                msg.span,
-                                &msg.attrs,
-                                format_ident!("{}{}", &msg.name, stringify!($suffix))
-                            ))
-                        },
-                        #[allow(unreachable_patterns)]
-                        _ => None
-                    }
+            defs.iter()
+                .filter(|def| def.$cs())
+                .filter_map(|def| match def {
+                    Def::Query(msg) => Some((
+                        msg.span,
+                        &msg.attrs,
+                        format_ident!("{}{}", &msg.name, stringify!($suffix)),
+                    )),
+                    #[allow(unreachable_patterns)]
+                    _ => None,
                 })
         };
     }

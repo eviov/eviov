@@ -2,8 +2,8 @@
 
 /// The observer channel
 pub mod obs {
-    use eviov_types::{ObjectId,Eci,Time,Vector,Length};
-    use serde::{Serialize, Deserialize};
+    use eviov_types::{Eci, Length, ObjectId, Time, Vector};
+    use serde::{Deserialize, Serialize};
 
     codegen::proto! {
         /// Client-system observer channel

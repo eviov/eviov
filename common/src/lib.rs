@@ -28,9 +28,9 @@
 #![cfg_attr(not(debug_assertions), deny(warnings, clippy::dbg_macro,))]
 
 pub use eviov_context::*;
-pub use eviov_types::*;
 pub use eviov_proto as proto;
 pub use eviov_transport as transport;
+pub use eviov_types::*;
 
 mod orbit;
 pub use orbit::*;
