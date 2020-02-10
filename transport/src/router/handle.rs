@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
-use std::time::Instant;
+use instant::Instant;
 
 use futures::channel::{mpsc, oneshot};
 use futures::lock::Mutex;

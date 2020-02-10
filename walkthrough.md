@@ -15,8 +15,8 @@ Different servers may connect to each other (details explained below),
 forming a possibly-disconnected graph.
 Various gamemodes are implemented in crated under the /games directory.
 
-The root directory also exposes a lib crate for code shared between server and
-client.
+There are other direct/indirect library crates in the root directory
+for code that are shared between server and client.
 
 ## Game mechanics
 The primary focus of this game is the mechanics arising from gravitational pull

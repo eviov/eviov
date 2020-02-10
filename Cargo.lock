@@ -420,6 +420,7 @@ dependencies = [
  "eviov-proto",
  "eviov-types",
  "futures 0.3.4",
+ "instant",
  "parking_lot 0.10.0",
  "ring",
  "rmp-serde",
@@ -663,6 +664,12 @@ checksum = "19a8a95243d5a0398cae618ec29477c6e3cb631152be5c19481f80bc71559754"
 dependencies = [
  "bytes",
 ]
+
+[[package]]
+name = "instant"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6c346c299e3fe8ef94dc10c2c0253d858a69aac1245157a3bf4125915d528caf"
 
 [[package]]
 name = "iovec"
