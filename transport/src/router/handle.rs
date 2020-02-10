@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
-use instant::Instant;
 
 use futures::channel::{mpsc, oneshot};
 use futures::lock::Mutex;
 use futures::sink::SinkExt;
 use futures::stream::StreamExt;
+use instant::Instant;
 
 use eviov_proto::{Endpoint, Handler, MessageFrom, QueryId, QueryRequestFrom, Single};
 
