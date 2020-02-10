@@ -1,10 +1,11 @@
-# Project walkthrough
+Project walkthrough.
+
 This article guides through all aspects (including technical and gameplay) of
 this project.
 
-Note that this file is intended for technical reference, not a gameplay guide.
+Note that this file is intended as technical reference, not a gameplay guide.
 
-## Project structure
+# Project structure
 The client is a static page running a WASM module.
 The source code of the WASM module is located in the /client directory.
 
@@ -18,11 +19,11 @@ Various gamemodes are implemented in crated under the /games directory.
 There are other direct/indirect library crates in the root directory
 for code that are shared between server and client.
 
-## Game mechanics
+# Game mechanics
 The primary focus of this game is the mechanics arising from gravitational pull
 in a 2D world.
 
-### Hierarchical orbital systems
+## Hierarchical orbital systems
 This game does not implement real-life n-bodies mechanics.
 Instead, apart from the root object (nicknamed the "Sun") which is stationary,
 every object (the "child") orbits exactly one other object (the "parent"),
@@ -55,7 +56,7 @@ but the interaction with its parent should be handled by the parent.
 The parent should see each large body child as a blackbox,
 only knowing its g-field radius.
 
-### Object transfer
+## Object transfer
 When a child escapes the g-field of its parent,
 it should be "transferred" to the grandparent (the parent of its parent),
 such that the grandparent becomes the new parent of this child.
@@ -79,7 +80,7 @@ intersects with the g-field of the old parent),
 it should perform the new transfer after sending the first `intra::EndTransfer`
 message.
 
-### Netsplits
+## Netsplits
 In the whole network, there might be multiple Suns.
 However, since there is no way for objects under different Suns to interact,
 generally speaking, we assume there is only one Sun.
@@ -100,7 +101,7 @@ Objects intersecting with the child g-field should perform "smooth collision".
 roadbank, where the velocity component parallel to the radius is removed,
 such that the object only moves along the circumference.
 
-### Distant view
+## Distant view
 Players have infinite Field of View, i.e. they can zoom out indefinitely.
 However, due to diffraciton of light,
 objects further away have reduced "resolution",
@@ -112,24 +113,37 @@ i.e. players can only see bigger objects at a distance.
 > For example, if a spacecraft spawns at a location 8*c* away,
 > it would appear on the client after 8 seconds.
 
-## Protocol
-Messages within the same process are sent through MPSC channels.
-Messages between processes are sent through websockets,
-with each message encoded in MessagePack format.
-
+# Protocol
 In this section, a "node" refers to a party that can send or receive messages.
-A node can be a client, a System coroutine, or "Hub servers".
+A node can be a client, the communications manager of a server process, a
+System coroutine, or "Hub servers".
 A Hub server is a logical server that handles non-physical events,
 such as player score, load balancing, etc.
 
-There are five types of connections used in this repo:
-- Time synchronization
-- Client-system connection
-- Client-hub connection
-- Intra-system connection
-- System-hub connection
+All communications go through the `Router`, which manages the internal and
+external communication routing.
 
-### Time synchronization
+For each communication, there is a "server" endpoint and a "client" endpoint.
+Before the connection is created, the server first listens at a "node address"
+(an object ID for internal, a server address plus an object ID for external).
+The client requests through the router (or two routers for external) to connect
+to a server.
+
+Data are exchanged in units of messages.
+Messages of the similar type are grouped as the same endpoint of a "protocol".
+Multiple protocols can be grouped as a "protocol aggregate",
+which shares the same identification information and reuses the connection.
+
+When an external connection is created, the server sends a challenge query to
+the client.
+This can be an empty query, but it must be sent even if empty.
+The client then sends a reply (based on the query or otherwise).
+If the server accepts the query, it replies with a `ChallengeResult::Ok`
+message, otherwise `ChallengeResult::Fail` and closes the connection.
+Then, protocol-specific messages can be transferred through the aggregate
+wrapper packets.
+
+## Time synchronization
 Time synchronization is used to synchronize the "game time" between processes.
 Game time is represented as number of "ticks" (1 tick = 20ms, 50 ticks = 1s)
 since the "Universal Epoch", which is the instant when the first node in the
@@ -142,25 +156,25 @@ the server side of time synchronization can be System coroutines.
 
 Clients should only perform time synchronization with System servers.
 
-#### Request
+### Request
 The request contains a random `id` field.
 
-#### Response
+### Response
 The response contains the `id` from the request,
 as well as the `time`, the current game time.
 
-### Client-system connection
+## Client-system connection
 Client-system connection is the wrapper protocol for multiple types
 ("channels")
 of communication between the client and Systems.
 Systems in the same process communicate with the same client using the same
 websocket.
 
-#### Observer channel
+### Observer channel
 The observer channel allows authorized clients to listen to events happening
 within the System.
 
-##### Handshake
+#### Handshake
 When a client is allowed to start listening to events in a System
 (most likely authorized by the parent or child of the System),
 the System and the authorizer indirectly exchange an
@@ -169,24 +183,24 @@ the System and the authorizer indirectly exchange an
 which uses the token to perform observer handshake to this System
 through the `cs::obs::Handshake::Request` message.
 
-##### Accept
+#### Accept
 If the System accepts the handshake, it responds with a
 `cs::obs::Handshake::Response` message.
 The response message contains the components of the center large body of the
 System, as well as the external traits of its children.
 
-##### Event
+#### Event
 The `cs::obs::Event` message encapsulates events happening in the System.
 For example, `cs::obs::EventContent::Accel` sets the gravity-independent
 acceleration of a child object.
 
-##### Termination
+#### Termination
 When the authorization to listen to events is revoked,
 the authorizer sends an `intra::RevokeObserve` message to the System.
 Then the System would send a `cs::obs::Close` message to the client and close
 the connection.
 
-#### Controller channel
+### Controller channel
 For gamemodes where the player controls a private object ("spacecraft"),
 the controller channel allows the player to toggle spacecraft controls.
 
@@ -197,18 +211,18 @@ the Controller channel is closed, and the client should create one in the new Sy
 
 Unresolved: what if two transfers happen in a short period of time?
 
-##### Handshake
+#### Handshake
 A client gains access to a spacecraft by providing its ID and password
 through the `cs::ctrl::Handshake::Request` message.
 The password is a random `u64` generated by the server,
 and provided to the client most likely during game join.
 
-##### Accept
+#### Accept
 If the System accepts the handshake, it responds with a
 `cs::ctrl::Handshake::Response` message.
 This message provides information of various controls of the spacecraft.
 
-##### Control
+#### Control
 The `cs::ctrl::Control` message encapsulates client actions to update the
 spacecraft controls.
 
@@ -216,35 +230,35 @@ The `cs::ctrl::Update` message encapsulates events in the System
 (such as changes in energy levels)
 that only the rocket controller should receive.
 
-### Client-hub connection
+## Client-hub connection
 This connection exchanges information about general public data and
 player-specific data, such as online server list, accumulated score, etc.
 
-### Intra-system connection
+## Intra-system connection
 This connection exchanges information about object transfers.
 Since object transfer can only occur between parent and children,
 the connection only exists at this level.
 
-#### Object transfer
+### Object transfer
 
-#### Observer authorization
+### Observer authorization
 
-### System-hub connection
+## System-hub connection
 This connection allows Systems to retrieve and update persistent data about
 players, such as player accumulated score.
 
-## Gamemodes
+# Gamemodes
 Adding more gamemodes is a late stage of development.
 In early stage, only the simplest Basic FFA mode is implemented.
 
-### Basic FFA
+## Basic FFA
 Players join in one-time sessions (no progress is retained).
 Players are attached to a specific "spacecraft" (a type of small body),
 and control its acceleration in a restricted range.
 The spacecraft can produce "missiles" (another type of small body),
 ejected with a specific initial velocity.
 
-#### Durability
+### Durability
 Both spacecrafts and missiles have "durability" (a type of scalar value).
 They disappear when durability reaches zero.
 
@@ -258,12 +272,12 @@ as defined by their "resistance value".
 In Basic mode, all spacecrafts have the same resistance value,
 and all missiles have the same resistance value.
 
-#### Environment
+### Environment
 Around a Sun, there are four planets, initially equally spaced in angle,
 with different radii from the Sun.
 Each planet has 2-3 children.
 
-### Evo FFA
+## Evo FFA
 Similar to Basic FFA, but there exists various classes of spacecrafts,
 allowing variation in acceleration range, rotation speed, durability,
 resistance value and missile type.
@@ -276,9 +290,9 @@ Spacecrafts can pick up floating space debris to increase their "energy level",
 which can be used to transform the spacecraft into other classes.
 Energy level can also be increased by destroying other spacecrafts.
 
-### Expert FFA
+## Expert FFA
 Similar to Evo FFA, but there is an additional constraint of fuel.
 All operations consume fuel, and the player has to pick up hydrogen and oxygen
 orbs in space in order to refill the fuel.
 
-## Client display
+# Client display

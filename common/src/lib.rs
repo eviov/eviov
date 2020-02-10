@@ -1,6 +1,8 @@
 //! The main common crate for the client and servers.
 //!
 //! This crate reexports items defined in other subcrates.
+//!
+//! See [mod walkthrough](./walkthrough/index.html) for a technical walkthrough  of the project.
 
 #![feature(type_alias_impl_trait, option_expect_none)]
 #![allow(dead_code, unused_variables, unreachable_code)]
@@ -34,6 +36,8 @@ pub use eviov_types::*;
 
 mod orbit;
 pub use orbit::*;
+
+include!(concat!(env!("OUT_DIR"), "/walkthrough.rs"));
 
 /// General-purpose enum to denote the termination action of a looping function.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
