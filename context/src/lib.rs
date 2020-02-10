@@ -32,11 +32,14 @@ use futures::future::{self, Either, Future, FutureExt};
 
 /// Implementation for client crates compiling to WASM.
 #[cfg(feature = "wasm")]
-pub mod wasm;
+mod wasm;
+#[cfg(feature = "wasm")]
+pub use wasm::*;
 
-/// Implementation for server crates compiling to native.
 #[cfg(feature = "not-wasm")]
-pub mod tokio;
+mod tokio;
+#[cfg(feature = "not-wasm")]
+pub use self::tokio::*;
 
 /// Context-dependent primitives.
 #[async_trait]
