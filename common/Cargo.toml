@@ -29,7 +29,7 @@ num-traits = "0.2.11"
 operator-sugar = "0.1.2"
 parking_lot = {version = "0.10.0", optional = true}
 ring = "0.16.10"
-rmp-serde = "0.14.0"
+rmp-serde = "0.14.3"
 serde = {version = "1.0.104", features = ["derive"]}
 stdweb = {version = "0.4.20", optional = true}
 tokio = {version = "0.2.9", features = ["net", "time"], optional = true}
