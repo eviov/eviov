@@ -12,9 +12,9 @@ use super::*;
 #[derive(Debug, Clone, Serialize, Deserialize, Add, Sub, CopyGetters)]
 pub struct Eci {
     /// The position value
-    #[get_copy = "pub"]
+    #[getset(get_copy = "pub")]
     position: Vector<Length>,
     /// The velocity value
-    #[get_copy = "pub"]
+    #[getset(get_copy = "pub")]
     velocity: Vector<Length>,
 }
