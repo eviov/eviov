@@ -15,5 +15,5 @@ derive_more = "0.99.3"
 eviov-codegen = {path = "../codegen"}
 eviov-types = {path = "../types"}
 futures = "0.3.1"
-serde = {version = "1.0.104", features = ["derive"]}
+serde = {version = "1.0.105", features = ["derive"]}
 type-equals = "0.1.0"
