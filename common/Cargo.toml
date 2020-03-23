@@ -14,7 +14,7 @@ wasm = ["stdweb", "eviov-context/wasm", "eviov-transport/wasm"]
 not-wasm = ["parking_lot", "tokio", "tokio-tungstenite", "url", "eviov-context/not-wasm", "eviov-transport/wasm"]
 
 [dependencies]
-async-trait = "0.1.25"
+async-trait = "0.1.26"
 cfg-if = "0.1.10"
 derive_more = "0.99.3"
 eviov-context = {path = "../context"}
