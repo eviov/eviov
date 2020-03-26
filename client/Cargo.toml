@@ -19,7 +19,7 @@ log = "0.4.8"
 rand = "0.7.3"
 rmp-serde = "0.14.3"
 stdweb = "0.4.20"
-wasm-bindgen = "0.2.58"
+wasm-bindgen = "0.2.60"
 wasm-logger = "0.2.0"
 wee_alloc = "0.4.5"
 
