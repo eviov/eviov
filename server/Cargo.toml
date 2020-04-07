@@ -10,7 +10,7 @@ readme = "README.md"
 description = "Orbital shooters game"
 
 [dependencies]
-async-trait = "0.1.29"
+async-trait = "0.1.30"
 crossbeam = "0.7.3"
 derive_more = "0.99.5"
 eviov = {path = "../common", default-features = false, features = ["not-wasm"]}
