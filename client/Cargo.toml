@@ -34,4 +34,4 @@ features = [
 ]
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.11"
+wasm-bindgen-test = "0.3.12"
