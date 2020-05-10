@@ -15,4 +15,4 @@ getset = "0.1.0"
 num-derive = "0.3.0"
 num-traits = "0.2.11"
 operator-sugar = "0.1.2"
-serde = {version = "1.0.108", features = ["derive"]}
+serde = {version = "1.0.109", features = ["derive"]}
