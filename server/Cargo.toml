@@ -15,7 +15,7 @@ crossbeam = "0.7.3"
 derive_more = "0.99.5"
 eviov = {path = "../common", default-features = false, features = ["not-wasm"]}
 futures = {version = "0.3.5", features = ["compat"]}
-getset = "0.1.0"
+getset = "0.1.1"
 legion = "0.2.1"
 log = "0.4.8"
 parking_lot = "0.10.2"
