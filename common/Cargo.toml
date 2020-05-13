@@ -16,7 +16,7 @@ not-wasm = ["parking_lot", "tokio", "tokio-tungstenite", "url", "eviov-context/n
 [dependencies]
 async-trait = "0.1.30"
 cfg-if = "0.1.10"
-derive_more = "0.99.5"
+derive_more = "0.99.6"
 eviov-context = {path = "../context"}
 eviov-proto = {path = "../proto"}
 eviov-transport = {path = "../transport"}
