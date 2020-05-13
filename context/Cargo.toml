@@ -15,7 +15,7 @@ not-wasm = ["tokio"]
 
 [dependencies]
 async-trait = "0.1.30"
-derive_more = "0.99.5"
+derive_more = "0.99.6"
 eviov-codegen = {path = "../codegen"}
 futures = "0.3.5"
 stdweb = {version = "0.4.20", optional = true}

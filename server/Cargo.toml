@@ -12,7 +12,7 @@ description = "Orbital shooters game"
 [dependencies]
 async-trait = "0.1.30"
 crossbeam = "0.7.3"
-derive_more = "0.99.5"
+derive_more = "0.99.6"
 eviov = {path = "../common", default-features = false, features = ["not-wasm"]}
 futures = {version = "0.3.5", features = ["compat"]}
 getset = "0.1.1"
