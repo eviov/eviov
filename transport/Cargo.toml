@@ -21,7 +21,7 @@ eviov-types = {path = "../types"}
 futures = "0.3.5"
 instant = "0.1.4"
 parking_lot = {version = "0.10.2", optional = true}
-ring = "0.16.13"
+ring = "0.16.14"
 rmp-serde = "0.14.3"
 serde = {version = "1.0.111", features = ["derive"]}
 stdweb = {version = "0.4.20", optional = true}
