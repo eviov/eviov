@@ -14,7 +14,7 @@ wasm = ["stdweb", "wasm-bindgen-futures"]
 not-wasm = ["tokio"]
 
 [dependencies]
-async-trait = "0.1.32"
+async-trait = "0.1.33"
 derive_more = "0.99.7"
 eviov-codegen = {path = "../codegen"}
 futures = "0.3.5"
