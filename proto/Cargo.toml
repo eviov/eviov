@@ -10,7 +10,7 @@ readme = "README.md"
 description = "eviov protocol structs"
 
 [dependencies]
-async-trait = "0.1.32"
+async-trait = "0.1.33"
 derive_more = "0.99.7"
 eviov-codegen = {path = "../codegen"}
 eviov-types = {path = "../types"}
