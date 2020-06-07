@@ -17,5 +17,5 @@ proc-macro = true
 heck = "0.3.1"
 matches2 = "1.2.1"
 proc-macro2 = "1.0.18"
-quote = "1.0.6"
+quote = "1.0.7"
 syn = "1.0.30"
