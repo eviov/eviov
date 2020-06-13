@@ -241,6 +241,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "derivative"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb582b60359da160a9477ee80f15c8d784c477e69c217ef2cdd4169c24ea380f"
+dependencies = [
+ "proc-macro2 1.0.18",
+ "quote 1.0.7",
+ "syn 1.0.31",
+]
+
+[[package]]
 name = "derive_more"
 version = "0.99.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -308,7 +319,7 @@ dependencies = [
  "num-derive",
  "num-traits",
  "operator-sugar",
- "parking_lot 0.10.2",
+ "parking_lot",
  "ring",
  "rmp-serde",
  "serde",
@@ -395,12 +406,12 @@ dependencies = [
  "getset",
  "legion",
  "log",
- "parking_lot 0.10.2",
+ "parking_lot",
  "pretty_env_logger",
  "rand",
  "rmp-serde",
  "serde",
- "smallvec 1.4.0",
+ "smallvec",
  "tokio",
  "tokio-tungstenite",
 ]
@@ -415,7 +426,7 @@ dependencies = [
  "eviov-types",
  "futures 0.3.5",
  "instant",
- "parking_lot 0.10.2",
+ "parking_lot",
  "ring",
  "rmp-serde",
  "serde",
@@ -566,6 +577,15 @@ dependencies = [
  "proc-macro-hack",
  "proc-macro-nested",
  "slab",
+]
+
+[[package]]
+name = "fxhash"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c31b6d751ae2c7f11320402d34e41349dd1016f8d5d45e48c4312bc8625af50c"
+dependencies = [
+ "byteorder",
 ]
 
 [[package]]
@@ -721,20 +741,49 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "legion"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eeee1b14f6e5e31b570b2b5f2673bab9f6d7061e713784ee535252b3e2798c8d"
+checksum = "1b542e2cbaee0dec378ad3563683c30075d3480e02818e1cd79372c276aa9dc8"
+dependencies = [
+ "legion-core",
+ "legion-systems",
+]
+
+[[package]]
+name = "legion-core"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eae8064aa1051c56ff792fc0773ffd2bb73b532035e283957df4a606b411bce1"
 dependencies = [
  "bit-set",
- "crossbeam",
- "derivative",
+ "crossbeam-channel",
+ "derivative 2.1.1",
  "downcast-rs",
+ "fxhash",
  "itertools",
- "parking_lot 0.9.0",
+ "parking_lot",
+ "rayon",
+ "smallvec",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "legion-systems"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "65fd1e500b6a1bc9a1c47b629292ff3050554bc0b886df3c8b97556019c56aba"
+dependencies = [
+ "bit-set",
+ "crossbeam-channel",
+ "crossbeam-queue",
+ "derivative 1.0.3",
+ "downcast-rs",
+ "fxhash",
+ "itertools",
+ "legion-core",
  "paste",
  "rayon",
- "shrinkwraprs",
- "smallvec 0.6.13",
  "tracing",
 ]
 
@@ -773,12 +822,6 @@ name = "matches2"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b641ba524b4c57a0b8e8b1dd6fb851fd21c77c0ce4f5c9a1e11da63c84677c5"
-
-[[package]]
-name = "maybe-uninit"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60302e4db3a61da70c0cb7991976248362f30319e88850c487b9b95bbf059e00"
 
 [[package]]
 name = "memchr"
@@ -904,38 +947,12 @@ checksum = "24b8786d2b9b6c16cc053524a27721c5a1761f3be0094882351357e923e9f5ab"
 
 [[package]]
 name = "parking_lot"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f842b1982eb6c2fe34036a4fbfb06dd185a3f5c8edfaacdf7d1ea10b07de6252"
-dependencies = [
- "lock_api",
- "parking_lot_core 0.6.2",
- "rustc_version",
-]
-
-[[package]]
-name = "parking_lot"
 version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3a704eb390aafdc107b0e392f56a82b668e3a71366993b5340f5833fd62505e"
 dependencies = [
  "lock_api",
- "parking_lot_core 0.7.1",
-]
-
-[[package]]
-name = "parking_lot_core"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b876b1b9e7ac6e1a74a6da34d25c42e17e8862aa409cbbbdcfc8d86c6f3bc62b"
-dependencies = [
- "cfg-if",
- "cloudabi",
- "libc",
- "redox_syscall",
- "rustc_version",
- "smallvec 0.6.13",
- "winapi 0.3.8",
+ "parking_lot_core",
 ]
 
 [[package]]
@@ -948,7 +965,7 @@ dependencies = [
  "cloudabi",
  "libc",
  "redox_syscall",
- "smallvec 1.4.0",
+ "smallvec",
  "winapi 0.3.8",
 ]
 
@@ -1330,32 +1347,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2579985fda508104f7587689507983eadd6a6e84dd35d6d115361f530916fa0d"
 
 [[package]]
-name = "shrinkwraprs"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83695fde96cbe9e08f0e4eb96b1b56fdbd44f2098ee27462dda964c7745fddc7"
-dependencies = [
- "bitflags",
- "itertools",
- "proc-macro2 1.0.18",
- "quote 1.0.7",
- "syn 1.0.31",
-]
-
-[[package]]
 name = "slab"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c111b5bd5695e56cffe5129854aa230b39c93a305372fdbb2668ca2394eea9f8"
-
-[[package]]
-name = "smallvec"
-version = "0.6.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f7b0758c52e15a8b5e3691eae6cc559f08eee9406e548a4477ba4e67770a82b6"
-dependencies = [
- "maybe-uninit",
-]
 
 [[package]]
 name = "smallvec"
@@ -1460,6 +1455,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb6bfa289a4d7c5766392812c0a1f4c1ba45afa1ad47803c11e1f407d846d75f"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "thiserror"
+version = "1.0.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b13f926965ad00595dd129fa12823b04bbf866e9085ab0a5f2b05b850fbfc344"
+dependencies = [
+ "thiserror-impl",
+]
+
+[[package]]
+name = "thiserror-impl"
+version = "1.0.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "893582086c2f98cde18f906265a65b5030a074b1046c674ae898be6519a7f479"
+dependencies = [
+ "proc-macro2 1.0.18",
+ "quote 1.0.7",
+ "syn 1.0.31",
 ]
 
 [[package]]
@@ -1604,7 +1619,7 @@ version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5479532badd04e128284890390c1e876ef7a993d0570b3597ae43dfa1d59afa4"
 dependencies = [
- "smallvec 1.4.0",
+ "smallvec",
 ]
 
 [[package]]
