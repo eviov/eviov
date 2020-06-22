@@ -3,7 +3,6 @@ update_configs:
   - package_manager: rust:cargo
     directory: /
     update_schedule: live
-    default_reviewers: [SOF3]
     default_labels: ["dependabot", "rust-deps"]
     automerged_updates:
       - match:
@@ -12,7 +11,6 @@ update_configs:
   - package_manager: javascript
     directory: /client/site
     update_schedule: live
-    default_reviewers: [SOF3]
     default_labels: ["dependabot", "wasm-toolchain"]
     automerged_updates:
       - match:
