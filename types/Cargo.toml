@@ -10,7 +10,7 @@ readme = "README.md"
 description = "eviov ID and unit newtypes"
 
 [dependencies]
-derive_more = "0.99.8"
+derive_more = "0.99.9"
 getset = "0.1.1"
 num-derive = "0.3.0"
 num-traits = "0.2.12"
