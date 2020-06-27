@@ -11,7 +11,7 @@ description = "eviov protocol structs"
 
 [dependencies]
 async-trait = "0.1.36"
-derive_more = "0.99.8"
+derive_more = "0.99.9"
 eviov-codegen = {path = "../codegen"}
 eviov-types = {path = "../types"}
 futures = "0.3.5"
