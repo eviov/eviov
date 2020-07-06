@@ -23,6 +23,6 @@ pretty_env_logger = "0.4.0"
 rand = "0.7.3"
 rmp-serde = "0.14.3"
 serde = {version = "1.0.114", features = ["derive"]}
-smallvec = "1.4.0"
+smallvec = "1.4.1"
 tokio = {version = "0.2.21", features = ["macros", "rt-threaded", "tcp", "time"]}
 tokio-tungstenite = "0.10.1"
