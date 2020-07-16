@@ -15,7 +15,7 @@ crate-type = ["cdylib"]
 [dependencies]
 async-trait = "0.1.36"
 eviov = {path = "../common", default-features = false, features = ["wasm"]}
-log = "0.4.8"
+log = "0.4.11"
 rand = "0.7.3"
 rmp-serde = "0.14.3"
 stdweb = "0.4.20"
