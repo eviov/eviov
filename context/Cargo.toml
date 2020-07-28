@@ -20,4 +20,4 @@ eviov-codegen = {path = "../codegen"}
 futures = "0.3.5"
 stdweb = {version = "0.4.20", optional = true}
 tokio = {version = "0.2.22", features = ["net", "time"], optional = true}
-wasm-bindgen-futures = {version = "0.4.16", optional = true}
+wasm-bindgen-futures = {version = "0.4.17", optional = true}
