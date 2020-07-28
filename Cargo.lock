@@ -1755,9 +1755,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-futures"
-version = "0.4.15"
+version = "0.4.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41ad6e4e8b2b7f8c90b6e09a9b590ea15cb0d1dbe28502b5a405cd95d1981671"
+checksum = "de69cfc3f6641a90c43efb615529b64750015cf88a9c21ec9927c7dd71df170f"
 dependencies = [
  "cfg-if",
  "js-sys",
