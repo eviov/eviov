@@ -725,9 +725,9 @@ checksum = "b8b7a7c0c47db5545ed3fef7468ee7bb5b74691498139e4b3f6a20685dc6dd8e"
 
 [[package]]
 name = "js-sys"
-version = "0.3.42"
+version = "0.3.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52732a3d3ad72c58ad2dc70624f9c17b46ecd0943b9a4f1ee37c4c18c5d983e2"
+checksum = "d7d8712512671fd243aa2ab95ca816506c6bd0c36221694bb6b58d9ce93df795"
 dependencies = [
  "wasm-bindgen",
 ]
@@ -1831,9 +1831,9 @@ dependencies = [
 
 [[package]]
 name = "web-sys"
-version = "0.3.42"
+version = "0.3.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8be2398f326b7ba09815d0b403095f34dd708579220d099caae89be0b32137b2"
+checksum = "f3362f54c47d0da11569b6115a1c1fbe5e7162ca720c382066e96aa2263d06c2"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
