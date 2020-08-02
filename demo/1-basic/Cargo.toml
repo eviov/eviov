@@ -1,0 +1,13 @@
+[package]
+name = "eviov-demo-1-basic"
+version = "0.0.0"
+authors = ["SOFe <sofe2038@gmail.com>"]
+edition = "2018"
+license = "Apache-2.0"
+repository = "https://github.com/eviov/eviov"
+homepage = "https://github.com/eviov/eviov"
+readme = "../README.md"
+description = "Eviov demo 1: basic"
+
+[dependencies]
+eviov-core = {version = "0.0.0", path = "../../core"}

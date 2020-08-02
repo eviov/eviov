@@ -1,0 +1,14 @@
+[package]
+name = "eviov-core"
+version = "0.0.0"
+authors = ["SOFe <sofe2038@gmail.com>"]
+edition = "2018"
+license = "Apache-2.0"
+repository = "https://github.com/eviov/eviov"
+homepage = "https://github.com/eviov/eviov"
+readme = "../README.md"
+description = "Eviov core bundle"
+
+[dependencies]
+amethyst = {version = "0.15.0", features = ["vulkan"]}
+log = "0.4.11"
