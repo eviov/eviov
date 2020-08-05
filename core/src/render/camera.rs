@@ -1,11 +1,21 @@
+use amethyst::ecs;
+use getset::*;
+
 use crate::units;
 
 /// The camera resource.
+#[derive(Getters, Setters, MutGetters, CopyGetters)]
 pub struct Camera {
-    /// The location of the camera.
-    pub address: units::Address,
+    /// The star system the camera is focused in.
+    #[getset(get_copy = "pub", set = "pub")]
+    star: ecs::Entity,
+    /// The camera position in the star system.
+    #[getset(get_copy = "pub", set = "pub")]
+    position: units::Position,
     /// The bearing of the camera.
-    pub bearing: units::Bearing,
+    #[getset(get_copy = "pub", set = "pub")]
+    bearing: units::Bearing,
     /// The in-game width of the screen.
-    pub width: units::Length,
+    #[getset(get_copy = "pub", set = "pub")]
+    width: units::Length,
 }

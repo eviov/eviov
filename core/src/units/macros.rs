@@ -1,11 +1,13 @@
 macro_rules! op_raw {
     ($lhs:ident, $rhs:ident; $op:ident, $snake_op:ident; $assign:ident, $snake_assign:ident) => {
+        op_raw!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; Self);
+    };
+    ($lhs:ident, $rhs:ident; $op:ident, $snake_op:ident; $assign:ident, $snake_assign:ident; $output:ident) => {
         impl std::ops::$op<$rhs> for $lhs {
-            type Output = Self;
+            type Output = $output;
 
-            fn $snake_op(mut self, other: $rhs) -> Self {
-                self.0 = std::ops::$op::$snake_op(self.0, other);
-                self
+            fn $snake_op(self, other: $rhs) -> $output {
+                $output(std::ops::$op::$snake_op(self.0, other))
             }
         }
 
@@ -19,12 +21,14 @@ macro_rules! op_raw {
 
 macro_rules! op_newtype {
     ($lhs:ident, $rhs:ident; $op:ident, $snake_op:ident; $assign:ident, $snake_assign:ident) => {
+        op_newtype!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; Self);
+    };
+    ($lhs:ident, $rhs:ident; $op:ident, $snake_op:ident; $assign:ident, $snake_assign:ident; $output:ident) => {
         impl std::ops::$op<$rhs> for $lhs {
-            type Output = Self;
+            type Output = $output;
 
-            fn $snake_op(mut self, other: $rhs) -> Self {
-                self.0 = std::ops::$op::$snake_op(self.0, other.0);
-                self
+            fn $snake_op(self, other: $rhs) -> $output {
+                $output(std::ops::$op::$snake_op(self.0, other.0))
             }
         }
 
@@ -41,14 +45,20 @@ macro_rules! common_ops {
         #[allow(unused_macros)]
         macro_rules! $mac_raw {
             ($lhs:ident, $rhs:ident) => {
-                op_raw!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign);
+                op_raw!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; Self);
+            };
+            ($lhs:ident, $rhs:ident -> $output:ident) => {
+                op_raw!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; $output);
             };
         }
 
         #[allow(unused_macros)]
         macro_rules! $mac_newtype {
             ($lhs:ident, $rhs:ident) => {
-                op_newtype!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign);
+                op_newtype!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; Self);
+            };
+            ($lhs:ident, $rhs:ident -> $output:ident) => {
+                op_newtype!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; $output);
             };
         }
     )*};

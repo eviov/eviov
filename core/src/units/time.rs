@@ -1,11 +1,13 @@
-/// A monotonic 100Hz clock in the game system.
+use serde::{Deserialize, Serialize};
+
+/// A monotonic 50Hz clock in the game system.
 ///
-/// This clock can represent the time for about 32 months from epoch.
+/// This clock can represent the time for about 64 months from epoch.
 ///
 /// Typically, the epoch is reset every time the universe is reloaded.
 /// This means all values in RAM using an epoch-dependent form
 /// need to be serialized as an epoch-independent form.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct GameInstant(pub u32);
 
 impl GameInstant {
@@ -16,16 +18,19 @@ impl GameInstant {
 }
 
 /// A non-negative difference between two `GameInstant`s.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Serialize, Deserialize)]
 pub struct GameDuration(pub u32);
 
 impl GameDuration {
     /// The smallest discrete duration unit.
     pub const UNIT: GameDuration = GameDuration(1);
 
-    /// Expresses the duration in seconds.
-    pub fn as_secs(self) -> f64 {
-        (self.0 as f64) / 100.
+    /// Expresses the time as float.
+    ///
+    /// This is a lossless conversion since `f64` has 52 bits of mantissa (compared to 32 bits of
+    /// the integer).
+    pub fn as_float(self) -> f64 {
+        self.0 as f64
     }
 }
 

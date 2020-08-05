@@ -8,7 +8,7 @@ use crate::units::{self, LengthExt};
 /// This is isomorphic to an `OrbitalState` given a specific mass and time frame.
 ///
 /// Extra data are stored in this struct for efficient computation.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Orbit {
     /// orbit eccentricity, a value between 0 and 1
     eccentricity: f64,
@@ -42,7 +42,7 @@ impl Orbit {
         // 5. Eccentricity (e). Dimension: 1
         let eccentricity: f64 = (1. - ang_momentum.powi(2) / (semimajor * mu)).sqrt();
         // 8. Argument of latitude (u). Dimension: 1 (angle)
-        let latitude: units::Bearing = units::Bearing(unimplemented!());
+        let latitude: units::Bearing = units::Bearing(todo!());
         // 9a. Semi-latus rectum (p). Dimension: L
         let slr: units::Length = semimajor * (1. - eccentricity.powi(2));
         // 9b. True anomaly (nu). Dimension: 1 (angle)
@@ -72,26 +72,45 @@ impl Orbit {
     ///
     /// The tolerance is measured on each component,
     /// and the modulus would have sqrt(2) times of this tolerance.
-    pub fn approx_position(&self, t: units::GameInstant, m: units::Mass, tolerance: units::Length) -> units::Position {
-        unimplemented!()
+    pub fn approx_position(
+        &self,
+        t: units::GameInstant,
+        tolerance: units::Length,
+    ) -> units::Position {
+        todo!()
     }
 
     /// Approximate the velocity of the orbit at time `t`.
     ///
     /// The tolerance is measured on each component,
     /// and the modulus would have sqrt(2) times of this tolerance.
-    pub fn approx_velocity(&self, t: units::GameInstant, m: units::Mass, tolerance: units::Length) -> units::Velocity {
-        unimplemented!()
+    pub fn approx_velocity(
+        &self,
+        t: units::GameInstant,
+        m: units::Mass,
+        tolerance: units::Length,
+    ) -> units::Velocity {
+        todo!()
     }
 
     /// Approximate the bearing of the orbit at time `t`.
-    pub fn approx_bearing(&self, t: units::GameInstant, m: units::Mass, tolerance: units::Theta) -> units::Bearing {
-        unimplemented!()
+    pub fn approx_bearing(
+        &self,
+        t: units::GameInstant,
+        m: units::Mass,
+        tolerance: units::Theta,
+    ) -> units::Bearing {
+        todo!()
     }
 
     /// Approximate the distance of the orbit from origin at time `t`.
-    pub fn approx_radius(&self, t: units::GameInstant, m: units::Mass, tolerance: units::Length) -> units::Length {
-        unimplemented!()
+    pub fn approx_radius(
+        &self,
+        t: units::GameInstant,
+        m: units::Mass,
+        tolerance: units::Length,
+    ) -> units::Length {
+        todo!()
     }
 
     /// Compare which orbit has radius.
@@ -101,8 +120,13 @@ impl Orbit {
     ///
     /// If the difference between the two radii is less than floating point precision in internal
     /// operations, `Ordering::Equal` may be returned.
-    pub fn compare_radius(&self, other: &Self, t: units::GameInstant, tolerance: units::Length) -> Ordering {
-        unimplemented!()
+    pub fn compare_radius(
+        &self,
+        other: &Self,
+        t: units::GameInstant,
+        tolerance: units::Length,
+    ) -> Ordering {
+        todo!()
     }
 
     /// Compare which orbit has greater bearing along the minor arc.
@@ -112,18 +136,33 @@ impl Orbit {
     ///
     /// If the difference between the two arcs (in the mod-2pi field) is less than floating point
     /// precision in internal operations, `Ordering::Equal` may be returned.
-    pub fn compare_bearing(&self, other: &Self, t: units::GameInstant, tolerance: units::Length) -> Ordering {
-        unimplemented!()
+    pub fn compare_bearing(
+        &self,
+        other: &Self,
+        t: units::GameInstant,
+        tolerance: units::Length,
+    ) -> Ordering {
+        todo!()
     }
 
     /// Tests whether the radius is in the range (low, high) at time `t`.
-    pub fn radius_in_range(&self, low: units::Length, high: units::Length, t: units::GameInstant) -> units::Length {
-        unimplemented!()
+    pub fn radius_in_range(
+        &self,
+        low: units::Length,
+        high: units::Length,
+        t: units::GameInstant,
+    ) -> units::Length {
+        todo!()
     }
 
     /// Tests whether the bearing is in the arc starting from `low`, extending counterclockwise until `high`.
-    pub fn bearing_in_range(&self, low: units::Length, high: units::Length, t: units::GameInstant) -> units::Length {
-        unimplemented!()
+    pub fn bearing_in_range(
+        &self,
+        low: units::Length,
+        high: units::Length,
+        t: units::GameInstant,
+    ) -> units::Length {
+        todo!()
     }
 
     /// Computes the time (starting from `after`) when this orbit intersects with the circle of
@@ -135,8 +174,12 @@ impl Orbit {
     ///
     /// This method returns `None` if the orbit can never, or not in computationally relevant time,
     /// intersect with `radius`.
-    pub fn when_intersect_radius(&self, radius: units::Length, after: units::GameInstant) -> Option<units::GameInstant> {
-        unimplemented!()
+    pub fn when_intersect_radius(
+        &self,
+        radius: units::Length,
+        after: units::GameInstant,
+    ) -> Option<units::GameInstant> {
+        todo!()
     }
 
     /// Computes the time (starting from `after`) when the bearings of the two orbits have less
@@ -145,8 +188,13 @@ impl Orbit {
     /// This method only computes a lower bound. It returns `Some(after)` if the two bearings are
     /// already less than `delta` apart. It returns `None` if the orbit can never, or not in
     /// computationally relevant time, reach less than `delta` bearing difference.
-    pub fn when_intersect_bearing(&self, other: &Self, delta: units::Theta, after: units::GameInstant) -> Option<units::GameInstant> {
-        unimplemented!()
+    pub fn when_intersect_bearing(
+        &self,
+        other: &Self,
+        delta: units::Theta,
+        after: units::GameInstant,
+    ) -> Option<units::GameInstant> {
+        todo!()
     }
 }
 

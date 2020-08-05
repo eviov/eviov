@@ -1,11 +1,13 @@
 use std::f64::consts::PI;
 
+use serde::{Deserialize, Serialize};
+
 /// An absolute direction bearing, in radians.
 ///
 /// The zero (default) value points to the positive X axis.
 ///
 /// The value is not necessarily normalized.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct Bearing(pub f64);
 
 impl Bearing {
@@ -24,7 +26,7 @@ impl Bearing {
 /// An amount of rotation.
 ///
 /// A positive value indicates rotation in the counterclockwise direction.
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default, Serialize, Deserialize)]
 pub struct Theta(pub f64);
 
 impl Theta {

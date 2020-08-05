@@ -9,6 +9,6 @@ impl<'a> ecs::System<'a> for System {
     type SystemData = (ecs::Write<'a, EventChannel<Event>>, ecs::Entities<'a>);
 
     fn run(&mut self, (col_events, entities): Self::SystemData) {
-        unimplemented!()
+        todo!()
     }
 }

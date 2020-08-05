@@ -6,13 +6,22 @@ use crate::units;
 
 /// One of the bounding boxes of a body.
 ///
-/// A body may have multiple bounding boxes,
+/// A body may have multiple BBs,
 /// e.g. atmosphere and land.
-/// Each such bounding box is represented by an entity
+/// Each such BB is represented by an entity
 /// with a `BoundingBox` component.
+#[derive(Debug)]
 pub struct BoundingBox {
+    /// The shape of the BB.
     shape: Shape,
+    /// The behavioural variant of the BB.
     variant: Variant,
+    /// The parent entity of the BB.
+    ///
+    /// The parent must have a `Body` component.
+    parent: ecs::Entity,
+    /// The position of the BB relative to the parent.
+    offset: units::Displace,
 }
 
 /// The shape of a bounding box (BB).
@@ -20,7 +29,7 @@ pub struct BoundingBox {
 /// BB shape affects the following:
 /// - collision between BBs
 /// - drag effect of fluids on the body of this BB
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum Shape {
     /// A point BB.
     ///
@@ -48,21 +57,21 @@ impl Shape {
 
     /// Computes the drag effect of this shape against the given direction
     pub fn drag(&self, direction: impl units::Direction) -> f32 {
-        unimplemented!()
+        todo!()
     }
 }
 
 /// The variant of a bounding box (BB).
 ///
-/// This determines how the bounding box can affect the colliding object.
-#[derive(Debug, Clone)]
+/// This determines how the BB can affect the colliding object.
+#[derive(Debug)]
 pub enum Variant {
-    /// A solid bounding box.
+    /// A solid BB.
     ///
     /// Colliding objects are immediately deflected using collision physics.
     Solid(units::Elasticity),
 
-    /// A fluid bounding box.
+    /// A fluid BB.
     ///
     /// Colliding objects are constantly dragged
     /// in a direction based on the velocity of the fluid body.

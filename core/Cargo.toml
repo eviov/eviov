@@ -11,4 +11,9 @@ description = "Eviov core bundle"
 
 [dependencies]
 amethyst = {version = "0.15.0", features = ["vulkan"]}
+getset = "0.1.1"
 log = "0.4.11"
+rand = "0.7.3"
+rmp-serde = "0.14.4"
+serde = {version = "1.0.114", features = ["derive"]}
+serde_iter = "0.1.1"

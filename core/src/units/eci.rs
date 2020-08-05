@@ -1,9 +1,12 @@
-use super::{Position, Theta, Velocity};
+use serde::{Deserialize, Serialize};
+
+use super::{Bearing, Position, Velocity};
 
 /// Indicates that the wrapped type is Earth-centered Earth-fixed (ECEF).
 ///
 /// Position and angle objects are assumed to be Earth-centered inertial (ECI)
 /// unless explicitly wrapped with this type.
+#[derive(Serialize, Deserialize)]
 pub struct Ecef<T: Eci> {
     /// the original type.
     pub inner: T,
@@ -19,4 +22,4 @@ impl Eci for Position {}
 
 impl Eci for Velocity {}
 
-impl Eci for Theta {}
+impl Eci for Bearing {}

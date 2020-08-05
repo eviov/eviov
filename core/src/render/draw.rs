@@ -10,7 +10,7 @@ impl<'a> ecs::System<'a> for DrawSystem {
     type SystemData = (ecs::ReadExpect<'a, Camera>, ecs::ReadStorage<'a, phy::Star>);
 
     fn run(&mut self, (camera, star_store): Self::SystemData) {
-        let star = match star_store.get(camera.address.star).or_else(|| {
+        let star = match star_store.get(camera.star()).or_else(|| {
             use ecs::Join;
             star_store.join().next()
         }) {

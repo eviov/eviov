@@ -8,4 +8,4 @@ pub mod collision;
 mod orbit;
 pub use orbit::{Orbit, OrbitalState};
 mod index;
-pub use index::OrbitIndex;
+pub use index::BodyIndex;

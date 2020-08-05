@@ -9,5 +9,6 @@ pub use amethyst::{self, core::math as nalgebra, ecs};
 
 pub mod phy;
 pub mod render;
+pub mod save;
 pub mod units;
 pub mod util;

@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::nalgebra::Vector2;
 use crate::units;
 
@@ -11,7 +13,7 @@ use crate::units;
 pub type Length = f64;
 
 /// A Cartesian position, typically using the position of the parent star as the origin.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Position(pub Vector2<Length>);
 
 impl Position {
@@ -22,7 +24,7 @@ impl Position {
 }
 
 /// Represents the signed displacement between two positions.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Displace(pub Vector2<Length>);
 
 impl Default for Displace {
@@ -65,9 +67,13 @@ impl std::ops::Sub<Position> for Position {
 }
 
 /// A velocity in displacement per `GameDuration` tick.
-pub type Velocity = super::rate::Rate<Displace>;
+pub type Velocity = super::Rate<Displace>;
+
+/// An acceleration in velocity per `GameDuration` tick.
+pub type Accel = super::Rate<Velocity>;
 
 /// Extension trait for length-specific methods.
+
 pub trait LengthExt: Sized + seal::Sealed {
     #[doc(hidden)]
     fn into_length(self) -> Length;
