@@ -42,7 +42,7 @@ impl Orbit {
 
         let r = (state.position - units::Position::origin()).0;
         let r_norm = r.norm();
-        let v = state.velocity.unit.0;
+        let v = state.velocity.0 .0;
 
         // 1. Angular momentum (h). Dimension: M L^2 T^-1
         let ang_momentum: f64 = r[0] * v[1] - r[1] * v[0];
@@ -68,7 +68,8 @@ impl Orbit {
         let ecc_anomaly = r[0].arccos(semimajor);
 
         // Mean anomaly (M). Dimension: 1 (angle)
-        let mean_anomaly = MeanAnomaly(ecc_anomaly - units::Theta(eccentricity * ecc_anomaly.sin()));
+        let mean_anomaly =
+            MeanAnomaly(ecc_anomaly - units::Theta(eccentricity * ecc_anomaly.sin()));
 
         let epoch_anomaly = mean_anomaly - average_sweep.after(t.since_epoch());
 

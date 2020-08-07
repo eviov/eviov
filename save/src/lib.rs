@@ -12,9 +12,9 @@ use std::num::NonZeroU32;
 use std::path::Path;
 use std::sync::atomic::{AtomicU32, Ordering};
 
-use specs::{Entities, ReadStorage, WriteStorage};
 use getset::*;
 use serde::{Deserialize, Serialize};
+use specs::{Entities, ReadStorage, WriteStorage};
 
 /// A resource for tracking global save count for the current run
 #[derive(Debug)]
@@ -117,7 +117,9 @@ pub fn save_world(
     let mut saves = vec![];
 
     // unused `Star` join to filter away non-stars
-    for (entity, _, body, saveable) in (entities, store_star, store_body, &mut *store_saveable).join() {
+    for (entity, _, body, saveable) in
+        (entities, store_star, store_body, &mut *store_saveable).join()
+    {
         let _ = saveable.save_id.fill_generation(generation);
         let star_id = saveable.save_id_mut().clone();
         if let phy::Body::Root(_) = body {

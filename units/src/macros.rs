@@ -8,14 +8,14 @@ macro_rules! op_raw {
         impl std::ops::$op<$rhs> for $lhs {
             type Output = $output;
 
-            #[inline(always)]
+            #[inline]
             fn $snake_op(self, other: $rhs) -> $output {
                 $output(std::ops::$op::$snake_op(self.0, other))
             }
         }
 
         impl std::ops::$assign<$rhs> for $lhs {
-            #[inline(always)]
+            #[inline]
             fn $snake_assign(&mut self, rhs: $rhs) {
                 *self = std::ops::$op::$snake_op(*self, rhs);
             }
@@ -33,14 +33,14 @@ macro_rules! op_newtype {
         impl std::ops::$op<$rhs> for $lhs {
             type Output = $output;
 
-            #[inline(always)]
+            #[inline]
             fn $snake_op(self, other: $rhs) -> $output {
                 $output(std::ops::$op::$snake_op(self.0, other.0))
             }
         }
 
         impl std::ops::$assign<$rhs> for $lhs {
-            #[inline(always)]
+            #[inline]
             fn $snake_assign(&mut self, rhs: $rhs) {
                 *self = std::ops::$op::$snake_op(*self, rhs);
             }
@@ -56,7 +56,7 @@ macro_rules! common_ops {
             ($lhs:ty, $rhs:ty) => {
                 $crate::op_raw!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; Self);
             };
-            ($lhs:ty, $rhs:ty => $output:ty) => {
+            ($lhs:ty, $rhs:ty => $output:ident) => {
                 $crate::op_raw!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; $output);
             };
         }
@@ -64,10 +64,10 @@ macro_rules! common_ops {
         #[allow(missing_docs)]
         #[macro_export]
         macro_rules! $mac_newtype {
-            ($lhs:ident, $rhs:ident) => {
+            ($lhs:ty, $rhs:ty) => {
                 $crate::op_newtype!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; Self);
             };
-            ($lhs:ident, $rhs:ident -> $output:ident) => {
+            ($lhs:ty, $rhs:ty => $output:ident) => {
                 $crate::op_newtype!($lhs, $rhs; $op, $snake_op; $assign, $snake_assign; $output);
             };
         }

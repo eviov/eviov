@@ -1,38 +1,34 @@
 use serde::{Deserialize, Serialize};
 
-use super::{Mass, Accel, Velocity, Displace};
-use crate::util;
+use super::{Accel, Displace, Mass, Velocity};
 
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-#[derive(Serialize, Deserialize)]
+/// A force vector type.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Force(pub Accel);
 
 add_newtype!(Force, Force);
 sub_newtype!(Force, Force);
 
-mul_newtype!(Accel, Mass -> Force);
-
 impl Force {
-    pub fn on(self, mass: Mass) -> Self {
-        Self(self.0 / mass.0)
+    /// Computes the acceleration when this force is applied on an object of the specified mass.
+    pub fn on(self, mass: Mass) -> Accel {
+        self.0 / mass.0
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-#[derive(Serialize, Deserialize)]
+/// Represents torque in the counterclockwise direction.
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub struct Torque(pub f64);
 
 impl From<(Displace, Force)> for Torque {
     fn from((displace, force): (Displace, Force)) -> Self {
-        Self(util::cross2d(displace, force))
+        Self(util::cross2d(displace.0, force.0 .0 .0 .0))
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-#[derive(Serialize, Deserialize)]
+/// A momentum vector type.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Momentum(pub Velocity);
 
 add_newtype!(Momentum, Momentum);
 sub_newtype!(Momentum, Momentum);
-
-mul_newtype!(Mass, Velocity -> Momentum);
