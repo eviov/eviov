@@ -15,6 +15,14 @@ impl GameInstant {
     ///
     /// All game instants must be beyond this epoch.
     pub const EPOCH: GameInstant = GameInstant(0);
+
+    /// Equivalent to self - GameInstant::EPOCH
+    ///
+    /// The compiler should be able to optimize the subtraction anyway,
+    /// but this function has more concise syntax due to frequent use.
+    pub fn since_epoch(self) -> GameDuration {
+        GameDuration(self.0)
+    }
 }
 
 /// A non-negative difference between two `GameInstant`s.

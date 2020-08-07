@@ -1,0 +1,94 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage[top=0.5in, bottom=1in]{geometry}
+
+\setlength\parindent{0cm}
+\setlength\parskip{1.5ex}
+
+\def\p#1{ \left( #1 \right)}
+\def\norm#1{ \left\lVert #1 \right\rVert}
+
+\begin{document}
+This file documents the symbols, formulae and equations used in this module.
+
+\section{Symbols}
+
+\begin{itemize}
+	\item $a$: length of semimajor axis, mean of periapsis and apoapsis
+	\item $b$: length of semiminor axis
+	\item $E$: Eccentric anomaly
+	\item $e$: Eccentricity
+	\item $h$: Angular momentum
+	\item $M$: Mean anomaly
+	\item $n$: Average sweep, the average angular velocity per unit time
+	\item $\nu$: True anomaly, angle [periapsis]-[star]-[body]
+	\item $p$: Semi-latus rectum, length from star to orbit parallel to minor axis
+	\item $r$: Distance from star
+	\item $\mathbf r$: Position relative to star
+	\item $u$: Argument of latitude
+	\item $v$: Magnitude of velocity
+	\item $\mathbf v$: Velocity
+	\item $\omega$: Longitude of periapsis, or equivalently the argument of periapsis, assuming longitutde of ascending node is zero in 2D
+	\item $\epsilon$: Specific orbital energy, sum of potential and kinetic energy
+\end{itemize}
+
+\section{Equations}
+\subsection{Orbital states to orbital elements}
+In 2D, for a star with fixed position (the origin) and mass, orbits have 4 degrees of freedom.
+
+Defining the ellipse requires 3 degrees of freedom:
+
+\begin{itemize}
+	\item Shape: fixed with $e$
+	\item Size: fixed with $a$
+	\item Rotation: fixed with $\omega$
+\end{itemize}
+
+For efficient computation over time, the position on the ellipse is represented by $M$.
+
+The orbital states ($\mathbf r, \mathbf v$), with 4 degrees of freedom,
+are bijective to the orbital elements.
+Based on cart2kep2002.pdf
+\footnote{https://web.archive.org/web/20160418175843/https://ccar.colorado.edu/asen5070/handouts/cart2kep2002.pdf},
+the following procedures convert Cartesian orbital states to the orbital elements in 2D,
+based on the external parameter $\mu$:
+
+\begin{align*}
+	h &= r_x v_y - r_y v_x \\
+	\epsilon &= \frac12 \norm{\mathbf v}^2 - \frac\mu{\norm{\mathbf r}} \\
+	a &= \frac{-\mu}{2\epsilon} \\
+	e &= \sqrt{1 - \frac{h^2}{a\mu}} \\
+	u &= \\
+	p &= a (1 - e^2) \\
+	\nu &= \arccos \frac{p - \norm{\mathbf r}}{\norm{\mathbf r}e} \\
+	\nu &= \arctan \frac{\sqrt{\frac p\mu} (\mathbf r \cdot \mathbf v)}{p - \norm{\mathbf r}} \\
+	\omega &= u - \nu \\
+	E &= 2 \arctan \p{\sqrt{\frac{1-e}{1+e}} \tan \frac\nu2} \\
+	M &= E - e \sin E
+\end{align*}
+
+This gives $(e, a, \omega, M)$ as the orbital elements.
+
+\subsection{Change of mean anomaly over time}
+Given mean anomaly $M$ at time $t$,
+the new mean anomaly $M'$ at time $t'$ can be found by
+$$ M' = M + n (t' - t), $$
+where the average sweep $n$ can be found with
+$$ n = \sqrt{\frac\mu{a^3}}. $$
+
+\subsection{Testing if orbit is above/below radius}
+For a frequently queried radius $r_q$,
+precompute the (smaller) mean anomaly $M_q$ such that
+$ r(M_q) = r(2\pi - M_q) = r_q$.
+Then $r > M \iff M_q < M < 2\pi - M_q \pmod{2\pi}$.
+
+For a specific $r_q$,
+solve $\cos E_q = \frac1e \p{1 - \frac ra}$ for $E_q$.
+Then calculate $M_q = E_q - e \sin E_q$.
+
+Verification: $\cos E_q = \cos(2 \pi - E_q)$ are the two eccentric anomalies
+where the star moves out of/into the queried radius.
+$$ 2\pi - E_q - e \sin(2\pi - E_q) = 2\pi - \p{E_q - e \sin E_q} = 2\pi - M_q $$
+
+\end{document}

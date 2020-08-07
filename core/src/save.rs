@@ -153,7 +153,7 @@ pub fn save_star(
     star: &phy::Star,
     store_body: &ReadStorage<'_, phy::Body>,
     store_saveable: &mut WriteStorage<'_, Saveable>,
-    mut fix_id: impl FnMut(&mut SaveId),
+    fix_id: impl FnMut(&mut SaveId),
     t: units::GameInstant,
 ) -> io::Result<()> {
     let mut file = fs::File::create(file)?;

@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::f64::consts::PI;
 
 use crate::units::{self, LengthExt};
 
@@ -16,6 +17,10 @@ pub struct Orbit {
     semimajor: units::Length,
     /// Argument of periapsis, an angle value
     periapsis: units::Bearing,
+    /// Mean anomaly at epoch
+    epoch_anomaly: units::Theta,
+    /// Rate of change of mean anomaly
+    average_sweep: units::Omega,
 }
 
 impl Orbit {
@@ -35,7 +40,7 @@ impl Orbit {
 
         // 1. Angular momentum (h). Dimension: M L^2 T^-1
         let ang_momentum: f64 = r[0] * v[1] - r[1] * v[0];
-        // 3. Specific energy (E_s). Dimension: L^2 T^-2
+        // 3. Specific energy (epsilon). Dimension: L^2 T^-2
         let energy: f64 = v.norm_squared() / 2. - mu / r_norm;
         // 4. Semimajor axis (a). Dimension: L
         let semimajor: units::Length = -mu / 2. / energy;
@@ -59,12 +64,14 @@ impl Orbit {
         // Mean anomaly (M). Dimension: 1 (angle)
         let mean_anomaly = ecc_anomaly - units::Theta(eccentricity * ecc_anomaly.sin());
 
-        let epoch_mean_anomaly = mean_anomaly - average_sweep.after(t - units::GameInstant::EPOCH);
+        let epoch_anomaly = mean_anomaly - average_sweep.after(t.since_epoch());
 
         Self {
             eccentricity,
             semimajor,
             periapsis,
+            epoch_anomaly,
+            average_sweep,
         }
     }
 
@@ -113,6 +120,32 @@ impl Orbit {
         todo!()
     }
 
+    /// Returns an efficient function to determine whether the orbit has radius greater than
+    /// `radius` at arbitrary time.
+    pub fn radius_comparator(&self, radius: units::Length) -> impl Fn(units::GameInstant) -> bool + 'static {
+        // cosine of eccentric anomaly at intersection
+        let cos_e = 1. / self.eccentricity - radius / (self.semimajor * self.eccentricity);
+        let threshold = if -1.0 < cos_e && cos_e < 1.0 {
+            let ecc_anomaly = cos_e.acos();
+            Some(ecc_anomaly - self.eccentricity * ecc_anomaly.sin())
+        } else {
+            None
+        };
+        let epoch_anomaly = self.epoch_anomaly;
+        let average_sweep = self.average_sweep;
+        move |time| match threshold {
+            Some(threshold) => {
+                let anomaly = epoch_anomaly + average_sweep.after(time.since_epoch());
+                let mut anomaly = anomaly.0 % (2. * PI);
+                if anomaly < 0. {
+                    anomaly += 2. * PI;
+                }
+                threshold < anomaly && anomaly < (2. * PI - threshold)
+            },
+            None => true,
+        }
+    }
+
     /// Compare which orbit has radius.
     ///
     /// `Ordering::Greater` implies that `other` has a shorter arc to `self` along the clockwise
@@ -142,16 +175,6 @@ impl Orbit {
         t: units::GameInstant,
         tolerance: units::Length,
     ) -> Ordering {
-        todo!()
-    }
-
-    /// Tests whether the radius is in the range (low, high) at time `t`.
-    pub fn radius_in_range(
-        &self,
-        low: units::Length,
-        high: units::Length,
-        t: units::GameInstant,
-    ) -> units::Length {
         todo!()
     }
 
