@@ -18,7 +18,7 @@ This file documents the symbols, formulae and equations used in this module.
 	\item $a$: length of semimajor axis, mean of periapsis and apoapsis
 	\item $b$: length of semiminor axis
 	\item $E$: Eccentric anomaly
-	\item $e$: Eccentricity
+	\item $e$: Eccentricity. In this file, if there are any references to Euler's number, it is denoted as $\operatorname{exp}(1)$ etc..
 	\item $h$: Angular momentum
 	\item $M$: Mean anomaly
 	\item $n$: Average sweep, the average angular velocity per unit time
@@ -26,6 +26,7 @@ This file documents the symbols, formulae and equations used in this module.
 	\item $p$: Semi-latus rectum, length from star to orbit parallel to minor axis
 	\item $r$: Distance from star
 	\item $\mathbf r$: Position relative to star
+	\item $\theta$: The argument of a body in the standard polar coordinate system
 	\item $u$: Argument of latitude
 	\item $v$: Magnitude of velocity
 	\item $\mathbf v$: Velocity
@@ -77,11 +78,13 @@ $$ M' = M + n (t' - t), $$
 where the average sweep $n$ can be found with
 $$ n = \sqrt{\frac\mu{a^3}}. $$
 
-\subsection{Testing if orbit is above/below radius}
+\subsection{Radius}
+
+\subsubsection{Testing if orbit is above/below radius}
 For a frequently queried radius $r_q$,
 precompute the (smaller) mean anomaly $M_q$ such that
 $ r(M_q) = r(2\pi - M_q) = r_q$.
-Then $r > M \iff M_q < M < 2\pi - M_q \pmod{2\pi}$.
+Then $r(M) > r_q \iff M_q < M < 2\pi - M_q \pmod{2\pi}$.
 
 For a specific $r_q$,
 solve $\cos E_q = \frac1e \p{1 - \frac ra}$ for $E_q$.
@@ -90,5 +93,26 @@ Then calculate $M_q = E_q - e \sin E_q$.
 Verification: $\cos E_q = \cos(2 \pi - E_q)$ are the two eccentric anomalies
 where the star moves out of/into the queried radius.
 $$ 2\pi - E_q - e \sin(2\pi - E_q) = 2\pi - \p{E_q - e \sin E_q} = 2\pi - M_q $$
+
+\subsection{Bearing}
+Bearing is the eviov name for argument in the polar coordinate system.
+
+The bearing of the periapsis is $\omega$.
+The bearing at specific true anomaly $\nu$ is $\omega + \nu$.
+
+\subsubsection{Approximating the bearing}
+This is done by direct approximation of true anomaly by Fourier expansion:
+
+$$ \theta = \omega + \nu \approx \omega + M + \sum_{i=1}^\infty TODO e^i \sin(iM) $$
+
+\subsubsection{Testing if orbit is between bearing}
+For a frequently queried bearing range $\p{\theta_1, \theta_2}$,
+precompute the mean anomalies $M_1, M_2$ such that
+$\theta(M_1) = \theta_1$ and $\theta(M_2) = \theta_2$.
+Then $\theta(M) \in \p{\theta_1, \theta_2} \iff M \in \p{M_1, M_2}$.
+
+Compute $$ E_q = 2 \arctan\p{ \sqrt{\frac{1-e}{1+e}} \tan\frac{\theta_q - \omega}2 } $$
+for $q = 1,2$.
+Then $M_q = E_q - e \sin E_q$.
 
 \end{document}

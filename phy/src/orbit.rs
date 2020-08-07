@@ -1,5 +1,7 @@
+// TODO check if some `%(2*PI)` operations can be elided by defining precisely the anomaly ranges.
+// Maybe change units::Theta to units::Bearing for anomalies?
+
 use std::cmp::Ordering;
-use std::f64::consts::PI;
 
 use units::LengthExt;
 
@@ -13,12 +15,16 @@ use units::LengthExt;
 pub struct Orbit {
     /// orbit eccentricity, a value between 0 and 1
     eccentricity: f64,
+    /// Ratio of `tan(nu / 2)` to `tan(E / 2)`.
+    ///
+    /// This is equal to `sqrt((1 + e) / (1 - e))`.
+    te_ratio: f64,
     /// Mean length of the apsides
     semimajor: units::Length,
     /// Argument of periapsis, an angle value
     periapsis: units::Bearing,
     /// Mean anomaly at epoch
-    epoch_anomaly: units::Theta,
+    epoch_anomaly: MeanAnomaly,
     /// Rate of change of mean anomaly
     average_sweep: units::Omega,
 }
@@ -62,12 +68,13 @@ impl Orbit {
         let ecc_anomaly = r[0].arccos(semimajor);
 
         // Mean anomaly (M). Dimension: 1 (angle)
-        let mean_anomaly = ecc_anomaly - units::Theta(eccentricity * ecc_anomaly.sin());
+        let mean_anomaly = MeanAnomaly(ecc_anomaly - units::Theta(eccentricity * ecc_anomaly.sin()));
 
         let epoch_anomaly = mean_anomaly - average_sweep.after(t.since_epoch());
 
         Self {
             eccentricity,
+            te_ratio: ((1. + eccentricity) / (1. - eccentricity)).sqrt(),
             semimajor,
             periapsis,
             epoch_anomaly,
@@ -139,11 +146,11 @@ impl Orbit {
         move |time| match threshold {
             Some(threshold) => {
                 let anomaly = epoch_anomaly + average_sweep.after(time.since_epoch());
-                let mut anomaly = anomaly.0 % (2. * PI);
-                if anomaly < 0. {
-                    anomaly += 2. * PI;
+                let mut anomaly = anomaly.0 % units::Theta::whole_ac();
+                if anomaly.0 < 0. {
+                    anomaly += units::Theta::whole_ac();
                 }
-                threshold < anomaly && anomaly < (2. * PI - threshold)
+                threshold < anomaly.0 && anomaly.0 < (units::Theta::whole_ac().0 - threshold)
             }
             None => true,
         }
@@ -184,11 +191,36 @@ impl Orbit {
     /// Tests whether the bearing is in the arc starting from `low`, extending counterclockwise until `high`.
     pub fn bearing_in_range(
         &self,
-        low: units::Length,
-        high: units::Length,
+        low: units::Bearing,
+        high: units::Bearing,
         t: units::GameInstant,
-    ) -> units::Length {
-        todo!()
+    ) -> impl Fn(units::GameInstant) -> bool {
+        let low = self.bearing_to_ta(low);
+        let low = self.ta_to_ea(low);
+        let low = self.ea_to_ma(low);
+        let mut low = low.0 % units::Theta::whole_ac();
+        if low.0 < 0.0 {
+            low += units::Theta::whole_ac();
+        }
+
+        let high = self.bearing_to_ta(high);
+        let high = self.ta_to_ea(high);
+        let high = self.ea_to_ma(high);
+        let mut high = high.0 % units::Theta::whole_ac();
+        if high.0 < 0.0 {
+            high += units::Theta::whole_ac();
+        }
+        if high.0 < low.0 {
+            high += units::Theta::whole_ac();
+        }
+
+        let epoch_anomaly = self.epoch_anomaly;
+        let average_sweep = self.average_sweep;
+
+        move |time| {
+            let MeanAnomaly(ma) = epoch_anomaly + average_sweep.after(t.since_epoch());
+            low < ma && ma < low
+        }
     }
 
     /// Computes the time (starting from `after`) when this orbit intersects with the circle of
@@ -222,6 +254,32 @@ impl Orbit {
     ) -> Option<units::GameInstant> {
         todo!()
     }
+
+    /// Converts bearing to true anomaly.
+    pub fn bearing_to_ta(&self, bearing: units::Bearing) -> TrueAnomaly {
+        TrueAnomaly(bearing - self.periapsis)
+    }
+
+    /// Converts true anomaly to eccentric anomaly.
+    pub fn ta_to_ea(&self, ta: TrueAnomaly) -> EccenAnomaly {
+        let tan_nu_2 = (ta.0 / 2.).tan();
+        let tan_e_2 = tan_nu_2 / self.te_ratio;
+        let e = tan_e_2.atan() * 2.;
+        EccenAnomaly(units::Theta(e))
+    }
+
+    /// Converts eccentric anomaly to true anomaly.
+    pub fn ea_to_ta(&self, ea: EccenAnomaly) -> TrueAnomaly {
+        let tan_e_2 = (ea.0 / 2.).tan();
+        let tan_nu_2 = tan_e_2 * self.te_ratio;
+        let e = tan_nu_2.atan() * 2.;
+        TrueAnomaly(units::Theta(e))
+    }
+
+    /// Converts eccentric anomaly to mean anomaly.
+    pub fn ea_to_ma(&self, ea: EccenAnomaly) -> MeanAnomaly {
+        MeanAnomaly(ea.0 - units::Theta(self.eccentricity * ea.0.sin()))
+    }
 }
 
 /// Represents the ECI position and velocity of an orbit at time `t`.
@@ -230,3 +288,21 @@ pub struct OrbitalState {
     position: units::Position,
     velocity: units::Velocity,
 }
+
+#[derive(Debug, Clone, Copy)]
+pub struct TrueAnomaly(pub units::Theta);
+
+units::add_raw!(TrueAnomaly, units::Theta);
+units::sub_raw!(TrueAnomaly, units::Theta);
+
+#[derive(Debug, Clone, Copy)]
+pub struct EccenAnomaly(pub units::Theta);
+
+units::add_raw!(EccenAnomaly, units::Theta);
+units::sub_raw!(EccenAnomaly, units::Theta);
+
+#[derive(Debug, Clone, Copy)]
+pub struct MeanAnomaly(pub units::Theta);
+
+units::add_raw!(MeanAnomaly, units::Theta);
+units::sub_raw!(MeanAnomaly, units::Theta);

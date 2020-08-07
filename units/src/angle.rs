@@ -30,6 +30,16 @@ impl Bearing {
 pub struct Theta(pub f64);
 
 impl Theta {
+    /// One whole circle in counter-clockwise direction.
+    pub fn whole_ac() -> Self {
+        Self(2. * PI)
+    }
+
+    /// One whole circle in clockwise direction.
+    pub fn whole_cw() -> Self {
+        Self(-2. * PI)
+    }
+
     /// Computes the sine of this angle.
     pub fn sin(self) -> f64 {
         self.0.sin()
