@@ -1,5 +1,5 @@
 [package]
-name = "eviov-demo-1-basic"
+name = "eviov-units"
 version = "0.0.0"
 authors = ["SOFe <sofe2038@gmail.com>"]
 edition = "2018"
@@ -7,8 +7,12 @@ license = "Apache-2.0"
 repository = "https://github.com/eviov/eviov"
 homepage = "https://github.com/eviov/eviov"
 readme = "../README.md"
-description = "Eviov demo 1: basic"
+description = "Declares units used in Eviov"
+
+[lib]
+name = "units"
 
 [dependencies]
-eviov-render = {version = "0.0.0", path = "../../render"}
-specs = "0.16.1"
+getset = "0.1.1"
+nalgebra = {version = "0.21.1", features = ["serde-serialize"]}
+serde = {version = "1.0.114", features = ["derive"]}

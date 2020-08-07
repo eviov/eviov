@@ -1,5 +1,5 @@
 [package]
-name = "eviov-demo-1-basic"
+name = "eviov-util"
 version = "0.0.0"
 authors = ["SOFe <sofe2038@gmail.com>"]
 edition = "2018"
@@ -7,8 +7,10 @@ license = "Apache-2.0"
 repository = "https://github.com/eviov/eviov"
 homepage = "https://github.com/eviov/eviov"
 readme = "../README.md"
-description = "Eviov demo 1: basic"
+description = "Miscellaneous utils used in eviov"
+
+[lib]
+name = "util"
 
 [dependencies]
-eviov-render = {version = "0.0.0", path = "../../render"}
-specs = "0.16.1"
+nalgebra = "0.21.1"

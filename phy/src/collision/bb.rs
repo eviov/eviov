@@ -1,9 +1,5 @@
 //! Bounding boxes
 
-use amethyst::ecs;
-
-use crate::units;
-
 /// One of the bounding boxes of a body.
 ///
 /// A body may have multiple BBs,
@@ -19,7 +15,7 @@ pub struct BoundingBox {
     /// The parent entity of the BB.
     ///
     /// The parent must have a `Body` component.
-    parent: ecs::Entity,
+    parent: specs::Entity,
     /// The position of the BB relative to the parent.
     offset: units::Displace,
 }
@@ -79,6 +75,6 @@ pub enum Variant {
     // maybe magnetic field etc in the future?
 }
 
-impl ecs::Component for BoundingBox {
-    type Storage = ecs::storage::VecStorage<Self>;
+impl specs::Component for BoundingBox {
+    type Storage = specs::storage::VecStorage<Self>;
 }

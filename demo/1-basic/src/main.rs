@@ -1,4 +1,4 @@
-use eviov_core::amethyst::{self, renderer, utils};
+use render::amethyst::{self, renderer, utils};
 
 mod state;
 use state::MainState;

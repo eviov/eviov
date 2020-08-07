@@ -1,8 +1,6 @@
-use amethyst::ecs;
 use getset::*;
 
 use super::BoundingBox;
-use crate::units;
 
 /// The data for collision events.
 ///
@@ -15,7 +13,7 @@ pub enum Event {
         /// The entity of the star system in which this collision is handled within.
         ///
         /// All positions in this event are relative to this star entity.
-        star: ecs::Entity,
+        star: specs::Entity,
         /// The parties participating in the collision.
         parties: [CollisionParty; 2],
     },
@@ -24,7 +22,7 @@ pub enum Event {
         /// The entity entering void zone
         ///
         /// This entity must contain a `Body` component.
-        subject: ecs::Entity,
+        subject: specs::Entity,
 
         /// Position of the entity
         position: units::Position,

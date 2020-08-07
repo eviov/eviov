@@ -1,4 +1,7 @@
-//! Handls data saving.
+//! Provides a bundle for data saving.
+
+#![cfg_attr(debug_assertions, allow(unused_variables, dead_code, unreachable_code))]
+#![warn(missing_docs)]
 
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -9,11 +12,9 @@ use std::num::NonZeroU32;
 use std::path::Path;
 use std::sync::atomic::{AtomicU32, Ordering};
 
-use amethyst::ecs::{self, Entities, ReadStorage, WriteStorage};
+use specs::{Entities, ReadStorage, WriteStorage};
 use getset::*;
 use serde::{Deserialize, Serialize};
-
-use crate::{phy, units};
 
 /// A resource for tracking global save count for the current run
 #[derive(Debug)]
@@ -84,8 +85,8 @@ pub struct Saveable {
     save_id: SaveId,
 }
 
-impl ecs::Component for Saveable {
-    type Storage = ecs::storage::BTreeStorage<Self>;
+impl specs::Component for Saveable {
+    type Storage = specs::storage::BTreeStorage<Self>;
 }
 
 /// The function that saved the world.
@@ -99,7 +100,7 @@ pub fn save_world(
 ) -> io::Result<()> {
     use io::Seek;
 
-    use ecs::Join;
+    use specs::Join;
 
     let mut file = fs::OpenOptions::new()
         .create(true)
@@ -114,9 +115,9 @@ pub fn save_world(
     let generation = NonZeroU32::new(index.generations).unwrap();
 
     let mut saves = vec![];
-    for (entity, star, body, saveable) in
-        (entities, store_star, store_body, &mut *store_saveable).join()
-    {
+
+    // unused `Star` join to filter away non-stars
+    for (entity, _, body, saveable) in (entities, store_star, store_body, &mut *store_saveable).join() {
         let _ = saveable.save_id.fill_generation(generation);
         let star_id = saveable.save_id_mut().clone();
         if let phy::Body::Root(_) = body {
@@ -152,8 +153,8 @@ pub fn save_star(
     file: impl AsRef<Path>,
     star: &phy::Star,
     store_body: &ReadStorage<'_, phy::Body>,
-    store_saveable: &mut WriteStorage<'_, Saveable>,
-    fix_id: impl FnMut(&mut SaveId),
+    _store_saveable: &mut WriteStorage<'_, Saveable>,
+    _fix_id: impl FnMut(&mut SaveId),
     t: units::GameInstant,
 ) -> io::Result<()> {
     let mut file = fs::File::create(file)?;
@@ -174,6 +175,7 @@ pub fn save_star(
     }
 
     fn body_ser(body: &phy::Body, star: &phy::Star, t: units::GameInstant) -> BodySer {
+        // TODO incomplete
         BodySer {
             position: body.position(t),
             velocity: body.velocity(t, star.strength()),

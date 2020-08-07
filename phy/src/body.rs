@@ -1,8 +1,6 @@
-use amethyst::ecs;
 use getset::*;
 
 use super::{BodyIndex, Orbit};
-use crate::units;
 
 /// A gravity-dependent object in a solar system.
 #[derive(Debug)]
@@ -31,7 +29,7 @@ pub struct OrbitingBody {
     orbit: Orbit,
     /// The entity of the star this body orbits about.
     #[getset(get_copy = "pub", set = "pub")]
-    parent: ecs::Entity,
+    parent: specs::Entity,
 }
 
 /// An object accelerating due to forces other than gravitation.
@@ -48,7 +46,7 @@ pub struct AccelBody {
     velocity: units::Velocity,
     /// The entity of the star that manages the gravity on this object.
     #[getset(get_copy = "pub", set = "pub")]
-    parent: ecs::Entity,
+    parent: specs::Entity,
 }
 
 /// An object standing on a star.
@@ -61,14 +59,14 @@ pub struct StandingBody {
     position: units::Position,
     /// The entity of the star this body stands on.
     #[getset(get_copy = "pub", set = "pub")]
-    parent: ecs::Entity,
+    parent: specs::Entity,
 }
 
 impl Body {
     /// Retrieves the parent of this body.
     ///
     /// Returns `None` if this body is a root star.
-    pub fn parent(&self) -> Option<ecs::Entity> {
+    pub fn parent(&self) -> Option<specs::Entity> {
         match self {
             Self::Root(_) => None,
             Self::Orbiting(body) => Some(body.parent()),
@@ -102,8 +100,8 @@ impl Body {
     }
 }
 
-impl ecs::Component for Body {
-    type Storage = ecs::storage::VecStorage<Self>;
+impl specs::Component for Body {
+    type Storage = specs::storage::VecStorage<Self>;
 }
 
 /// An object with a non-negligible gravitational field.
@@ -129,6 +127,6 @@ pub struct Star {
     index: BodyIndex,
 }
 
-impl ecs::Component for Star {
-    type Storage = ecs::storage::BTreeStorage<Self>;
+impl specs::Component for Star {
+    type Storage = specs::storage::BTreeStorage<Self>;
 }

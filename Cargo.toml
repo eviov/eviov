@@ -1,5 +1,9 @@
 [workspace]
 members = [
-	"core",
+	"util",
+	"units",
+	"phy",
+	"save",
+	"render",
 	"demo/1-basic",
 ]

@@ -1,7 +1,6 @@
-use amethyst::ecs::{Entity, WriteStorage};
+use specs::{Entity, WriteStorage};
 
 use super::collision::BoundingBox;
-use crate::units;
 
 /// A data structure to store a set of bodies.
 ///

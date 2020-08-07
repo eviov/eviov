@@ -1,5 +1,5 @@
 [package]
-name = "eviov-core"
+name = "eviov-render"
 version = "0.0.0"
 authors = ["SOFe <sofe2038@gmail.com>"]
 edition = "2018"
@@ -7,13 +7,15 @@ license = "Apache-2.0"
 repository = "https://github.com/eviov/eviov"
 homepage = "https://github.com/eviov/eviov"
 readme = "../README.md"
-description = "Eviov core bundle"
+description = "Eviov render bundle"
+
+[lib]
+name = "render"
 
 [dependencies]
 amethyst = {version = "0.15.0", features = ["vulkan"]}
+eviov-phy = {version = "0.0.0", path = "../phy"}
+eviov-units = {version = "0.0.0", path = "../units"}
 getset = "0.1.1"
 log = "0.4.11"
-rand = "0.7.3"
-rmp-serde = "0.14.4"
-serde = {version = "1.0.114", features = ["derive"]}
-serde_iter = "0.1.1"
+specs = "0.16.1"

@@ -1,7 +1,7 @@
+use nalgebra::Vector2;
 use serde::{Deserialize, Serialize};
 
-use crate::nalgebra::Vector2;
-use crate::units;
+use crate::Theta;
 
 /// A measure of length in a star system.
 ///
@@ -79,18 +79,18 @@ pub trait LengthExt: Sized + seal::Sealed {
     fn into_length(self) -> Length;
 
     /// Computes arcsin(self, hyp)
-    fn arcsin(self, hyp: Length) -> units::Theta {
-        units::Theta((self.into_length() / hyp).sin())
+    fn arcsin(self, hyp: Length) -> Theta {
+        Theta((self.into_length() / hyp).sin())
     }
 
     /// Computes arccos(self, hyp)
-    fn arccos(self, hyp: Length) -> units::Theta {
-        units::Theta((self.into_length() / hyp).cos())
+    fn arccos(self, hyp: Length) -> Theta {
+        Theta((self.into_length() / hyp).cos())
     }
 
     /// Computes arctan(self, hyp)
-    fn arctan(self, adj: Length) -> units::Theta {
-        units::Theta(self.into_length().atan2(adj))
+    fn arctan(self, adj: Length) -> Theta {
+        Theta(self.into_length().atan2(adj))
     }
 }
 

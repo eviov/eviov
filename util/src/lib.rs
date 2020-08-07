@@ -1,9 +1,9 @@
-//! Math util functions
+//! Miscellaneous util functions
 
 use std::fmt;
 use std::ops;
 
-use amethyst::core::math::Vector2;
+use nalgebra::Vector2;
 
 /// Perform Newton's method on the input.
 ///

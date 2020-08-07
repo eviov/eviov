@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use super::angle::Bearing;
 use super::length::Displace;
-use crate::nalgebra::Vector2;
+use nalgebra::Vector2;
 
 /// A value that represents a direction.
 pub trait Direction {

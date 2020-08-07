@@ -1,5 +1,8 @@
 //! Common units used in eviov.
 
+#![cfg_attr(debug_assertions, allow(unused_variables, dead_code, unreachable_code))]
+#![warn(missing_docs)]
+
 #[macro_use]
 mod macros;
 

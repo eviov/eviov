@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::f64::consts::PI;
 
-use crate::units::{self, LengthExt};
+use units::LengthExt;
 
 /// Represents a Keplerian orbit.
 ///
@@ -122,7 +122,10 @@ impl Orbit {
 
     /// Returns an efficient function to determine whether the orbit has radius greater than
     /// `radius` at arbitrary time.
-    pub fn radius_comparator(&self, radius: units::Length) -> impl Fn(units::GameInstant) -> bool + 'static {
+    pub fn radius_comparator(
+        &self,
+        radius: units::Length,
+    ) -> impl Fn(units::GameInstant) -> bool + 'static {
         // cosine of eccentric anomaly at intersection
         let cos_e = 1. / self.eccentricity - radius / (self.semimajor * self.eccentricity);
         let threshold = if -1.0 < cos_e && cos_e < 1.0 {
@@ -141,7 +144,7 @@ impl Orbit {
                     anomaly += 2. * PI;
                 }
                 threshold < anomaly && anomaly < (2. * PI - threshold)
-            },
+            }
             None => true,
         }
     }
