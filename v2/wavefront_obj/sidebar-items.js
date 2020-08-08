@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["mtl","A parser for Wavefront's `.mtl` file format, for storing information about the material of which a 3D mesh is composed."],["obj","A parser for Wavefront's `.obj` file format for storing 3D meshes."]],"struct":[["ParseError","A parsing error, with location information."]]});

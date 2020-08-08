@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["BackendVariant","Backend wrapper."],["Mesh","Mesh wrapper."],["Texture","Texture wrapper."]],"struct":[["MeshData","Newtype for MeshBuilder prefab usage."],["TextureData","Newtype for TextureBuilder prefab usage."]],"trait":[["Backend","Extension of the rendy Backend trait."]],"type":[["DefaultBackend","Default backend"]]});

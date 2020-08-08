@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["with_winit","Resolve into input AST if winit support is enabled."],["without_winit","Resolve into input AST if winit support is disabled."]],"struct":[["NextImages","Represents acquire frames that will be presented next."],["Surface","Rendering target bound to window."],["Target","Rendering target bound to window. With swapchain created."]]});

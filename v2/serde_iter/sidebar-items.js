@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["map","Serializes an iterator of serializable 2-tuples into a serde map."],["seq","Serializes an iterator of serializables into a serde sequence."]],"struct":[["CloneOnce","A hack utility struct to wrap use-once iterators."]]});

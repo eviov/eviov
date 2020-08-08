@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Shape","The shape of a bounding box (BB)."],["Variant","The variant of a bounding box (BB)."]],"struct":[["BoundingBox","One of the bounding boxes of a body."]]});

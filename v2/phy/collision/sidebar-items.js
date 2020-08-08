@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Event","The data for collision events."]],"mod":[["bb","Bounding boxes"]],"struct":[["System","The system handling collisions."]]});

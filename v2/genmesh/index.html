@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `genmesh` crate."><meta name="keywords" content="rust, rustlang, rust-lang, genmesh"><title>genmesh - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../genmesh/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate genmesh</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all genmesh's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'genmesh', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/genmesh/lib.rs.html#1-69' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>genmesh</a></span></h1><div class='docblock'><p><code>Genmesh</code>'s is a library that offers ways to generate and manipulate vertex streams.</p>
+<p>The core problem that this library solves is to find a nice way to build meshes that
+does not just result in throwing all the vertices and indices into a <code>Vec&lt;T&gt;</code> and
+calling it done. While doing so is simple from a library writers point of view, the
+consumer will often have to translate that buffer to the format that they need before
+it can be used. This produces needless buffering that can be avoided.</p>
+<p><code>Genmesh</code>'s solution is to utilize the <code>Iterator</code> trait to build a vertex processing
+pipeline. The <code>Iterator</code> trait has a number of useful functions like <code>zip</code>, <code>map</code> and
+<code>collect</code> that are useful in themselves. <code>Genmesh</code> includes a number of traits that
+can be used with the built in <code>Iterator</code> traits to build the meshes that your engine
+needs.</p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table><tr class='module-item'><td><a class="mod" href="generators/index.html" title='genmesh::generators mod'>generators</a></td><td class='docblock-short'><p>A collection of utilties that can be used to build
+meshes programmatically.</p>
+</td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.Line.html" title='genmesh::Line struct'>Line</a></td><td class='docblock-short'><p>Represents a line</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.LruIndexer.html" title='genmesh::LruIndexer struct'>LruIndexer</a></td><td class='docblock-short'><p>An <code>LruIndexer</code> is useful for creating indexed steam from a stream of
+vertices. Each vertex that is index is only compared against the vetices
+contained in the cache. If a vertex is not found the LruIndexer will <code>emit</code>
+a new vertex and return the index of that new vertex.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Neighbors.html" title='genmesh::Neighbors struct'>Neighbors</a></td><td class='docblock-short'><p>Neighbors search accelerating structure.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Quad.html" title='genmesh::Quad struct'>Quad</a></td><td class='docblock-short'><p>A polygon with 4 points. Maps to <code>GL_QUADS</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Triangle.html" title='genmesh::Triangle struct'>Triangle</a></td><td class='docblock-short'><p>A polygon with 3 points. Maps to <code>GL_TRIANGLE</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.TriangulateIterator.html" title='genmesh::TriangulateIterator struct'>TriangulateIterator</a></td><td class='docblock-short'><p>Used to iterator of polygons into a iterator of triangles</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Vertex.html" title='genmesh::Vertex struct'>Vertex</a></td><td class='docblock-short'><p>Common vertex type.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.VerticesIterator.html" title='genmesh::VerticesIterator struct'>VerticesIterator</a></td><td class='docblock-short'><p>an iterator that breaks a polygon down into its individual
+verticies.</p>
+</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.Polygon.html" title='genmesh::Polygon enum'>Polygon</a></td><td class='docblock-short'><p>This is All-the-types container. This exists since some generators
+produce both <code>Triangles</code> and <code>Quads</code>.</p>
+</td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table><tr class='module-item'><td><a class="trait" href="trait.EmitLines.html" title='genmesh::EmitLines trait'>EmitLines</a></td><td class='docblock-short'><p>Convert a Polygon into it's fragments</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.EmitTriangles.html" title='genmesh::EmitTriangles trait'>EmitTriangles</a></td><td class='docblock-short'><p>provides a way to convert a polygon down to triangles</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Indexer.html" title='genmesh::Indexer trait'>Indexer</a></td><td class='docblock-short'><p>A trait defining how to defined an Indexer. An indexer is a object
+that collects verticies and emits indexes for the vertex. The intent
+is that an Indexer can find redundent vertexes and deduplicate them
+by returning aliased indexes.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Lines.html" title='genmesh::Lines trait'>Lines</a></td><td class='docblock-short'><p>Creates an LinesIterator from another Iterator</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.MapToVertices.html" title='genmesh::MapToVertices trait'>MapToVertices</a></td><td class='docblock-short'><p>This acts very similar to a vertex shader. It gives a way to manipulate
+and modify the vertices in a polygon. This is useful if you need to scale
+the mesh using a matrix multiply, or just for modifying the type of each
+vertex.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.MapVertex.html" title='genmesh::MapVertex trait'>MapVertex</a></td><td class='docblock-short'><p>equivalent of <code>map</code> but per-vertex</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Triangulate.html" title='genmesh::Triangulate trait'>Triangulate</a></td><td class='docblock-short'><p><code>Triangluate</code> is a easy to to convert any Polygon stream to
+a stream of triangles. This is useful since Quads and other geometry
+are not supported by modern graphics pipelines like OpenGL.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Vertices.html" title='genmesh::Vertices trait'>Vertices</a></td><td class='docblock-short'><p>Supplies a way to convert an iterator of polygons to an iterator
+of vertices. Useful for when you need to write the vertices into
+a graphics pipeline.</p>
+</td></tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table><tr class='module-item'><td><a class="type" href="type.Normal.html" title='genmesh::Normal type'>Normal</a></td><td class='docblock-short'><p>Common vertex normal type.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.Position.html" title='genmesh::Position type'>Position</a></td><td class='docblock-short'><p>Common vertex position type.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "genmesh";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

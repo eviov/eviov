@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Plane","A plane which can be intersected by a ray."],["Ray","A Ray represents and infinite half-line starting at `origin` and going in specified unit length `direction`."]]});

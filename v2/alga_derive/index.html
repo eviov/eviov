@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `alga_derive` crate."><meta name="keywords" content="rust, rustlang, rust-lang, alga_derive"><title>alga_derive - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../alga_derive/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate alga_derive</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all alga_derive's items</p></a><p class='location'></p><script>window.sidebarCurrent = {name: 'alga_derive', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/alga_derive/lib.rs.html#1-503' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>alga_derive</a></span></h1><div class='docblock'><h1 id="alga-derive" class="section-header"><a href="#alga-derive">alga-derive</a></h1>
+<p>Custom derive for <code>alga</code> traits.</p>
+<p>Supported traits:</p>
+<ul>
+<li><code>AbstractQuasigroup</code></li>
+<li><code>AbstractMonoid</code></li>
+<li><code>AbstractSemigroup</code></li>
+<li><code>AbstractGroup</code></li>
+<li><code>AbstractGroupAbelian</code></li>
+<li><code>AbstractRing</code></li>
+<li><code>AbstractRingCommutative</code></li>
+<li><code>AbstractField</code></li>
+</ul>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alga</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alga_derive</span>;
+
+<span class="kw">use</span> <span class="ident">alga</span>::<span class="ident">general</span>::<span class="ident">Additive</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Alga</span>)]</span>
+<span class="attribute">#[<span class="ident">alga_traits</span>(<span class="ident">Group</span>(<span class="ident">Additive</span>))]</span>
+<span class="kw">struct</span> <span class="ident">Struct</span>;</pre></div>
+<p>This derive implements <code>AbstractGroup</code> marker trait with <code>Additive</code> operator and all
+marker traits required by the algebraic groupness property
+(<code>AbstractMonoid</code>, <code>AbstractSemigroup</code>, <code>AbstractLoop</code> and <code>AbstractQuasigroup</code>) for the target of the derive.</p>
+<p>Traits required by these marker traits (<code>Identity</code>, <code>PartialEq</code>, <code>TwoSidedInverse</code> and <code>AbstractMagma</code>) should be implemented manually.</p>
+<p>If <code>#[alga_quickcheck]</code> attribute is added for the target of the derive,
+then <code>quickcheck</code> tests will be generated.
+These tests will check that the algebraic properties of the derived trait are true for the type.
+This attribute requires <code>quickcheck</code>s <code>Arbitrary</code> trait to be implemented for the target of the derive.</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alga</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alga_derive</span>;
+
+<span class="kw">use</span> <span class="ident">alga</span>::<span class="ident">general</span>::{<span class="ident">Additive</span>, <span class="ident">AbstractGroup</span>};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Alga</span>)]</span>
+<span class="attribute">#[<span class="ident">alga_traits</span>(<span class="ident">Group</span>(<span class="ident">Additive</span>), <span class="ident">Where</span> <span class="op">=</span> <span class="string">&quot;T: AbstractGroup&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">alga_quickcheck</span>(<span class="ident">check</span>(<span class="ident">i32</span>), <span class="ident">check</span>(<span class="ident">i64</span>))]</span>
+<span class="kw">struct</span> <span class="ident">Struct</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;</pre></div>
+<p>When there is generic parameters on the target of the derive,
+then all the concrete type parameters that the tests are generated for can be specified in
+<code>alga_quickcheck</code> attribute by listing them in <code>check</code>s.</p>
+<p>If bounds are required for the <code>alga</code> traits to be implemented,
+they can be listed by <code>Where = &quot;A: Bound1. B: Bound2&quot;</code>.</p>
+</div><h2 id='derives' class='section-header'><a href="#derives">Derive Macros</a></h2>
+<table><tr class='module-item'><td><a class="derive" href="derive.Alga.html" title='alga_derive::Alga derive'>Alga</a></td><td class='docblock-short'><p>Implementation of the custom derive</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "alga_derive";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

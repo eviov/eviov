@@ -1,0 +1,322 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `proc_macro_roids` crate."><meta name="keywords" content="rust, rustlang, rust-lang, proc_macro_roids"><title>proc_macro_roids - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../proc_macro_roids/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate proc_macro_roids</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all proc_macro_roids's items</p></a><div class="block items"><ul><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'proc_macro_roids', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/proc_macro_roids/lib.rs.html#1-385' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>proc_macro_roids</a></span></h1><div class='docblock'><p>Traits and functions to make writing proc macros more ergonomic.</p>
+<pre><code class="language-toml">proc_macro_roids = &quot;0.7.0&quot;
+</code></pre>
+<p>Makes writing procedural macros much easier:</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+
+<span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
+<span class="kw">use</span> <span class="ident">proc_macro_roids</span>::{<span class="ident">DeriveInputStructExt</span>, <span class="ident">FieldExt</span>, <span class="ident">IdentExt</span>};
+<span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_macro_input</span>, <span class="ident">parse_quote</span>, <span class="ident">DeriveInput</span>, <span class="ident">Ident</span>};
+
+<span class="doccomment">/// Derives a `Super` enum with a variant for each struct field:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,edition2018</span>
+<span class="doccomment">/// use std::marker::PhantomData;</span>
+<span class="doccomment">/// use super_derive::Super;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// #[derive(Super)]</span>
+<span class="doccomment">/// pub struct Man&lt;T&gt; {</span>
+<span class="doccomment">///     #[super_derive(skip)]</span>
+<span class="doccomment">///     name: String,</span>
+<span class="doccomment">///     power_level: u64,</span>
+<span class="doccomment">///     marker: PhantomData&lt;T&gt;,</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Generates:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,ignore</span>
+<span class="doccomment">/// pub enum SuperMan {</span>
+<span class="doccomment">///     U64(u64),</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">Super</span>, <span class="ident">attributes</span>(<span class="ident">super_derive</span>))]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">system_desc_derive</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">DeriveInput</span>);
+    <span class="kw">let</span> <span class="ident">enum_name</span> <span class="op">=</span> <span class="ident">ast</span>.<span class="ident">ident</span>.<span class="ident">prepend</span>(<span class="string">&quot;Super&quot;</span>);
+    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">ast</span>.<span class="ident">fields</span>();
+    <span class="kw">let</span> <span class="ident">relevant_fields</span> <span class="op">=</span> <span class="ident">fields</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_phantom_data</span>())
+        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">contains_tag</span>(<span class="kw-2">&amp;</span><span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">super_derive</span>), <span class="kw-2">&amp;</span><span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">skip</span>)));
+
+    <span class="kw">let</span> <span class="ident">variants</span> <span class="op">=</span> <span class="ident">relevant_fields</span>
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">type_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">type_name</span>();
+            <span class="kw">let</span> <span class="ident">variant_name</span> <span class="op">=</span> <span class="ident">type_name</span>.<span class="ident">to_string</span>().<span class="ident">to_uppercase</span>();
+            <span class="kw">let</span> <span class="ident">variant_name</span> <span class="op">=</span> <span class="ident">Ident</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">variant_name</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>());
+            <span class="macro">quote</span><span class="macro">!</span> {
+                #<span class="ident">variant_name</span>(#<span class="ident">type_name</span>)
+            }
+        })
+        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+
+    <span class="kw">let</span> <span class="ident">token_stream2</span> <span class="op">=</span> <span class="macro">quote</span><span class="macro">!</span> {
+        <span class="kw">pub</span> <span class="kw">enum</span> #<span class="ident">enum_name</span> {
+            #(#<span class="ident">variants</span>,)<span class="op">*</span>
+        }
+    };
+
+    <span class="ident">token_stream2</span>.<span class="ident">into</span>()
+}</pre></div>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1><details>
+<summary>1. Append additional `#[derive(..)]`s.</summary>
+<p>This works for function-like or attribute proc macros.</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+
+<span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
+<span class="kw">use</span> <span class="ident">proc_macro_roids</span>::<span class="ident">DeriveInputExt</span>;
+<span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_macro_input</span>, <span class="ident">parse_quote</span>, <span class="ident">DeriveInput</span>};
+
+<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copy</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="comment">// Example input:</span>
+    <span class="comment">//</span>
+    <span class="comment">// #[derive(Debug)]</span>
+    <span class="comment">// struct Struct;</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ast</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">DeriveInput</span>);
+
+    <span class="comment">// Append the derives.</span>
+    <span class="kw">let</span> <span class="ident">derives</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>);
+    <span class="ident">ast</span>.<span class="ident">append_derives</span>(<span class="ident">derives</span>);
+
+    <span class="comment">// Example output:</span>
+    <span class="comment">//</span>
+    <span class="comment">// #[derive(Debug, Clone, Copy)]</span>
+    <span class="comment">// struct Struct;</span>
+    <span class="ident">TokenStream</span>::<span class="ident">from</span>(<span class="macro">quote</span><span class="macro">!</span> { #<span class="ident">ast</span> })
+}</pre></div>
+</details>
+<details>
+<summary>2. Append named fields.</summary>
+<p>This works for structs with named fields or unit structs.</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+
+<span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
+<span class="kw">use</span> <span class="ident">proc_macro_roids</span>::<span class="ident">FieldsNamedAppend</span>;
+<span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_macro_input</span>, <span class="ident">parse_quote</span>, <span class="ident">DeriveInput</span>, <span class="ident">FieldsNamed</span>};
+
+<span class="doccomment">/// Example usage:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use macro_crate::append_cd;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// #[append_cd]</span>
+<span class="doccomment">/// struct StructNamed { a: u32, b: i32 }</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_cd</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="comment">// Example input:</span>
+    <span class="comment">//</span>
+    <span class="comment">// struct StructNamed { a: u32, b: i32 }</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ast</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">DeriveInput</span>);
+
+    <span class="comment">// Append the fields.</span>
+    <span class="kw">let</span> <span class="ident">fields_additional</span>: <span class="ident">FieldsNamed</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>({ <span class="ident">c</span>: <span class="ident">i64</span>, <span class="ident">d</span>: <span class="ident">usize</span> });
+    <span class="ident">ast</span>.<span class="ident">append_named</span>(<span class="ident">fields_additional</span>);
+
+    <span class="comment">// Example output:</span>
+    <span class="comment">//</span>
+    <span class="comment">// struct StructNamed { a: u32, b: i32, c: i64, d: usize }</span>
+    <span class="ident">TokenStream</span>::<span class="ident">from</span>(<span class="macro">quote</span><span class="macro">!</span> { #<span class="ident">ast</span> })
+}</pre></div>
+</details>
+<details>
+<summary>3. Append unnamed fields (tuples).</summary>
+<p>This works for structs with unnamed fields or unit structs.</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+
+<span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
+<span class="kw">use</span> <span class="ident">proc_macro_roids</span>::<span class="ident">FieldsUnnamedAppend</span>;
+<span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_macro_input</span>, <span class="ident">parse_quote</span>, <span class="ident">DeriveInput</span>, <span class="ident">FieldsUnnamed</span>};
+
+<span class="doccomment">/// Example usage:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use macro_crate::append_i64_usize;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// #[append_i64_usize]</span>
+<span class="doccomment">/// struct StructUnit;</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_i64_usize</span>(<span class="ident">_args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="comment">// Example input:</span>
+    <span class="comment">//</span>
+    <span class="comment">// struct StructUnit;</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ast</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">DeriveInput</span>);
+
+    <span class="comment">// Append the fields.</span>
+    <span class="kw">let</span> <span class="ident">fields_additional</span>: <span class="ident">FieldsUnnamed</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>((<span class="ident">i64</span>, <span class="ident">usize</span>));
+    <span class="ident">ast</span>.<span class="ident">append_unnamed</span>(<span class="ident">fields_additional</span>);
+
+    <span class="comment">// Example output:</span>
+    <span class="comment">//</span>
+    <span class="comment">// struct StructUnit(i64, usize);</span>
+    <span class="ident">TokenStream</span>::<span class="ident">from</span>(<span class="macro">quote</span><span class="macro">!</span> { #<span class="ident">ast</span> })
+}</pre></div>
+</details>
+<details>
+<summary>4. Get newtype inner `Field`.</summary>
+<p>This works for structs with unnamed fields or unit structs.</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+
+<span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
+<span class="kw">use</span> <span class="ident">proc_macro_roids</span>::<span class="ident">DeriveInputNewtypeExt</span>;
+<span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_macro_input</span>, <span class="ident">parse_quote</span>, <span class="ident">DeriveInput</span>, <span class="ident">Type</span>};
+
+<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">Deref</span>)]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_deref</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="comment">// Example input:</span>
+    <span class="comment">//</span>
+    <span class="comment">// #[derive(Deref)]</span>
+    <span class="comment">// struct Newtype(u32);</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ast</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">DeriveInput</span>);
+
+    <span class="comment">// Get the inner field.</span>
+    <span class="kw">let</span> <span class="ident">inner_field</span> <span class="op">=</span> <span class="ident">ast</span>.<span class="ident">inner_type</span>();
+
+    <span class="comment">// Implement `Deref`</span>
+    <span class="kw">let</span> <span class="ident">type_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>.<span class="ident">ident</span>;
+    <span class="kw">let</span> <span class="ident">token_stream_2</span> <span class="op">=</span> <span class="macro">quote</span><span class="macro">!</span> {
+        #<span class="ident">ast</span>
+
+        <span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Deref</span> <span class="kw">for</span> #<span class="ident">type_name</span> {
+            <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> #<span class="ident">inner_type</span>;
+            <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Target</span> {
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+            }
+        }
+    }
+    <span class="ident">TokenStream</span>::<span class="ident">from</span>(<span class="ident">token_stream_2</span>)
+}</pre></div>
+</details>
+<details>
+<summary>5. `Ident` concatenation.</summary>
+
+<div class='information'><div class='tooltip edition'>ⓘ<span class='tooltiptext'>This code runs with edition 2018</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered edition ">
+<span class="kw">use</span> <span class="ident">proc_macro_roids</span>::<span class="ident">IdentExt</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::<span class="ident">Ident</span>;
+
+<span class="kw">let</span> <span class="ident">one</span> <span class="op">=</span> <span class="ident">Ident</span>::<span class="ident">new</span>(<span class="string">&quot;One&quot;</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>());
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ident</span>::<span class="ident">new</span>(<span class="string">&quot;OneSuffix&quot;</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>()), <span class="ident">one</span>.<span class="ident">append</span>(<span class="string">&quot;Suffix&quot;</span>));
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ident</span>::<span class="ident">new</span>(<span class="string">&quot;PrefixOne&quot;</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>()), <span class="ident">one</span>.<span class="ident">prepend</span>(<span class="string">&quot;Prefix&quot;</span>));
+
+<span class="kw">let</span> <span class="ident">two</span> <span class="op">=</span> <span class="ident">Ident</span>::<span class="ident">new</span>(<span class="string">&quot;Two&quot;</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>());
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ident</span>::<span class="ident">new</span>(<span class="string">&quot;OneTwo&quot;</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>()), <span class="ident">one</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="ident">two</span>));
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Ident</span>::<span class="ident">new</span>(<span class="string">&quot;TwoOne&quot;</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>()), <span class="ident">one</span>.<span class="ident">prepend</span>(<span class="kw-2">&amp;</span><span class="ident">two</span>));</pre></div>
+</details>
+<details>
+<summary>6. Accessing struct fields.</summary>
+
+<div class='information'><div class='tooltip edition'>ⓘ<span class='tooltiptext'>This code runs with edition 2018</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered edition ">
+<span class="kw">use</span> <span class="ident">proc_macro_roids</span>::<span class="ident">DeriveInputStructExt</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_quote</span>, <span class="ident">DeriveInput</span>, <span class="ident">Fields</span>};
+
+<span class="kw">let</span> <span class="ident">ast</span>: <span class="ident">DeriveInput</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span> {
+    <span class="kw">struct</span> <span class="ident">Named</span> {}
+};
+
+<span class="kw">if</span> <span class="kw">let</span> <span class="ident">Fields</span>::<span class="ident">Named</span>(..) <span class="op">=</span> <span class="ident">ast</span>.<span class="ident">fields</span>() {
+    <span class="comment">// do something</span>
+}</pre></div>
+</details>
+<details>
+<summary>7. Inspecting `Field`s.</summary>
+
+<div class='information'><div class='tooltip edition'>ⓘ<span class='tooltiptext'>This code runs with edition 2018</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered edition ">
+<span class="kw">use</span> <span class="ident">proc_macro_roids</span>::<span class="ident">FieldExt</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_quote</span>, <span class="ident">Fields</span>, <span class="ident">FieldsNamed</span>, <span class="ident">Lit</span>, <span class="ident">LitStr</span>, <span class="ident">Meta</span>, <span class="ident">MetaNameValue</span>, <span class="ident">NestedMeta</span>};
+
+<span class="kw">let</span> <span class="ident">fields_named</span>: <span class="ident">FieldsNamed</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span> {{
+    <span class="attribute">#[<span class="ident">my</span>::<span class="ident">derive</span>(<span class="ident">tag</span>::<span class="ident">name</span>(<span class="ident">param</span> <span class="op">=</span> <span class="string">&quot;value&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+}};
+<span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">Fields</span>::<span class="ident">from</span>(<span class="ident">fields_named</span>);
+<span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;Expected field to exist.&quot;</span>);
+
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">field</span>.<span class="ident">type_name</span>(), <span class="string">&quot;PhantomData&quot;</span>);
+<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">field</span>.<span class="ident">is_phantom_data</span>());
+<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">field</span>.<span class="ident">contains_tag</span>(<span class="kw-2">&amp;</span><span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">my</span>::<span class="ident">derive</span>), <span class="kw-2">&amp;</span><span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">tag</span>::<span class="ident">name</span>)));
+<span class="macro">assert_eq</span><span class="macro">!</span>(
+    <span class="ident">field</span>.<span class="ident">tag_parameter</span>(
+        <span class="kw-2">&amp;</span><span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">my</span>::<span class="ident">derive</span>),
+        <span class="kw-2">&amp;</span><span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">tag</span>::<span class="ident">name</span>),
+    ).<span class="ident">expect</span>(<span class="string">&quot;Expected parameter to exist.&quot;</span>),
+    <span class="ident">NestedMeta</span>::<span class="ident">Meta</span>(<span class="ident">Meta</span>::<span class="ident">NameValue</span>(<span class="ident">MetaNameValue</span> {
+        <span class="ident">path</span>: <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">param</span>),
+        <span class="ident">eq_token</span>: <span class="ident">Default</span>::<span class="ident">default</span>(),
+        <span class="ident">lit</span>: <span class="ident">Lit</span>::<span class="ident">Str</span>(<span class="ident">LitStr</span>::<span class="ident">new</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>())),
+    })),
+);</pre></div>
+</details>
+<details>
+<summary>8. (De)constructing `Fields`.</summary>
+
+<div class='information'><div class='tooltip edition'>ⓘ<span class='tooltiptext'>This code runs with edition 2018</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered edition ">
+<span class="kw">use</span> <span class="ident">proc_macro_roids</span>::{<span class="ident">DeriveInputStructExt</span>, <span class="ident">FieldsExt</span>};
+<span class="comment">// Need to generate code that instantiates `MyEnum::Struct`:</span>
+<span class="comment">// enum MyEnum {</span>
+<span class="comment">//     Struct {</span>
+<span class="comment">//         field_0: u32,</span>
+<span class="comment">//         field_1: u32,</span>
+<span class="comment">//     }</span>
+<span class="comment">// }</span>
+
+<span class="kw">let</span> <span class="ident">ast</span>: <span class="ident">DeriveInput</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span> {
+    <span class="kw">struct</span> <span class="ident">Struct</span> {
+        <span class="ident">field_0</span>: <span class="ident">u32</span>,
+        <span class="ident">field_1</span>: <span class="ident">u32</span>,
+    }
+};
+<span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">ast</span>.<span class="ident">fields</span>();
+<span class="kw">let</span> <span class="ident">construction_form</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">construction_form</span>();
+<span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="macro">quote</span><span class="macro">!</span> { <span class="ident">MyEnum</span>::<span class="ident">Struct</span> #<span class="ident">construction_form</span> };
+
+<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">TokenStream</span>::<span class="ident">from_str</span>(<span class="string">&quot;MyEnum::Struct { field_0, field_1, }&quot;</span>).<span class="ident">unwrap</span>();
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">expected</span>.<span class="ident">to_string</span>(), <span class="ident">tokens</span>.<span class="ident">to_string</span>());</pre></div>
+</details>
+<hr />
+<p><strong>Note:</strong> The <em>roids</em> name is chosen because, although these functions make it easy to perform
+certain operations, they may not always be good ideas =D!</p>
+</div><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table><tr class='module-item'><td><a class="trait" href="trait.DeriveInputExt.html" title='proc_macro_roids::DeriveInputExt trait'>DeriveInputExt</a></td><td class='docblock-short'><p>Functions to make it ergonomic to work with <code>struct</code> ASTs.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.DeriveInputNewtypeExt.html" title='proc_macro_roids::DeriveInputNewtypeExt trait'>DeriveInputNewtypeExt</a></td><td class='docblock-short'><p>Functions to make it ergonomic to work with newtype <code>struct</code> ASTs.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.DeriveInputStructExt.html" title='proc_macro_roids::DeriveInputStructExt trait'>DeriveInputStructExt</a></td><td class='docblock-short'><p>Functions to make it ergonomic to work with <code>struct</code> ASTs.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.FieldExt.html" title='proc_macro_roids::FieldExt trait'>FieldExt</a></td><td class='docblock-short'><p>Functions to make it ergonomic to inspect <code>Field</code>s and their attributes.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.FieldsExt.html" title='proc_macro_roids::FieldsExt trait'>FieldsExt</a></td><td class='docblock-short'><p>Functions to make it ergonomic to work with <code>Fields</code>.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.FieldsNamedAppend.html" title='proc_macro_roids::FieldsNamedAppend trait'>FieldsNamedAppend</a></td><td class='docblock-short'><p>Indicates this type may have <code>FieldsNamed</code> appended to it.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.FieldsUnnamedAppend.html" title='proc_macro_roids::FieldsUnnamedAppend trait'>FieldsUnnamedAppend</a></td><td class='docblock-short'><p>Indicates this type may have <code>FieldsUnnamed</code> appended to it.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.IdentExt.html" title='proc_macro_roids::IdentExt trait'>IdentExt</a></td><td class='docblock-short'><p>Convenience methods on <code>Ident</code>s.</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.contains_tag.html" title='proc_macro_roids::contains_tag fn'>contains_tag</a></td><td class='docblock-short'><p>Returns whether an item's attributes contains a given <code>#[namespace(tag)]</code> attribute.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.format_path.html" title='proc_macro_roids::format_path fn'>format_path</a></td><td class='docblock-short'><p>Returns a <code>Path</code> as a String without whitespace between tokens.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.ident_concat.html" title='proc_macro_roids::ident_concat fn'>ident_concat</a></td><td class='docblock-short'><p>Returns an <code>Ident</code> by concatenating <code>String</code> representations.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.meta_list_contains.html" title='proc_macro_roids::meta_list_contains fn'>meta_list_contains</a></td><td class='docblock-short'><p>Returns whether the <code>MetaList</code> contains the specified <code>NestedMeta</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.namespace_meta_lists.html" title='proc_macro_roids::namespace_meta_lists fn'>namespace_meta_lists</a></td><td class='docblock-short'><p>Returns the meta lists of the form: <code>#[namespace(..)]</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.namespace_meta_lists_iter.html" title='proc_macro_roids::namespace_meta_lists_iter fn'>namespace_meta_lists_iter</a></td><td class='docblock-short'><p>Returns the meta lists of the form: <code>#[namespace(..)]</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.namespace_parameter.html" title='proc_macro_roids::namespace_parameter fn'>namespace_parameter</a></td><td class='docblock-short'><p>Returns the parameter from <code>#[namespace(parameter)]</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.namespace_parameters.html" title='proc_macro_roids::namespace_parameters fn'>namespace_parameters</a></td><td class='docblock-short'><p>Returns the parameters from <code>#[namespace(param1, param2, ..)]</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.nested_meta_to_path.html" title='proc_macro_roids::nested_meta_to_path fn'>nested_meta_to_path</a></td><td class='docblock-short'><p>Returns the <code>Path</code> of a nested meta. If it is a literal, <code>None</code> is returned.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.tag_meta_lists_iter.html" title='proc_macro_roids::tag_meta_lists_iter fn'>tag_meta_lists_iter</a></td><td class='docblock-short'><p>Returns an iterator over meta lists from <code>#[namespace(tag(..))]</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.tag_meta_lists_owned_iter.html" title='proc_macro_roids::tag_meta_lists_owned_iter fn'>tag_meta_lists_owned_iter</a></td><td class='docblock-short'><p>Returns an iterator over meta lists from <code>#[namespace(tag(..))]</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.tag_parameter.html" title='proc_macro_roids::tag_parameter fn'>tag_parameter</a></td><td class='docblock-short'><p>Returns the parameter from <code>#[namespace(tag(parameter))]</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.tag_parameters.html" title='proc_macro_roids::tag_parameters fn'>tag_parameters</a></td><td class='docblock-short'><p>Returns the parameters from <code>#[namespace(tag(param1, param2, ..))]</code>.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "proc_macro_roids";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

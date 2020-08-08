@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `amethyst_rendy` crate."><meta name="keywords" content="rust, rustlang, rust-lang, amethyst_rendy"><title>amethyst_rendy - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../amethyst_rendy/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate amethyst_rendy</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all amethyst_rendy's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'amethyst_rendy', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/amethyst_rendy/lib.rs.html#1-122' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>amethyst_rendy</a></span></h1><div class='docblock'><p>This implementation of the Amethyst Renderer utilizes the <code>rendy</code> crate, built on top of
+<code>gfx-hal</code> to provide the building blocks for a AAA configurable rendering graph-based pipeline.</p>
+<p>As a general overview, this crate can be broken down as follows:</p>
+<h3 id="core" class="section-header"><a href="#core">Core</a></h3><h3 id="submodules" class="section-header"><a href="#submodules">Submodules</a></h3><h3 id="passes" class="section-header"><a href="#passes">Passes</a></h3>
+<ul>
+<li><a href="crate::pass::flat2d::DrawFlat2DDesc"><code>DrawFlat2DDesc</code></a></li>
+<li><a href="crate::pass::flat2d::DrawFlat2DTransparentDesc"><code>DrawFlat2DTransparentDesc</code></a></li>
+<li><a href="crate::pass::pbr::DrawPbrDesc"><code>DrawPbrDesc</code></a></li>
+<li><a href="crate::pass::flat::DrawFlatDesc"><code>DrawFlatDesc</code></a></li>
+<li><a href="crate::pass::shaded::DrawShadedDesc"><code>DrawShadedDesc</code></a></li>
+<li><a href="crate::pass::skybox::DrawSkyboxDesc"><code>DrawSkyboxDesc</code></a></li>
+<li><a href="crate::pass::debug_lines::DrawDebugLinesDesc"><code>DrawDebugLinesDesc</code></a></li>
+</ul>
+<h2 id="systems" class="section-header"><a href="#systems">Systems</a></h2>
+<ul>
+<li><a href="crate::system::RenderingSystem"><code>RenderingSystem</code></a></li>
+<li><a href="crate::visibility::VisibilitySortingSystem"><code>VisibilitySortingSystem</code></a></li>
+<li><a href="crate::sprite_visibility::SpriteVisibilitySortingSystem"><code>SpriteVisibilitySortingSystem</code></a></li>
+</ul>
+<h2 id="components" class="section-header"><a href="#components">Components</a></h2>
+<ul>
+<li><a href="camera::Camera"><code>Camera</code></a></li>
+<li><a href="sprite_visibility::SpriteVisibility"><code>SpriteVisibility</code></a></li>
+<li><a href="visibility::Visibility"><code>Visibility</code></a></li>
+<li><a href="visibility::BoundingSphere"><code>BoundingSphere</code></a></li>
+<li><a href="debug_drawing::DebugLinesComponent"><code>DebugLinesComponent</code></a></li>
+<li><a href="light::Light"><code>Light</code></a></li>
+<li><a href="resources::Tint"><code>Tint</code></a></li>
+<li><a href="skinning::JointTransforms"><code>JointTransforms</code></a></li>
+<li><a href="sprite::SpriteRender"><code>SpriteRender</code></a></li>
+</ul>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table><tr class='module-item'><td><a class="mod" href="batch/index.html" title='amethyst_rendy::batch mod'>batch</a></td><td class='docblock-short'><p>Module containing structures useful for batching draw calls
+in scenarios with various known assumptions, e.g. order independence.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="bundle/index.html" title='amethyst_rendy::bundle mod'>bundle</a></td><td class='docblock-short'><p>A home of [RenderingBundle] with it's rendering plugins system and all types directly related to it.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="camera/index.html" title='amethyst_rendy::camera mod'>camera</a></td><td class='docblock-short'><p>Camera type with support for perspective and orthographic projections.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="debug_drawing/index.html" title='amethyst_rendy::debug_drawing mod'>debug_drawing</a></td><td class='docblock-short'><p>Debug Drawing library</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="error/index.html" title='amethyst_rendy::error mod'>error</a></td><td class='docblock-short'><p>Renderer error types.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="formats/index.html" title='amethyst_rendy::formats mod'>formats</a></td><td class='docblock-short'><p>Pre-defined graphical formats and data provided by amethyst_rendy</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="light/index.html" title='amethyst_rendy::light mod'>light</a></td><td class='docblock-short'><p>Light sources.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="loaders/index.html" title='amethyst_rendy::loaders mod'>loaders</a></td><td class='docblock-short'><p>Loaders re-exported from <code>rendy</code> for loading the most common image types as textures.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="mtl/index.html" title='amethyst_rendy::mtl mod'>mtl</a></td><td class='docblock-short'><p>Physically-based material.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="palette/index.html" title='amethyst_rendy::palette mod'>palette</a></td><td class='docblock-short'><p>A library that makes linear color calculations and conversion easy and
+accessible for anyone. It uses the type system to enforce correctness and
+to avoid mistakes, such as mixing incompatible color types.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="pass/index.html" title='amethyst_rendy::pass mod'>pass</a></td><td class='docblock-short'><p>Passes and shaders implemented by amethyst</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="pipeline/index.html" title='amethyst_rendy::pipeline mod'>pipeline</a></td><td class='docblock-short'><p>Graphics pipeline abstraction</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="plugins/index.html" title='amethyst_rendy::plugins mod'>plugins</a></td><td class='docblock-short'><p>Set of predefined implementations of <code>RenderPlugin</code> for use with <code>RenderingBundle</code>.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="pod/index.html" title='amethyst_rendy::pod mod'>pod</a></td><td class='docblock-short'><p>GPU POD data types.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="rendy/index.html" title='amethyst_rendy::rendy mod'>rendy</a></td><td class='docblock-short'><p>Rendy's top level crate.
+Reexports all others.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="resources/index.html" title='amethyst_rendy::resources mod'>resources</a></td><td class='docblock-short'><p><code>amethyst</code> rendering ecs resources</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="serde_shim/index.html" title='amethyst_rendy::serde_shim mod'>serde_shim</a></td><td class='docblock-short'><p>This module contains a few serialization shims for types from <code>palette</code> crate.
+It is required due to buggy default implementation of those types.
+See this issue for more details: https://github.com/Ogeon/palette/issues/130
+When above issue will be resolved, this can probably be removed.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="shape/index.html" title='amethyst_rendy::shape mod'>shape</a></td><td class='docblock-short'><p>Basic shape prefabs.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="skinning/index.html" title='amethyst_rendy::skinning mod'>skinning</a></td><td class='docblock-short'><p>Skinned mesh and bone implementation for renderer.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="sprite/index.html" title='amethyst_rendy::sprite mod'>sprite</a></td><td class='docblock-short'><p>2D Sprite Rendering implementation details.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="sprite_visibility/index.html" title='amethyst_rendy::sprite_visibility mod'>sprite_visibility</a></td><td class='docblock-short'><p>Transparency, visibility sorting and camera centroid culling for 2D Sprites.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="submodules/index.html" title='amethyst_rendy::submodules mod'>submodules</a></td><td class='docblock-short'><p>Various helpers and implementations for sub functions of render passes.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="system/index.html" title='amethyst_rendy::system mod'>system</a></td><td class='docblock-short'><p>Renderer system</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="transparent/index.html" title='amethyst_rendy::transparent mod'>transparent</a></td><td class='docblock-short'><p>Transparency component implementation</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="types/index.html" title='amethyst_rendy::types mod'>types</a></td><td class='docblock-short'><p>'Global' rendering type declarations</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="util/index.html" title='amethyst_rendy::util mod'>util</a></td><td class='docblock-short'><p>Misc. rendy and rendering utility functions and types.</p>
+</td></tr><tr class='module-item'><td><a class="mod" href="visibility/index.html" title='amethyst_rendy::visibility mod'>visibility</a></td><td class='docblock-short'><p>Transparency, visibility sorting and camera centroid culling for 3D Meshes.</p>
+</td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.ActiveCamera.html" title='amethyst_rendy::ActiveCamera struct'>ActiveCamera</a></td><td class='docblock-short'><p>Active camera resource, used by the renderer to choose which camera to get the view matrix from.
+If no active camera is found, the first camera will be used as a fallback.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Camera.html" title='amethyst_rendy::Camera struct'>Camera</a></td><td class='docblock-short'><p>Camera struct.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Factory.html" title='amethyst_rendy::Factory struct'>Factory</a></td><td class='docblock-short'><p>Higher level device interface.
+Manges memory, resources and queue families.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.GraphBuilder.html" title='amethyst_rendy::GraphBuilder struct'>GraphBuilder</a></td><td class='docblock-short'><p>Build graph from nodes and resource.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ImageFormat.html" title='amethyst_rendy::ImageFormat struct'>ImageFormat</a></td><td class='docblock-short'><p>Image format description newtype wrapper for <code>ImageTextureConfig</code> from rendy.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Material.html" title='amethyst_rendy::Material struct'>Material</a></td><td class='docblock-short'><p>A physically based Material with metallic workflow, fully utilized in PBR render pass.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.MaterialDefaults.html" title='amethyst_rendy::MaterialDefaults struct'>MaterialDefaults</a></td><td class='docblock-short'><p>A resource providing default textures for <code>Material</code>.
+These will be be used by the renderer in case a texture
+handle points to a texture which is not loaded already.
+Additionally, you can use it to fill up the fields of
+<code>Material</code> you don't want to specify.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.MeshProcessorSystem.html" title='amethyst_rendy::MeshProcessorSystem struct'>MeshProcessorSystem</a></td><td class='docblock-short'><p>Asset processing system for <code>Mesh</code> asset type.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RenderBase3D.html" title='amethyst_rendy::RenderBase3D struct'>RenderBase3D</a></td><td class='docblock-short'><p>A <code>RenderPlugin</code> for forward rendering of 3d objects.
+Generic over 3d pass rendering method.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RenderDebugLines.html" title='amethyst_rendy::RenderDebugLines struct'>RenderDebugLines</a></td><td class='docblock-short'><p>A [RenderPlugin] for drawing debug lines.
+Use with [debug_drawing::DebugLines] resource or [debug_drawing::DebugLinesComponent].</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RenderFlat2D.html" title='amethyst_rendy::RenderFlat2D struct'>RenderFlat2D</a></td><td class='docblock-short'><p>A [RenderPlugin] for drawing 2d objects with flat shading.
+Required to display sprites defined with [SpriteRender] component.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RenderSkybox.html" title='amethyst_rendy::RenderSkybox struct'>RenderSkybox</a></td><td class='docblock-short'><p>RenderPlugin for rendering skyboxes.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RenderToWindow.html" title='amethyst_rendy::RenderToWindow struct'>RenderToWindow</a></td><td class='docblock-short'><p>A [RenderPlugin] for opening a window and displaying a render target to it.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RenderingBundle.html" title='amethyst_rendy::RenderingBundle struct'>RenderingBundle</a></td><td class='docblock-short'><p>A bundle of systems used for rendering using <code>Rendy</code> render graph.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.RenderingSystem.html" title='amethyst_rendy::RenderingSystem struct'>RenderingSystem</a></td><td class='docblock-short'><p>Amethyst rendering system</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Sprite.html" title='amethyst_rendy::Sprite struct'>Sprite</a></td><td class='docblock-short'><p>Dimensions and texture coordinates of each sprite in a sprite sheet.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.SpriteRender.html" title='amethyst_rendy::SpriteRender struct'>SpriteRender</a></td><td class='docblock-short'><p>Information for rendering a sprite.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.SpriteSheet.html" title='amethyst_rendy::SpriteSheet struct'>SpriteSheet</a></td><td class='docblock-short'><p>Meta data for a sprite sheet texture.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.SpriteSheetFormat.html" title='amethyst_rendy::SpriteSheetFormat struct'>SpriteSheetFormat</a></td><td class='docblock-short'><p>Allows loading of sprite sheets in RON format.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.SubpassBuilder.html" title='amethyst_rendy::SubpassBuilder struct'>SubpassBuilder</a></td><td class='docblock-short'><p>Build for rendering sub-pass.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.TextureProcessorSystem.html" title='amethyst_rendy::TextureProcessorSystem struct'>TextureProcessorSystem</a></td><td class='docblock-short'><p>Asset processing system for <code>Texture</code> asset type.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.Transparent.html" title='amethyst_rendy::Transparent struct'>Transparent</a></td><td class='docblock-short'><p>Transparent mesh component</p>
+</td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.ChangeDetection.html" title='amethyst_rendy::ChangeDetection enum'>ChangeDetection</a></td><td class='docblock-short'><p>Helper structure for tracking indexed changes for per-image draw call recording.</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Format.html" title='amethyst_rendy::Format enum'>Format</a></td><td class='docblock-short'><p>A format descriptor that describes the channels present in a
+texture or view, how they are laid out, what size they are,
+and how the elements of the channels are interpreted (integer,
+float, etc.)</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Kind.html" title='amethyst_rendy::Kind enum'>Kind</a></td><td class='docblock-short'><p>Specifies the dimensionality of an image to be allocated,
+along with the number of mipmap layers and MSAA samples
+if applicable.</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Mesh.html" title='amethyst_rendy::Mesh enum'>Mesh</a></td><td class='docblock-short'><p>Mesh wrapper.</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.MeshPrefab.html" title='amethyst_rendy::MeshPrefab enum'>MeshPrefab</a></td><td class='docblock-short'><p>Internal mesh loading</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Texture.html" title='amethyst_rendy::Texture enum'>Texture</a></td><td class='docblock-short'><p>Texture wrapper.</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.TexturePrefab.html" title='amethyst_rendy::TexturePrefab enum'>TexturePrefab</a></td><td class='docblock-short'><p><code>PrefabData</code> for loading <code>Texture</code>s.</p>
+</td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table><tr class='module-item'><td><a class="trait" href="trait.Backend.html" title='amethyst_rendy::Backend trait'>Backend</a></td><td class='docblock-short'><p>Extension of the rendy Backend trait.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.GraphCreator.html" title='amethyst_rendy::GraphCreator trait'>GraphCreator</a></td><td class='docblock-short'><p>Graph trait implementation required by consumers. Builds a graph and manages signaling when
+the graph needs to be rebuilt.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.RenderGroupDesc.html" title='amethyst_rendy::RenderGroupDesc trait'>RenderGroupDesc</a></td><td class='docblock-short'><p>Descriptor for render group</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.RenderPlugin.html" title='amethyst_rendy::RenderPlugin trait'>RenderPlugin</a></td><td class='docblock-short'><p>Basic building block of rendering in [RenderingBundle].</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.simple_shader_set.html" title='amethyst_rendy::simple_shader_set fn'>simple_shader_set</a></td><td class='docblock-short'><p>Helper function to create a <code>GraphicsShaderSet</code></p>
+</td></tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table><tr class='module-item'><td><a class="type" href="type.RenderFlat3D.html" title='amethyst_rendy::RenderFlat3D type'>RenderFlat3D</a></td><td class='docblock-short'><p>A <code>RenderPlugin</code> for forward rendering of 3d objects using flat shading.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.RenderPbr3D.html" title='amethyst_rendy::RenderPbr3D type'>RenderPbr3D</a></td><td class='docblock-short'><p>A <code>RenderPlugin</code> for forward rendering of 3d objects using physically-based shading.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.RenderShaded3D.html" title='amethyst_rendy::RenderShaded3D type'>RenderShaded3D</a></td><td class='docblock-short'><p>A <code>RenderPlugin</code> for forward rendering of 3d objects using shaded shading.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "amethyst_rendy";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

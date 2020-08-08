@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["PipelineDescBuilder","Builder abstraction for constructing a backend-agnostic rendy `GraphicsPipeline`"],["PipelinesBuilder","Pipeline builder set."]]});

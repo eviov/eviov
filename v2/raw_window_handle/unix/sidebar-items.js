@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["WaylandHandle","Raw window handle for Wayland."],["X11Handle","Raw window handle for X11."]]});

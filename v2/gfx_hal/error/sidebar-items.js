@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["DeviceCreationError","Device creation errors during `open`."],["HostExecutionError","Errors during execution of operations on the host side."]]});

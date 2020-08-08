@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AmbientGatherer","If an `AmbientColor` exists in the world, return it - otherwise return pure white."],["CameraGatherer","Helper `CameraGatherer` for fetching appropriate matrix information from camera entities."]]});

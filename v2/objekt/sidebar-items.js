@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["clone",""],["clone_box",""]],"macro":[["clone_trait_object","Implement the standard library `Clone` for a trait object that has `objekt::Clone` as a supertrait."]],"trait":[["Clone","This trait is implemented by any type that implements [`std::clone::Clone`]."]]});

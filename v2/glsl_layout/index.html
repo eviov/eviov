@@ -1,0 +1,149 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `glsl_layout` crate."><meta name="keywords" content="rust, rustlang, rust-lang, glsl_layout"><title>glsl_layout - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../dark.css"><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="shortcut icon" href="../favicon.ico"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../glsl_layout/index.html'><div class='logo-container'><img src='../rust-logo.png' alt='logo'></div></a><p class='location'>Crate glsl_layout</p><div class="sidebar-elems"><a id='all-types' href='all.html'><p>See all glsl_layout's items</p></a><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'glsl_layout', ty: 'mod', relpath: '../'};</script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/glsl_layout/lib.rs.html#1-100' title='goto source code'>[src]</a></span><span class='in-band'>Crate <a class="mod" href=''>glsl_layout</a></span></h1><div class='docblock'><p>This crates provides data types to build structures ready to upload into UBO.
+Data layout will match one for uniform blocks declared with <code>layout(std140)</code>.
+See <a href="https://www.khronos.org/registry/OpenGL/specs/gl/glspec45.core.pdf#page=159">specs</a> for alignment rules.</p>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">AsStd140</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Foo</span> {
+    <span class="ident">x</span>: <span class="ident">int</span>,
+    <span class="ident">y</span>: <span class="ident">vec3</span>,
+    <span class="ident">z</span>: <span class="ident">float</span>,
+    <span class="ident">w</span>: <span class="ident">mat4x4</span>,
+    <span class="ident">a</span>: [<span class="ident">f32</span>; <span class="number">3</span>],
+    <span class="ident">b</span>: <span class="ident">f32</span>,
+}
+
+<span class="kw">type</span> <span class="ident">UFoo</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Foo</span> <span class="kw">as</span> <span class="ident">AsStd140</span><span class="op">&gt;</span>::<span class="ident">Std140</span>;
+
+<span class="macro">assert_eq</span><span class="macro">!</span>(
+    <span class="macro">offset_of</span><span class="macro">!</span>(<span class="ident">UFoo</span>: <span class="ident">y</span>),
+    <span class="ident">round_up_to</span>(<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">int</span><span class="op">&gt;</span>(), <span class="number">16</span>), <span class="comment">// `vec3` has alignment of size `vec4`</span>
+    <span class="string">&quot;Offset of field `y` must be equal of size of `x` rounded up to the alignment&quot;</span>,
+);
+
+<span class="macro">assert_eq</span><span class="macro">!</span>(
+    <span class="macro">offset_of</span><span class="macro">!</span>(<span class="ident">UFoo</span>: <span class="ident">z</span>),
+    <span class="ident">round_up_to</span>(<span class="macro">offset_of</span><span class="macro">!</span>(<span class="ident">UFoo</span>: <span class="ident">y</span>) <span class="op">+</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">vec3</span><span class="op">&gt;</span>(), <span class="number">4</span>),
+    <span class="string">&quot;Field `z` must follow `y`. `y` should not have padding at the end&quot;</span>,
+);
+
+<span class="macro">assert_eq</span><span class="macro">!</span>(
+    <span class="macro">offset_of</span><span class="macro">!</span>(<span class="ident">UFoo</span>: <span class="ident">b</span>),
+    <span class="macro">offset_of</span><span class="macro">!</span>(<span class="ident">UFoo</span>: <span class="ident">a</span>) <span class="op">+</span> <span class="ident">size_of</span>::<span class="op">&lt;</span>[[<span class="ident">f32</span>; <span class="number">4</span>]; <span class="number">3</span>]<span class="op">&gt;</span>(),
+    <span class="string">&quot;Field `b` must follow `a`. But `a` has padding at the end.&quot;</span>,
+);
+<span class="kw">let</span> <span class="ident">foo_uniform</span> <span class="op">=</span> <span class="ident">Foo</span> {
+    <span class="ident">x</span>: <span class="number">2</span>,
+    <span class="ident">y</span>: [<span class="number">0.0</span>; <span class="number">3</span>].<span class="ident">into</span>(),
+    <span class="ident">z</span>: <span class="number">0.0</span>,
+    <span class="ident">w</span>: [[<span class="number">0.0</span>; <span class="number">4</span>]; <span class="number">4</span>].<span class="ident">into</span>(),
+    <span class="ident">a</span>: [<span class="number">0.0</span>; <span class="number">3</span>].<span class="ident">into</span>(),
+    <span class="ident">b</span>: <span class="number">0.0</span>,
+}.<span class="ident">std140</span>();
+</pre></div>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.Element.html" title='glsl_layout::Element struct'>Element</a></td><td class='docblock-short'><p>Aligning wrapper.
+Elements for array are aligned to 16 bytes (size of vec4) at least.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bmat2x2.html" title='glsl_layout::bmat2x2 struct'>bmat2x2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bmat2x3.html" title='glsl_layout::bmat2x3 struct'>bmat2x3</a></td><td class='docblock-short'><p>Matrix of 2 x 3 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bmat2x4.html" title='glsl_layout::bmat2x4 struct'>bmat2x4</a></td><td class='docblock-short'><p>Matrix of 2 x 4 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bmat3x2.html" title='glsl_layout::bmat3x2 struct'>bmat3x2</a></td><td class='docblock-short'><p>Matrix of 3 x 2 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bmat3x3.html" title='glsl_layout::bmat3x3 struct'>bmat3x3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bmat3x4.html" title='glsl_layout::bmat3x4 struct'>bmat3x4</a></td><td class='docblock-short'><p>Matrix of 3 x 4 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bmat4x2.html" title='glsl_layout::bmat4x2 struct'>bmat4x2</a></td><td class='docblock-short'><p>Matrix of 4 x 2 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bmat4x3.html" title='glsl_layout::bmat4x3 struct'>bmat4x3</a></td><td class='docblock-short'><p>Matrix of 4 x 3 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bmat4x4.html" title='glsl_layout::bmat4x4 struct'>bmat4x4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.boolean.html" title='glsl_layout::boolean struct'>boolean</a></td><td class='docblock-short'><p>Boolean value.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bvec2.html" title='glsl_layout::bvec2 struct'>bvec2</a></td><td class='docblock-short'><p>Vector of 2 <code>boolean</code> values.
+<code>foo: bvec2</code> is equivalent to glsl's <code>bvec2 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bvec3.html" title='glsl_layout::bvec3 struct'>bvec3</a></td><td class='docblock-short'><p>Vector of 3 <code>boolean</code> values.
+<code>foo: bvec3</code> is equivalent to glsl's <code>bvec3 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.bvec4.html" title='glsl_layout::bvec4 struct'>bvec4</a></td><td class='docblock-short'><p>Vector of 4 <code>boolean</code> values.
+<code>foo: bvec4</code> is equivalent to glsl's <code>bvec4 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dmat2x2.html" title='glsl_layout::dmat2x2 struct'>dmat2x2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dmat2x3.html" title='glsl_layout::dmat2x3 struct'>dmat2x3</a></td><td class='docblock-short'><p>Matrix of 2 x 3 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dmat2x4.html" title='glsl_layout::dmat2x4 struct'>dmat2x4</a></td><td class='docblock-short'><p>Matrix of 2 x 4 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dmat3x2.html" title='glsl_layout::dmat3x2 struct'>dmat3x2</a></td><td class='docblock-short'><p>Matrix of 3 x 2 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dmat3x3.html" title='glsl_layout::dmat3x3 struct'>dmat3x3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dmat3x4.html" title='glsl_layout::dmat3x4 struct'>dmat3x4</a></td><td class='docblock-short'><p>Matrix of 3 x 4 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dmat4x2.html" title='glsl_layout::dmat4x2 struct'>dmat4x2</a></td><td class='docblock-short'><p>Matrix of 4 x 2 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dmat4x3.html" title='glsl_layout::dmat4x3 struct'>dmat4x3</a></td><td class='docblock-short'><p>Matrix of 4 x 3 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dmat4x4.html" title='glsl_layout::dmat4x4 struct'>dmat4x4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dvec2.html" title='glsl_layout::dvec2 struct'>dvec2</a></td><td class='docblock-short'><p>Vector of 2 <code>double</code> value.
+<code>foo: dvec2</code> is equivalent to glsl's <code>dvec2 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dvec3.html" title='glsl_layout::dvec3 struct'>dvec3</a></td><td class='docblock-short'><p>Vector of 3 <code>double</code> value.
+<code>foo: dvec3</code> is equivalent to glsl's <code>dvec3 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.dvec4.html" title='glsl_layout::dvec4 struct'>dvec4</a></td><td class='docblock-short'><p>Vector of 4 <code>double</code> value.
+<code>foo: dvec4</code> is equivalent to glsl's <code>dvec4 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.imat2x2.html" title='glsl_layout::imat2x2 struct'>imat2x2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.imat2x3.html" title='glsl_layout::imat2x3 struct'>imat2x3</a></td><td class='docblock-short'><p>Matrix of 2 x 3 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.imat2x4.html" title='glsl_layout::imat2x4 struct'>imat2x4</a></td><td class='docblock-short'><p>Matrix of 2 x 4 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.imat3x2.html" title='glsl_layout::imat3x2 struct'>imat3x2</a></td><td class='docblock-short'><p>Matrix of 3 x 2 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.imat3x3.html" title='glsl_layout::imat3x3 struct'>imat3x3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.imat3x4.html" title='glsl_layout::imat3x4 struct'>imat3x4</a></td><td class='docblock-short'><p>Matrix of 3 x 4 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.imat4x2.html" title='glsl_layout::imat4x2 struct'>imat4x2</a></td><td class='docblock-short'><p>Matrix of 4 x 2 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.imat4x3.html" title='glsl_layout::imat4x3 struct'>imat4x3</a></td><td class='docblock-short'><p>Matrix of 4 x 3 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.imat4x4.html" title='glsl_layout::imat4x4 struct'>imat4x4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ivec2.html" title='glsl_layout::ivec2 struct'>ivec2</a></td><td class='docblock-short'><p>Vector of 2 <code>int</code> values.
+<code>foo: ivec2</code> is equivalent to glsl's <code>ivec2 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ivec3.html" title='glsl_layout::ivec3 struct'>ivec3</a></td><td class='docblock-short'><p>Vector of 3 <code>int</code> values.
+<code>foo: ivec3</code> is equivalent to glsl's <code>ivec3 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.ivec4.html" title='glsl_layout::ivec4 struct'>ivec4</a></td><td class='docblock-short'><p>Vector of 4 <code>int</code> values.
+<code>foo: ivec4</code> is equivalent to glsl's <code>ivec4 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.mat2x2.html" title='glsl_layout::mat2x2 struct'>mat2x2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.mat2x3.html" title='glsl_layout::mat2x3 struct'>mat2x3</a></td><td class='docblock-short'><p>Matrix of 2 x 3 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.mat2x4.html" title='glsl_layout::mat2x4 struct'>mat2x4</a></td><td class='docblock-short'><p>Matrix of 2 x 4 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.mat3x2.html" title='glsl_layout::mat3x2 struct'>mat3x2</a></td><td class='docblock-short'><p>Matrix of 3 x 2 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.mat3x3.html" title='glsl_layout::mat3x3 struct'>mat3x3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.mat3x4.html" title='glsl_layout::mat3x4 struct'>mat3x4</a></td><td class='docblock-short'><p>Matrix of 3 x 4 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.mat4x2.html" title='glsl_layout::mat4x2 struct'>mat4x2</a></td><td class='docblock-short'><p>Matrix of 4 x 2 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.mat4x3.html" title='glsl_layout::mat4x3 struct'>mat4x3</a></td><td class='docblock-short'><p>Matrix of 4 x 3 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.mat4x4.html" title='glsl_layout::mat4x4 struct'>mat4x4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.umat2x2.html" title='glsl_layout::umat2x2 struct'>umat2x2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.umat2x3.html" title='glsl_layout::umat2x3 struct'>umat2x3</a></td><td class='docblock-short'><p>Matrix of 2 x 3 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.umat2x4.html" title='glsl_layout::umat2x4 struct'>umat2x4</a></td><td class='docblock-short'><p>Matrix of 2 x 4 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.umat3x2.html" title='glsl_layout::umat3x2 struct'>umat3x2</a></td><td class='docblock-short'><p>Matrix of 3 x 2 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.umat3x3.html" title='glsl_layout::umat3x3 struct'>umat3x3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.umat3x4.html" title='glsl_layout::umat3x4 struct'>umat3x4</a></td><td class='docblock-short'><p>Matrix of 3 x 4 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.umat4x2.html" title='glsl_layout::umat4x2 struct'>umat4x2</a></td><td class='docblock-short'><p>Matrix of 4 x 2 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.umat4x3.html" title='glsl_layout::umat4x3 struct'>umat4x3</a></td><td class='docblock-short'><p>Matrix of 4 x 3 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.umat4x4.html" title='glsl_layout::umat4x4 struct'>umat4x4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.uvec2.html" title='glsl_layout::uvec2 struct'>uvec2</a></td><td class='docblock-short'><p>Vector of 2 <code>uint</code> values.
+<code>foo: uvec2</code> is equivalent to glsl's <code>uvec2 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.uvec3.html" title='glsl_layout::uvec3 struct'>uvec3</a></td><td class='docblock-short'><p>Vector of 3 <code>uint</code> values.
+<code>foo: uvec3</code> is equivalent to glsl's <code>uvec3 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.uvec4.html" title='glsl_layout::uvec4 struct'>uvec4</a></td><td class='docblock-short'><p>Vector of 4 <code>uint</code> values.
+<code>foo: uvec4</code> is equivalent to glsl's <code>uvec4 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.vec2.html" title='glsl_layout::vec2 struct'>vec2</a></td><td class='docblock-short'><p>Vector of 2 <code>float</code> values.
+<code>foo: vec2</code> is equivalent to glsl's <code>vec2 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.vec3.html" title='glsl_layout::vec3 struct'>vec3</a></td><td class='docblock-short'><p>Vector of 3 <code>float</code> values.
+<code>foo: vec3</code> is equivalent to glsl's <code>vec3 foo;</code></p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.vec4.html" title='glsl_layout::vec4 struct'>vec4</a></td><td class='docblock-short'><p>Vector of 4 <code>float</code> values.
+<code>foo: vec4</code> is equivalent to glsl's <code>vec4 foo;</code></p>
+</td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table><tr class='module-item'><td><a class="trait" href="trait.AsStd140.html" title='glsl_layout::AsStd140 trait'>AsStd140</a></td><td class='docblock-short'><p>Structure to transform data from rust's structure to the raw data ready to upload to UBO.
+Users should prefer to use <code>derive(AsStd140)</code> instead of implementing this manually.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.Std140.html" title='glsl_layout::Std140 trait'>Std140</a></td><td class='docblock-short'><p>Special marker trait implemented only for <code>std140</code> types.</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.as_bytes.html" title='glsl_layout::as_bytes fn'>as_bytes</a></td><td class='docblock-short'><p>Convert reference to bytes slice.</p>
+</td></tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table><tr class='module-item'><td><a class="type" href="type.bmat2.html" title='glsl_layout::bmat2 type'>bmat2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.bmat3.html" title='glsl_layout::bmat3 type'>bmat3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.bmat4.html" title='glsl_layout::bmat4 type'>bmat4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 boolean values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.dmat2.html" title='glsl_layout::dmat2 type'>dmat2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.dmat3.html" title='glsl_layout::dmat3 type'>dmat3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.dmat4.html" title='glsl_layout::dmat4 type'>dmat4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 double-precision floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.double.html" title='glsl_layout::double type'>double</a></td><td class='docblock-short'><p>Double-precision floating-point value.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.float.html" title='glsl_layout::float type'>float</a></td><td class='docblock-short'><p>floating-point value.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.imat2.html" title='glsl_layout::imat2 type'>imat2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.imat3.html" title='glsl_layout::imat3 type'>imat3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.imat4.html" title='glsl_layout::imat4 type'>imat4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 signed integer values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.int.html" title='glsl_layout::int type'>int</a></td><td class='docblock-short'><p>Signed integer value.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.mat2.html" title='glsl_layout::mat2 type'>mat2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.mat3.html" title='glsl_layout::mat3 type'>mat3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.mat4.html" title='glsl_layout::mat4 type'>mat4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 floating-point values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.uint.html" title='glsl_layout::uint type'>uint</a></td><td class='docblock-short'><p>Unsigned integer value.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.umat2.html" title='glsl_layout::umat2 type'>umat2</a></td><td class='docblock-short'><p>Matrix of 2 x 2 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.umat3.html" title='glsl_layout::umat3 type'>umat3</a></td><td class='docblock-short'><p>Matrix of 3 x 3 unsiged integer values.</p>
+</td></tr><tr class='module-item'><td><a class="type" href="type.umat4.html" title='glsl_layout::umat4 type'>umat4</a></td><td class='docblock-short'><p>Matrix of 4 x 4 unsiged integer values.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "glsl_layout";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
