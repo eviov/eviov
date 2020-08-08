@@ -10,5 +10,6 @@ readme = "../README.md"
 description = "Eviov demo 1: basic"
 
 [dependencies]
+amethyst = {version = "0.15.0", features = ["vulkan"]}
 eviov-render = {version = "0.0.0", path = "../../render"}
 specs = "0.16.1"

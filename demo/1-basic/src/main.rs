@@ -1,6 +1,6 @@
 #![cfg_attr(debug_assertions, allow(unused_variables, dead_code, unreachable_code))]
 
-use render::amethyst::{self, renderer, utils};
+use amethyst::{self, renderer, utils};
 
 mod state;
 use state::MainState;

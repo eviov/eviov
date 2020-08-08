@@ -1,4 +1,4 @@
-#[allow(missing_docs)]
+/// Defines `struct Lhs(T)` [op] `T`.
 #[macro_export]
 macro_rules! op_raw {
     ($lhs:ty, $rhs:ty; $op:ident, $snake_op:ident; $assign:ident, $snake_assign:ident) => {
@@ -23,7 +23,7 @@ macro_rules! op_raw {
     };
 }
 
-#[allow(missing_docs)]
+/// Defines `struct Lhs(T)` [op] `struct Rhs(T)`.
 #[macro_export]
 macro_rules! op_newtype {
     ($lhs:ty, $rhs:ty; $op:ident, $snake_op:ident; $assign:ident, $snake_assign:ident) => {
@@ -50,7 +50,7 @@ macro_rules! op_newtype {
 
 macro_rules! common_ops {
     ($($mac_raw:ident, $mac_newtype:ident : $op:ident :: $snake_op:ident, $assign:ident :: $snake_assign:ident;)*) => {$(
-        #[allow(missing_docs)]
+        /// Defines the operator on a wrapper type and the raw type.
         #[macro_export]
         macro_rules! $mac_raw {
             ($lhs:ty, $rhs:ty) => {
@@ -61,7 +61,7 @@ macro_rules! common_ops {
             };
         }
 
-        #[allow(missing_docs)]
+        /// Defines the operator on the two wrapper types.
         #[macro_export]
         macro_rules! $mac_newtype {
             ($lhs:ty, $rhs:ty) => {

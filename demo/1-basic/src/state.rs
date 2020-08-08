@@ -1,5 +1,3 @@
-use render::amethyst;
-
 pub struct MainState;
 
 impl amethyst::SimpleState for MainState {
