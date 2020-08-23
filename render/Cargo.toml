@@ -13,7 +13,7 @@ description = "Eviov render bundle"
 name = "render"
 
 [dependencies]
-amethyst_rendy = {version = "0.5.0"}
+amethyst_rendy = {version = "0.15.3"}
 eviov-phy = {version = "0.0.0", path = "../phy"}
 eviov-units = {version = "0.0.0", path = "../units"}
 getset = "0.1.1"
