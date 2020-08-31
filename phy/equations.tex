@@ -84,7 +84,7 @@ $$ n = \sqrt{\frac\mu{a^3}}. $$
 For a frequently queried radius $r_q$,
 precompute the (smaller) mean anomaly $M_q$ such that
 $ r(M_q) = r(2\pi - M_q) = r_q$.
-Then $r(M) > r_q \iff M_q < M < 2\pi - M_q \pmod{2\pi}$.
+Then $r(t) > r_q \iff M_q < M(t) < 2\pi - M_q \pmod{2\pi}$.
 
 For a specific $r_q$,
 solve $\cos E_q = \frac1e \p{1 - \frac ra}$ for $E_q$.
@@ -109,7 +109,7 @@ $$ \theta = \omega + \nu \approx \omega + M + \sum_{i=1}^\infty TODO e^i \sin(iM
 For a frequently queried bearing range $\p{\theta_1, \theta_2}$,
 precompute the mean anomalies $M_1, M_2$ such that
 $\theta(M_1) = \theta_1$ and $\theta(M_2) = \theta_2$.
-Then $\theta(M) \in \p{\theta_1, \theta_2} \iff M \in \p{M_1, M_2}$.
+Then $\theta(t) \in \p{\theta_1, \theta_2} \iff M(t) \in \p{M_1, M_2}$.
 
 Compute $$ E_q = 2 \arctan\p{ \sqrt{\frac{1-e}{1+e}} \tan\frac{\theta_q - \omega}2 } $$
 for $q = 1,2$.
