@@ -13,4 +13,4 @@ description = "Miscellaneous utils used in eviov"
 name = "util"
 
 [dependencies]
-nalgebra = "0.21.1"
+nalgebra = "0.23.1"
