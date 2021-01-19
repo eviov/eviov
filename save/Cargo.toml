@@ -18,7 +18,7 @@ eviov-units = {version = "0.0.0", path = "../units"}
 getset = "0.1.1"
 # log = "0.4.11"
 # rand = "0.7.3"
-rmp-serde = "0.14.4"
+rmp-serde = "0.15.3"
 specs = "0.16.1"
 serde = {version = "1.0.114", features = ["derive"]}
 serde_iter = "0.1.1"
