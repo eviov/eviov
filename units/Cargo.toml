@@ -15,5 +15,5 @@ name = "units"
 [dependencies]
 eviov-util = {version = "0.0.0", path = "../util"}
 getset = "0.1.1"
-nalgebra = {version = "0.21.1", features = ["serde-serialize"]}
+nalgebra = {version = "0.24.1", features = ["serde-serialize"]}
 serde = {version = "1.0.114", features = ["derive"]}
